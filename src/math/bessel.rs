@@ -242,21 +242,21 @@ pub fn y<T, U>(x: T, order: U) -> Complex
 pub fn i<T, U>(x: T, order: U) -> Complex
     where T: Into<Complex>, U: Into<f64> + Copy {
     
-    // i^(-n) * jn(ix)
-    Complex::i().powf(-order.into()) * jf(Complex::i() * x, order)
+        // i^(-n) * jn(ix)
+        Complex::i().powf(-order.into()) * jf(Complex::i() * x, order)
 }
 
 /// # K modified Bessel function
 pub fn k<T, U>(x: T, order: U) -> Complex
     where T: Into<Complex> + Copy, U: Into<f64> {
     
-    let n: f64 = order.into();
+        let n: f64 = order.into();
 
-    let pos = i(x, n);
-    let neg = i(x, -n);
-    let factor: f64 = FRAC_PI_2 / (n * PI).sin();
-    
-    factor * (neg - pos)
+        let pos = i(x, n);
+        let neg = i(x, -n);
+        let factor: f64 = FRAC_PI_2 / (n * PI).sin();
+        
+        factor * (neg - pos)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
