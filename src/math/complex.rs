@@ -105,23 +105,6 @@ impl Complex {
         }
     }
 
-    /// # Modulus computation
-    /// 
-    /// The modulus of a complex number is defined as the square root of the
-    /// sum of its squared part.
-    /// 
-    /// ```
-    /// # use scilib::math::complex::Complex;
-    /// let c1 = Complex::from(2, -1.5);
-    /// let c2 = Complex::from(-5.1, 17);
-    /// 
-    /// assert_eq!(c1.modulus(), 2.5);
-    /// assert!((c2.modulus() - 17.7485210651).abs() < 1.0e-8);
-    /// ```
-    pub fn modulus(&self) -> f64 {
-        (self.re.powi(2) + self.im.powi(2)).sqrt()
-    }
-
     /// # Exponential
     /// 
     /// Computes the exponential value of a complex number
@@ -177,6 +160,23 @@ impl Complex {
         self.im.atan2(self.re)
     }
 
+    /// # Modulus computation
+    /// 
+    /// The modulus of a complex number is defined as the square root of the
+    /// sum of its squared part.
+    /// 
+    /// ```
+    /// # use scilib::math::complex::Complex;
+    /// let c1 = Complex::from(2, -1.5);
+    /// let c2 = Complex::from(-5.1, 17);
+    /// 
+    /// assert_eq!(c1.modulus(), 2.5);
+    /// assert!((c2.modulus() - 17.7485210651).abs() < 1.0e-8);
+    /// ```
+    pub fn modulus(&self) -> f64 {
+        (self.re.powi(2) + self.im.powi(2)).sqrt()
+    }
+
     /// # The polar coordinates of the number
     /// 
     /// Returns a tuple where the zeroth element is the argument and the first
@@ -227,6 +227,20 @@ impl Complex {
         }
 
         res
+    }
+    /// # Raising to an integer power
+    ///
+    /// ```
+    /// # use scilib::math::complex::Complex;
+    /// let c = Complex::from(2.5, -3.6);
+    /// let res = c.powf(1.25);
+    /// 
+    /// assert!((res.re - 2.2697926495).abs() < 1.0e-8 && (res.im - -5.9215705908).abs() < 1.0e-8);
+    /// ```
+    pub fn powf(&self, e: f64) -> Self {
+        // Cheating via polar
+        let (arg, norm): (f64, f64) = self.polar();
+        Self::from_polar(arg * e, norm.powf(e))
     }
 }
 
