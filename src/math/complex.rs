@@ -142,6 +142,39 @@ impl Complex {
             im: -self.im
         }
     }
+
+    /// # Raising to an integer power
+    ///
+    /// ```
+    /// # use scilib::math::complex::Complex;
+    /// let c = Complex::from(3.0, 1.0);
+    /// let res1 = c.powi(4);
+    /// let res2 = c.powi(-1);
+    /// 
+    /// assert!(res1.re == 28.0 && res1.im == 96.0);
+    /// assert!(res2.re == 0.3 && res2.im == -0.1);
+    /// ```
+    pub fn powi(self, e: i32) -> Self {
+
+        // x^0 = 1, technically not correct for 0^0 but we have to do something
+        if e == 0 {
+            return 1.0.into();
+        }
+
+        let mut res: Self = self;
+
+        // When e > 0
+        for _ in 1..e {
+            res *= self;
+        }
+
+        // When e < 0
+        for _ in e..=0 {
+            res /= self;
+        }
+
+        res
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
