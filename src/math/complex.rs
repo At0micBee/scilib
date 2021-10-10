@@ -15,7 +15,8 @@ use std::ops::{     // Implementing basic operations
     Mul,            // Multiplication
     MulAssign,      // Assigning multiplication
     Div,            // Division
-    DivAssign       // Assigning division
+    DivAssign,      // Assigning division
+    Neg             // Negation
 };
 
 use std::fmt::{     // Formatter display
@@ -175,8 +176,10 @@ impl<T: Into<f64>> From<T> for Complex {
 /// let c1 = Complex::from(2.1, 3.0);
 /// let c2 = Complex::from(5.0, 0.5);
 /// let res = c1 + c2;
+/// let res2 = c1 + 5.5;
 /// 
 /// assert!(res.re == 7.1 && res.im == 3.5);
+/// assert!(res2.re == 7.6 && res2.im == 3.0);
 /// ```
 impl<T: Into<Self>> Add<T> for Complex {
     type Output = Self;
@@ -194,10 +197,12 @@ impl<T: Into<Self>> Add<T> for Complex {
 /// ```
 /// # use scilib::math::complex::Complex;
 /// let mut c1 = Complex::from(2.1, 3.0);
-/// let c2 = Complex::from(5.0, 0.5);
+/// let mut c2 = Complex::from(5.0, 0.5);
 /// c1 += c2;
+/// c2 += 2;
 /// 
 /// assert!(c1.re == 7.1 && c1.im == 3.5);
+/// assert!(c2.re == 7.0 && c2.im == 0.5);
 /// ```
 impl<T: Into<Self>> AddAssign<T> for Complex {
     fn add_assign(&mut self, rhs: T) {
@@ -214,8 +219,10 @@ impl<T: Into<Self>> AddAssign<T> for Complex {
 /// let c1 = Complex::from(2.1, 3.0);
 /// let c2 = Complex::from(5.0, 0.5);
 /// let res = c1 - c2;
+/// let res2 = c1 - 5;
 /// 
 /// assert!(res.re == -2.9 && res.im == 2.5);
+/// assert!(res2.re == -2.9 && res2.im == 3.0);
 impl<T: Into<Self>> Sub<T> for Complex {
     type Output = Self;
     fn sub(self, rhs: T) -> Self::Output {
@@ -232,10 +239,12 @@ impl<T: Into<Self>> Sub<T> for Complex {
 /// ```
 /// # use scilib::math::complex::Complex;
 /// let mut c1 = Complex::from(2.1, 3.0);
-/// let c2 = Complex::from(5.0, 0.5);
+/// let mut c2 = Complex::from(5.0, 0.5);
 /// c1 -= c2;
+/// c2 -= 12.0;
 /// 
 /// assert!(c1.re == -2.9 && c1.im == 2.5);
+/// assert!(c2.re == -7.0 && c2.im == 0.5)
 impl<T: Into<Self>> SubAssign<T> for Complex {
     fn sub_assign(&mut self, rhs: T) {
         let rhs: Self = rhs.into();
@@ -289,10 +298,12 @@ impl Mul<Complex> for f64 {
 /// ```
 /// # use scilib::math::complex::Complex;
 /// let mut c1 = Complex::from(2.1, 3.0);
-/// let c2 = Complex::from(5.0, 0.5);
+/// let mut c2 = Complex::from(5.0, 0.5);
 /// c1 *= c2;
+/// c2 *= 2;
 /// 
 /// assert!(c1.re == 9.0 && c1.im == 16.05);
+/// assert!(c2.re == 10.0 && c2.im == 1.0);
 impl<T: Into<Self>> MulAssign<T> for Complex {
     fn mul_assign(&mut self, rhs: T) {
         let rhs: Self = rhs.into();
@@ -309,8 +320,10 @@ impl<T: Into<Self>> MulAssign<T> for Complex {
 /// let c1 = Complex::from(2.1, 3.0);
 /// let c2 = Complex::from(5.0, 0.5);
 /// let res = c1 / c2;
+/// let res2 = c1 / 2.0;
 /// 
 /// assert!((res.re - 0.47524752475).abs() < 1.0e-9 && (res.im - 0.5524752475).abs() < 1.0e-9);
+/// assert!(res2.re == 1.05 && res2.im == 1.5);
 impl<T: Into<Self>> Div<T> for Complex {
     type Output = Self;
     fn div(self, rhs: T) -> Self::Output {
@@ -328,10 +341,12 @@ impl<T: Into<Self>> Div<T> for Complex {
 /// ```
 /// # use scilib::math::complex::Complex;
 /// let mut c1 = Complex::from(2.1, 3.0);
-/// let c2 = Complex::from(5.0, 0.5);
+/// let mut c2 = Complex::from(5.0, 0.5);
 /// c1 /= c2;
+/// c2 /= 10.0;
 /// 
 /// assert!((c1.re - 0.47524752475).abs() < 1.0e-9 && (c1.im - 0.5524752475).abs() < 1.0e-9);
+/// assert!(c2.re == 0.5 && c2.im == 0.05);
 impl<T: Into<Self>> DivAssign<T> for Complex {
     fn div_assign(&mut self, rhs: T) {
         let rhs: Self = rhs.into();
@@ -339,6 +354,27 @@ impl<T: Into<Self>> DivAssign<T> for Complex {
         let old_re: f64 = self.re;
         self.re = (self.re * rhs.re + self.im * rhs.im) / div;
         self.im = (self.im * rhs.re - old_re * rhs.im) / div;
+    }
+}
+
+/// # Negation
+/// 
+/// Returns the opposite of the number
+/// 
+/// ```
+/// # use scilib::math::complex::Complex;
+/// let c = Complex::from(1, 0.05);
+/// let c_neg = -c;
+/// 
+/// assert!(c_neg.re == -1.0 && c_neg.im ==-0.05);
+/// ```
+impl Neg for Complex {
+    type Output = Self;
+    fn neg(self) -> Self::Output {
+        Self {
+            re: -self.re,
+            im: -self.im
+        }
     }
 }
 
