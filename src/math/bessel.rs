@@ -6,7 +6,10 @@
 
 use std::f64::consts::PI;   // Value of pi
 
-use super::basic;           // Calling the basic math function
+use super::{                           // Calling sub-modules
+    basic,
+    complex::Complex
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -30,48 +33,53 @@ const DISTANCE_Y_LIM: f64 = 0.001;
 /// The J Bessel function cannot return values for `x < 0`, as they should be complex. We return 0 in those cases.
 /// 
 /// ```
+/// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::j;
 /// // Computing some example values
-/// let res_00: f64 = j(0.0, 0);
-/// let res_01: f64 = j(1.0, 0);
-/// let res_10: f64 = j(0.0, 1);
-/// let res_11: f64 = j(1.0, 1);
-/// let res_20: f64 = j(0.0, 2);
-/// let res_21: f64 = j(1.0, 2);
-/// let res: f64 = j(5.2, 7);
+/// let res_00: Complex = j(0.0, 0);
+/// let res_01: Complex = j(1.0, 0);
+/// let res_10: Complex = j(0.0, 1);
+/// let res_11: Complex = j(1.0, 1);
+/// let res_20: Complex = j(0.0, 2);
+/// let res_21: Complex = j(1.0, 2);
+/// let res: Complex = j(5.2, 7);
 /// 
 /// // Comparing to tabulated data
-/// assert_eq!(res_00, 1.0);
-/// assert!((res_01 - 0.7651976865).abs() < 1.0e-8);
-/// assert_eq!(res_10, 0.0);
-/// assert!((res_11 - 0.44005058).abs() < 1.0e-8);
-/// assert_eq!(res_20, 0.0);
-/// assert!((res_21 - 0.11490348).abs() < 1.0e-8);
-/// assert!((res - 0.06544728).abs() < 1.0e-8);
+/// assert_eq!(res_00, 1.0.into());
+/// assert!((res_01.re - 0.7651976865).abs() < 1.0e-8);
+/// assert_eq!(res_10, 0.0.into());
+/// assert!((res_11.re - 0.44005058).abs() < 1.0e-8);
+/// assert_eq!(res_20, 0.0.into());
+/// assert!((res_21.re - 0.11490348).abs() < 1.0e-8);
+/// assert!((res.re - 0.06544728).abs() < 1.0e-8);
 /// 
 /// // The function also handles negative orders
-/// let pos1: f64 = j(3.2, 3);
-/// let neg1: f64 = j(3.2, -3);
-/// let pos2: f64 = j(2.45, 6);
-/// let neg2: f64 = j(2.45, -6);
+/// let pos1: Complex = j(3.2, 3);
+/// let neg1: Complex = j(3.2, -3);
+/// let pos2: Complex = j(2.45, 6);
+/// let neg2: Complex = j(2.45, -6);
 /// 
 /// assert!(pos1 == -neg1);
 /// assert!(pos2 == neg2);
+/// 
+/// // The input is treated as complex
+/// let c: Complex = Complex::from(1, 2.5);
+/// let res: Complex = j(c, 2);
 /// ```
-pub fn j(x: f64, n: i32) -> f64 {
+pub fn j<T: Into<Complex>>(x: T, n: i32) -> Complex {
 
     let np: i32 = n.abs();                                      // Getting the positive value of n
-    let x2: f64 = x / 2.0;                                      // Halving x
+    let x2: Complex = x.into() / 2.0;                           // Halving x
     let mut k: i32 = 0;                                         // Order counter
     let mut d1: f64 = 1.0;                                      // First div
     let mut d2: f64 = basic::factorial(np as usize) as f64;     // Second div
     let mut sg: f64 = 1.0;                                      // Sign of the term
 
-    let mut term: f64 = x2.powi(np) / d2;                       // The term at each step
-    let mut res: f64 = 0.0;                                     // The result of the operation
+    let mut term: Complex = x2.powi(np) / d2;                   // The term at each step
+    let mut res: Complex = Complex::default();                  // The result of the operation
 
     // If the first term is already too small we exit directly
-    if term < PRECISION_CONVERGENCE {
+    if term.modulus() < PRECISION_CONVERGENCE {
         return res;
     }
 
@@ -80,7 +88,7 @@ pub fn j(x: f64, n: i32) -> f64 {
         res += term;
 
         // If the changed compared to the final value is small we break
-        if (term / res).abs() < PRECISION_CONVERGENCE {
+        if (term / res).modulus().abs() < PRECISION_CONVERGENCE {
             break 'convergence;
         }
 
@@ -107,36 +115,49 @@ pub fn j(x: f64, n: i32) -> f64 {
 /// integer orders.
 /// 
 /// ```
+/// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::{ j, jf };
 /// // This method allows the computation of real index for J
-/// let res_pos = jf(1.0, 2.5);
-/// let res_neg = jf(2.4, -1.75);
-/// assert!((res_pos - 0.04949681).abs() < 1.0e-4);
-/// assert!((res_neg - 0.11990699).abs() < 1.0e-4);
+/// let res_pos: Complex = jf(1.0, 2.5);
+/// let res_neg: Complex = jf(2.4, -1.75);
+/// assert!((res_pos.re - 0.04949681).abs() < 1.0e-4);
+/// assert!((res_neg.re - 0.11990699).abs() < 1.0e-4);
 /// 
 /// // We can also check that the results are coherent with integers
-/// let res_i = j(0.75, 2);
-/// let res_r = jf(0.75, 2.0);
-/// assert!((res_i - res_r).abs() < 1.0e-4);
+/// let res_i: Complex = j(0.75, 2);
+/// let res_r: Complex = jf(0.75, 2.0);
+/// assert!((res_i.re - res_r.re).abs() < 1.0e-4);
+/// 
+/// // Because results are Complex, negative numbers are allowed
+/// let neg: Complex = jf(-0.75, 2.3);
+/// let expected: Complex = Complex::from(0.0219887007, 0.030264850);
+/// 
+/// assert!((neg.re - expected.re).abs() < 1.0e-5 && (neg.im - expected.im).abs() < 1.0e-5);
+/// 
+/// // As for j, we can also use Complex numbers
+/// let c: Complex = Complex::from(1.2, 0.5);
+/// let res: Complex = jf(c, 1.5);
+/// 
+/// assert!((res.re - 0.3124202913).abs() < 1.0e-5 && (res.im - 0.1578998151) < 1.0e-5);
 /// ```
-pub fn jf(x: f64, n: f64) -> f64 {
+pub fn jf<T: Into<Complex>>(x: T, n: f64) -> Complex {
 
     // If the number passed in whole, we fall back on the other method instead
     if n.fract() == 0.0 {
         return j(x, n as i32);
     }
 
-    let x2: f64 = x / 2.0;                      // Halving x
+    let x2: Complex = x.into() / 2.0;                      // Halving x
     let mut k: f64 = 0.0;                       // Order counter
     let mut d1: f64 = 1.0;                      // First div
     let mut d2: f64 = basic::gamma(n + 1.0);    // Second div
     let mut sg: f64 = 1.0;                      // Sign of the term
 
-    let mut term: f64 = x2.powf(n) / d2;        // The term at each step
-    let mut res: f64 = 0.0;                     // The result of the operation
+    let mut term: Complex = x2.powf(n) / d2;        // The term at each step
+    let mut res: Complex = Complex::default();                     // The result of the operation
     
     // If the first term is already too small we exit directly
-    if term.abs() < PRECISION_CONVERGENCE || term.is_nan() {
+    if term.modulus().abs() < PRECISION_CONVERGENCE {
         return res;
     }
 
@@ -145,7 +166,7 @@ pub fn jf(x: f64, n: f64) -> f64 {
         res += term;
 
         // If the changed compared to the final value is small we break
-        if (term / res).abs() < PRECISION_CONVERGENCE {
+        if (term / res).modulus().abs() < PRECISION_CONVERGENCE {
             break 'convergence;
         }
 
@@ -174,25 +195,33 @@ pub fn jf(x: f64, n: f64) -> f64 {
 /// work with real numbers, thus the Y function cannot return a value for `x < 0`, as they become complex (returns 0).
 /// 
 /// ```
+/// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::y;
 /// let res_pos = y(1.0, 1.5);
 /// let res_neg = y(1.0, -1.5);
 /// 
-/// assert!((res_pos - -1.10249557).abs() < 1.0e-5);
-/// assert!((res_neg - -0.24029783).abs() < 1.0e-5);
+/// assert!((res_pos.re - -1.10249557).abs() < 1.0e-5);
+/// assert!((res_neg.re - -0.24029783).abs() < 1.0e-5);
 /// 
 /// // Values for integer n also works
 /// let res_int_p = y(0.5, 1.0);
 /// let res_int_n = y(0.5, -1.0);
 /// 
-/// assert!((res_int_p - -1.47147239).abs() < 1.0e-5);
-/// assert!((res_int_n - 1.47147239).abs() < 1.0e-5);
+/// assert!((res_int_p.re - -1.47147239).abs() < 1.0e-5);
+/// assert!((res_int_n.re - 1.47147239).abs() < 1.0e-5);
 /// 
-/// // We cannot compute negative value with Y, as the result should be complex
-/// let impossible = y(-1.2, 3.1);
-/// assert_eq!(impossible, 0.0);
+/// // We can compute negative value with Y, the result is complex
+/// let res_neg = y(-1.2, 3.1);
+/// assert!((res_neg.re - 3.90596471).abs() < 1.0e-5 && (res_neg.im - -1.32157214).abs() < 1.0e-5);
+/// 
+/// // And we can use Complex as input
+/// let c: Complex = Complex::from(-1.0, -0.5);
+/// let res_c = y(c, 2.0);
+/// 
+/// assert!((res_c.re - -0.79108492).abs() < 1.0e-5 && (res_c.im - 0.60211151).abs() < 1.0e-5);
 /// ```
-pub fn y(x: f64, n: f64) -> f64 {
+pub fn y<T>(x: T, n: f64) -> Complex
+    where T: Into<Complex> + Copy {
 
     // If n is whole, we have to take the limit, otherwise it's direct
     if n.fract() == 0.0 {
