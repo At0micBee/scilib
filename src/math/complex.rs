@@ -228,7 +228,8 @@ impl Complex {
 
         res
     }
-    /// # Raising to an integer power
+
+    /// # Raising to a real power
     ///
     /// ```
     /// # use scilib::math::complex::Complex;
