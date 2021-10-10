@@ -4,7 +4,10 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-use std::f64::consts::PI;   // Value of pi
+use std::f64::consts::{                 // Calling constants
+    PI,
+    FRAC_PI_2
+};
 
 use super::{                           // Calling sub-modules
     basic,
@@ -125,7 +128,7 @@ pub fn j<T: Into<Complex>>(x: T, n: i32) -> Complex {
 /// 
 /// // We can also check that the results are coherent with integers
 /// let res_i: Complex = j(0.75, 2);
-/// let res_r: Complex = jf(0.75, 2.0);
+/// let res_r: Complex = jf(0.75, 2);
 /// assert!((res_i.re - res_r.re).abs() < 1.0e-4);
 /// 
 /// // Because results are Complex, negative numbers are allowed
@@ -140,21 +143,23 @@ pub fn j<T: Into<Complex>>(x: T, n: i32) -> Complex {
 /// 
 /// assert!((res.re - 0.3124202913).abs() < 1.0e-5 && (res.im - 0.1578998151) < 1.0e-5);
 /// ```
-pub fn jf<T: Into<Complex>>(x: T, n: f64) -> Complex {
+pub fn jf<T, U>(x: T, order: U) -> Complex
+    where T: Into<Complex>, U: Into<f64> {
 
+    let n: f64 = order.into();
     // If the number passed in whole, we fall back on the other method instead
     if n.fract() == 0.0 {
         return j(x, n as i32);
     }
 
-    let x2: Complex = x.into() / 2.0;                      // Halving x
+    let x2: Complex = x.into() / 2.0;           // Halving x
     let mut k: f64 = 0.0;                       // Order counter
     let mut d1: f64 = 1.0;                      // First div
     let mut d2: f64 = basic::gamma(n + 1.0);    // Second div
     let mut sg: f64 = 1.0;                      // Sign of the term
 
-    let mut term: Complex = x2.powf(n) / d2;        // The term at each step
-    let mut res: Complex = Complex::default();                     // The result of the operation
+    let mut term: Complex = x2.powf(n) / d2;    // The term at each step
+    let mut res: Complex = Complex::default();  // The result of the operation
     
     // If the first term is already too small we exit directly
     if term.modulus().abs() < PRECISION_CONVERGENCE {
@@ -204,8 +209,8 @@ pub fn jf<T: Into<Complex>>(x: T, n: f64) -> Complex {
 /// assert!((res_neg.re - -0.24029783).abs() < 1.0e-5);
 /// 
 /// // Values for integer n also works
-/// let res_int_p = y(0.5, 1.0);
-/// let res_int_n = y(0.5, -1.0);
+/// let res_int_p = y(0.5, 1);
+/// let res_int_n = y(0.5, -1);
 /// 
 /// assert!((res_int_p.re - -1.47147239).abs() < 1.0e-5);
 /// assert!((res_int_n.re - 1.47147239).abs() < 1.0e-5);
@@ -220,8 +225,10 @@ pub fn jf<T: Into<Complex>>(x: T, n: f64) -> Complex {
 /// 
 /// assert!((res_c.re - -0.79108492).abs() < 1.0e-5 && (res_c.im - 0.60211151).abs() < 1.0e-5);
 /// ```
-pub fn y<T>(x: T, n: f64) -> Complex
-    where T: Into<Complex> + Copy {
+pub fn y<T, U>(x: T, order: U) -> Complex
+    where T: Into<Complex> + Copy, U: Into<f64> {
+
+    let n: f64 = order.into();
 
     // If n is whole, we have to take the limit, otherwise it's direct
     if n.fract() == 0.0 {
@@ -229,6 +236,52 @@ pub fn y<T>(x: T, n: f64) -> Complex
     } else {
         ((n * PI).cos() * jf(x, n) - jf(x, -n)) / (n * PI).sin()
     }
+}
+
+/// # I modified Bessel function
+pub fn i<T, U>(x: T, order: U) -> Complex
+    where T: Into<Complex>, U: Into<f64> + Copy {
+    
+    // i^(-n) * jn(ix)
+    Complex::i().powf(-order.into()) * jf(Complex::i() * x, order)
+}
+
+/// # K modified Bessel function
+pub fn k<T, U>(x: T, order: U) -> Complex
+    where T: Into<Complex> + Copy, U: Into<f64> {
+    
+    let n: f64 = order.into();
+
+    let pos = i(x, n);
+    let neg = i(x, -n);
+    let factor: f64 = FRAC_PI_2 / (n * PI).sin();
+    
+    factor * (neg - pos)
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/// # First Hankel function: H1
+/// 
+/// Computes the first kind of Hankel function, accepts complex input.
+pub fn hankel_first<T, U>(x: T, order: U) -> Complex
+    where T: Into<Complex> + Copy, U: Into<f64> {
+
+    let n: f64 = order.into();
+    let res_j = jf(x, n);
+    let res_y = Complex::i() * y(x, n);
+
+    res_j + res_y
+}
+
+/// # Second Hankel function: H2
+/// 
+/// Computes the second kind of Hankel function, accepts complex input.
+/// We simplify the computation by simply conjugating the first kind
+pub fn hankel_second<T, U>(x: T, order: U) -> Complex
+    where T: Into<Complex> + Copy, U: Into<f64> {
+    
+    hankel_first(x, order).conjugate()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
