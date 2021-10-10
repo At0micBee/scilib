@@ -28,7 +28,7 @@ use std::fmt::{     // Formatter display
 /// # Complex structure
 /// 
 /// The principle is simple, we create both parts in a struct and treat them accordingly.
-#[derive(Debug, Default)]
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct Complex {
     /// The real part of the number
     pub re: f64,
@@ -146,6 +146,28 @@ impl Complex {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Here comes a long list of implementations for the operations
 
+/// # Conversion from a scalar
+/// 
+/// Takes a scalar value and assigns it to the real part, as long as the type
+/// allows conversion to `f64`.
+/// 
+/// ```
+/// # use scilib::math::complex::Complex;
+/// let c1: Complex = 3.5.into();
+/// let c2: Complex = (-5).into();
+/// 
+/// assert!(c1.re == 3.5 && c1.im == 0.0);
+/// assert!(c2.re == -5.0 && c2.im == 0.0);
+/// ```
+impl<T: Into<f64>> From<T> for Complex {
+    fn from(val: T) -> Self {
+        Self {
+            re: val.into(),
+            im: 0.0
+        }
+    }
+}
+
 /// # Addition of complex numbers
 /// 
 /// ```
@@ -156,9 +178,10 @@ impl Complex {
 /// 
 /// assert!(res.re == 7.1 && res.im == 3.5);
 /// ```
-impl Add for Complex {
+impl<T: Into<Self>> Add<T> for Complex {
     type Output = Self;
-    fn add(self, rhs: Self) -> Self::Output {
+    fn add(self, rhs: T) -> Self::Output {
+        let rhs: Self = rhs.into();
         Self {
             re: self.re + rhs.re,
             im: self.im + rhs.im
@@ -176,8 +199,9 @@ impl Add for Complex {
 /// 
 /// assert!(c1.re == 7.1 && c1.im == 3.5);
 /// ```
-impl AddAssign for Complex {
-    fn add_assign(&mut self, rhs: Self) {
+impl<T: Into<Self>> AddAssign<T> for Complex {
+    fn add_assign(&mut self, rhs: T) {
+        let rhs: Self = rhs.into();
         self.re += rhs.re;
         self.im += rhs.im;
     }
@@ -192,9 +216,10 @@ impl AddAssign for Complex {
 /// let res = c1 - c2;
 /// 
 /// assert!(res.re == -2.9 && res.im == 2.5);
-impl Sub for Complex {
+impl<T: Into<Self>> Sub<T> for Complex {
     type Output = Self;
-    fn sub(self, rhs: Self) -> Self::Output {
+    fn sub(self, rhs: T) -> Self::Output {
+        let rhs: Self = rhs.into();
         Self {
             re: self.re - rhs.re,
             im: self.im - rhs.im
@@ -211,8 +236,9 @@ impl Sub for Complex {
 /// c1 -= c2;
 /// 
 /// assert!(c1.re == -2.9 && c1.im == 2.5);
-impl SubAssign for Complex {
-    fn sub_assign(&mut self, rhs: Self) {
+impl<T: Into<Self>> SubAssign<T> for Complex {
+    fn sub_assign(&mut self, rhs: T) {
+        let rhs: Self = rhs.into();
         self.re -= rhs.re;
         self.im -= rhs.im;
     }
@@ -225,32 +251,17 @@ impl SubAssign for Complex {
 /// let c1 = Complex::from(2.1, 3.0);
 /// let c2 = Complex::from(5.0, 0.5);
 /// let res = c1 * c2;
+/// let res2 = c1 * 2.0;
 /// 
 /// assert!(res.re == 9.0 && res.im == 16.05);
-impl Mul for Complex {
+/// assert!(res2.re == 4.2 && res2.im == 6.0);
+impl<T: Into<Self>> Mul<T> for Complex {
     type Output = Self;
-    fn mul(self, rhs: Self) -> Self::Output {
+    fn mul(self, rhs: T) -> Self::Output {
+        let rhs: Self = rhs.into();
         Self {
             re: self.re * rhs.re - self.im * rhs.im,
             im: self.re * rhs.im + self.im * rhs.re
-        }
-    }
-}
-
-/// # Multiplication to f64 (real): `c * f64`
-/// 
-/// ```
-/// # use scilib::math::complex::Complex;
-/// let c = Complex::from(5, 2.0);
-/// let res = c * 3.0;
-/// 
-/// assert!(res.re == 15.0 && res.im == 6.0);
-impl Mul<f64> for Complex {
-    type Output = Self;
-    fn mul(self, rhs: f64) -> Self::Output {
-        Self {
-            re: self.re * rhs,
-            im: self.im * rhs
         }
     }
 }
@@ -282,8 +293,9 @@ impl Mul<Complex> for f64 {
 /// c1 *= c2;
 /// 
 /// assert!(c1.re == 9.0 && c1.im == 16.05);
-impl MulAssign for Complex {
-    fn mul_assign(&mut self, rhs: Self) {
+impl<T: Into<Self>> MulAssign<T> for Complex {
+    fn mul_assign(&mut self, rhs: T) {
+        let rhs: Self = rhs.into();
         let old_re: f64 = self.re;
         self.re = self.re * rhs.re - self.im * rhs.im;
         self.im = old_re * rhs.im + self.im * rhs.re;
@@ -299,9 +311,10 @@ impl MulAssign for Complex {
 /// let res = c1 / c2;
 /// 
 /// assert!((res.re - 0.47524752475).abs() < 1.0e-9 && (res.im - 0.5524752475).abs() < 1.0e-9);
-impl Div for Complex {
+impl<T: Into<Self>> Div<T> for Complex {
     type Output = Self;
-    fn div(self, rhs: Self) -> Self::Output {
+    fn div(self, rhs: T) -> Self::Output {
+        let rhs: Self = rhs.into();
         let div: f64 = rhs.re.powi(2) + rhs.im.powi(2);
         Self {
             re: (self.re * rhs.re + self.im * rhs.im) / div,
@@ -319,8 +332,9 @@ impl Div for Complex {
 /// c1 /= c2;
 /// 
 /// assert!((c1.re - 0.47524752475).abs() < 1.0e-9 && (c1.im - 0.5524752475).abs() < 1.0e-9);
-impl DivAssign for Complex {
-    fn div_assign(&mut self, rhs: Self) {
+impl<T: Into<Self>> DivAssign<T> for Complex {
+    fn div_assign(&mut self, rhs: T) {
+        let rhs: Self = rhs.into();
         let div: f64 = rhs.re.powi(2) + rhs.im.powi(2);
         let old_re: f64 = self.re;
         self.re = (self.re * rhs.re + self.im * rhs.im) / div;
