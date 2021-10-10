@@ -20,7 +20,7 @@ const PRECISION: f64 = 1.0e-12;
 /// Returns: the sinc value of x
 /// 
 /// ```
-/// # use abacus::math::basic::sinc;
+/// # use scilib::math::basic::sinc;
 /// let x: f64 = sinc(0.0);
 /// let y: f64 = sinc(1.2);
 /// 
@@ -44,7 +44,7 @@ pub fn sinc(x: f64) -> f64 {
 /// Returns: `k` among `n`
 /// 
 /// ```
-/// # use abacus::math::basic::binomial;
+/// # use scilib::math::basic::binomial;
 /// let res: usize = binomial(4_usize, 2_usize);
 /// assert_eq!(res, 6);
 /// ```
@@ -82,7 +82,7 @@ pub fn binomial(n: usize, k: usize) -> usize {
 /// Returns: `n`!
 /// 
 /// ```
-/// # use abacus::math::basic::factorial;
+/// # use scilib::math::basic::factorial;
 /// let res: usize = factorial(5_usize);
 /// assert_eq!(res, 120);
 /// ```
@@ -99,7 +99,7 @@ pub fn factorial<T>(n: T) -> usize
 /// used to provide value for non-integer numbers (except non-positive integers).
 /// 
 /// ```
-/// # use abacus::math::basic::gamma;
+/// # use scilib::math::basic::gamma;
 /// let res_1: f64 = gamma(2.3);
 /// let res_2: f64 = gamma(-0.45);
 /// 

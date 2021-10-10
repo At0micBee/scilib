@@ -50,7 +50,7 @@ impl Legendre {
     /// Returns: `Self`, the corresponding struct
     ///
     /// ```
-    /// # use abacus::math::polynomial::Legendre;
+    /// # use scilib::math::polynomial::Legendre;
     /// let p20 = Legendre::new(2, 0);      // l=2, m=0
     /// let p21 = Legendre::new(2, 1);      // l=2, m=1
     /// ```
@@ -129,7 +129,7 @@ impl Legendre {
     /// Returns: the result of the polynomial Plm(x)
     /// 
     /// ```
-    /// # use abacus::math::polynomial::Legendre;
+    /// # use scilib::math::polynomial::Legendre;
     /// let x = -0.25;                      // Example value
     /// 
     /// let p20 = Legendre::new(2, 0);      // l=2, m=0
@@ -191,7 +191,7 @@ impl Laguerre {
     /// 
     /// Returns: `Self`, the corresponding struct
     /// ```
-    /// # use abacus::math::polynomial::Laguerre;
+    /// # use scilib::math::polynomial::Laguerre;
     /// let p20 = Laguerre::new(2, 0);      // l=2, m=0
     /// let p21 = Laguerre::new(2, 1);      // l=2, m=1
     /// ```
@@ -225,7 +225,7 @@ impl Laguerre {
     /// Returns: the result of the polynomial Plm(x)
     /// 
     /// ```
-    /// # use abacus::math::polynomial::Laguerre;
+    /// # use scilib::math::polynomial::Laguerre;
     /// let x = 0.2;                        // Example value
     /// 
     /// let p = Laguerre::new(2, 1);        // l=2, m=1

@@ -52,7 +52,7 @@ impl Complex {
     /// 
     /// Both parts can be any number that can be cast to `f64`.
     /// ```
-    /// # use abacus::math::complex::Complex;
+    /// # use scilib::math::complex::Complex;
     /// let c1 = Complex::from(3.0, 2.0);
     /// let c2 = Complex::from(10, 1.5);
     /// let c3 = Complex::from(1, -2);
@@ -75,7 +75,7 @@ impl Complex {
     /// Simply returns i.
     /// 
     /// ```
-    /// # use abacus::math::complex::Complex;
+    /// # use scilib::math::complex::Complex;
     /// let res = Complex::i();
     /// 
     /// assert!(res.re == 0.0 && res.im ==1.0);
@@ -93,7 +93,7 @@ impl Complex {
     /// sum of its squared part.
     /// 
     /// ```
-    /// # use abacus::math::complex::Complex;
+    /// # use scilib::math::complex::Complex;
     /// let c1 = Complex::from(2, -1.5);
     /// let c2 = Complex::from(-5.1, 17);
     /// 
@@ -109,7 +109,7 @@ impl Complex {
     /// Computes the exponential value of a complex number
     /// 
     /// ```
-    /// # use abacus::math::complex::Complex;
+    /// # use scilib::math::complex::Complex;
     /// let c = Complex::from(2, 2.2);
     /// let res = c.exp();
     /// 
@@ -129,7 +129,7 @@ impl Complex {
     /// Conjugating a complex number changes the sign of the imaginary part.
     /// 
     /// ```
-    /// # use abacus::math::complex::Complex;
+    /// # use scilib::math::complex::Complex;
     /// let c = Complex::from(3, 4.6);
     /// let c_star = c.conjugate();
     /// 
@@ -149,7 +149,7 @@ impl Complex {
 /// # Addition of complex numbers
 /// 
 /// ```
-/// # use abacus::math::complex::Complex;
+/// # use scilib::math::complex::Complex;
 /// let c1 = Complex::from(2.1, 3.0);
 /// let c2 = Complex::from(5.0, 0.5);
 /// let res = c1 + c2;
@@ -169,7 +169,7 @@ impl Add for Complex {
 /// # Assigning Addition
 /// 
 /// ```
-/// # use abacus::math::complex::Complex;
+/// # use scilib::math::complex::Complex;
 /// let mut c1 = Complex::from(2.1, 3.0);
 /// let c2 = Complex::from(5.0, 0.5);
 /// c1 += c2;
@@ -186,7 +186,7 @@ impl AddAssign for Complex {
 /// # Subtraction
 /// 
 /// ```
-/// # use abacus::math::complex::Complex;
+/// # use scilib::math::complex::Complex;
 /// let c1 = Complex::from(2.1, 3.0);
 /// let c2 = Complex::from(5.0, 0.5);
 /// let res = c1 - c2;
@@ -205,7 +205,7 @@ impl Sub for Complex {
 /// # Assigning subtraction
 /// 
 /// ```
-/// # use abacus::math::complex::Complex;
+/// # use scilib::math::complex::Complex;
 /// let mut c1 = Complex::from(2.1, 3.0);
 /// let c2 = Complex::from(5.0, 0.5);
 /// c1 -= c2;
@@ -221,7 +221,7 @@ impl SubAssign for Complex {
 /// # Multiplication
 /// 
 /// ```
-/// # use abacus::math::complex::Complex;
+/// # use scilib::math::complex::Complex;
 /// let c1 = Complex::from(2.1, 3.0);
 /// let c2 = Complex::from(5.0, 0.5);
 /// let res = c1 * c2;
@@ -240,7 +240,7 @@ impl Mul for Complex {
 /// # Multiplication to f64 (real): `c * f64`
 /// 
 /// ```
-/// # use abacus::math::complex::Complex;
+/// # use scilib::math::complex::Complex;
 /// let c = Complex::from(5, 2.0);
 /// let res = c * 3.0;
 /// 
@@ -258,7 +258,7 @@ impl Mul<f64> for Complex {
 /// # Multiplication to f64 (real): `f64 * c`
 /// 
 /// ```
-/// # use abacus::math::complex::Complex;
+/// # use scilib::math::complex::Complex;
 /// let c = Complex::from(5, 2.0);
 /// let res = 3.0 * c;
 /// 
@@ -276,7 +276,7 @@ impl Mul<Complex> for f64 {
 /// # Assigning multiplication
 /// 
 /// ```
-/// # use abacus::math::complex::Complex;
+/// # use scilib::math::complex::Complex;
 /// let mut c1 = Complex::from(2.1, 3.0);
 /// let c2 = Complex::from(5.0, 0.5);
 /// c1 *= c2;
@@ -293,7 +293,7 @@ impl MulAssign for Complex {
 /// # Division
 /// 
 /// ```
-/// # use abacus::math::complex::Complex;
+/// # use scilib::math::complex::Complex;
 /// let c1 = Complex::from(2.1, 3.0);
 /// let c2 = Complex::from(5.0, 0.5);
 /// let res = c1 / c2;
@@ -313,7 +313,7 @@ impl Div for Complex {
 /// # Assigning division
 /// 
 /// ```
-/// # use abacus::math::complex::Complex;
+/// # use scilib::math::complex::Complex;
 /// let mut c1 = Complex::from(2.1, 3.0);
 /// let c2 = Complex::from(5.0, 0.5);
 /// c1 /= c2;

@@ -30,7 +30,7 @@ const DISTANCE_Y_LIM: f64 = 0.001;
 /// The J Bessel function cannot return values for `x < 0`, as they should be complex. We return 0 in those cases.
 /// 
 /// ```
-/// # use abacus::math::bessel::j;
+/// # use scilib::math::bessel::j;
 /// // Computing some example values
 /// let res_00: f64 = j(0.0, 0);
 /// let res_01: f64 = j(1.0, 0);
@@ -107,7 +107,7 @@ pub fn j(x: f64, n: i32) -> f64 {
 /// integer orders.
 /// 
 /// ```
-/// # use abacus::math::bessel::{ j, jf };
+/// # use scilib::math::bessel::{ j, jf };
 /// // This method allows the computation of real index for J
 /// let res_pos = jf(1.0, 2.5);
 /// let res_neg = jf(2.4, -1.75);
@@ -174,7 +174,7 @@ pub fn jf(x: f64, n: f64) -> f64 {
 /// work with real numbers, thus the Y function cannot return a value for `x < 0`, as they become complex (returns 0).
 /// 
 /// ```
-/// # use abacus::math::bessel::y;
+/// # use scilib::math::bessel::y;
 /// let res_pos = y(1.0, 1.5);
 /// let res_neg = y(1.0, -1.5);
 /// 
