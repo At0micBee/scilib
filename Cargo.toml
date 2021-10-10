@@ -1,6 +1,7 @@
 [package]
 name = "scilib"
 description = "A scientific library for the Rust programming language."
+documentation = "https://docs.rs/scilib/"
 author = "Hugo G. 'AtomicBee' Vivien [hugo.vivien@pm.me]"
 keywords = ["mathematics", "science"]
 categories = ["mathematics", "science"]
