@@ -71,6 +71,23 @@ impl Complex {
         }
     }
 
+    /// # From polar coordinates
+    /// 
+    /// Creates the complex number based on polar coordinates values
+    /// 
+    /// ```
+    /// # use std::f64::consts::PI;
+    /// # use std::f64::consts::SQRT_2;
+    /// # use scilib::math::complex::Complex;
+    /// let c = Complex::from_polar(PI / 4.0, SQRT_2);
+    /// 
+    /// assert!((c.re - 1.0).abs() < 1.0e-8 && c.im == 1.0);
+    /// ```
+    pub fn from_polar<T, U>(arg: T, norm: U) -> Self
+    where T: Into<f64> + Copy, U: Into<f64> + Copy {
+        Self::from(arg.into().cos() * norm.into(), arg.into().sin() * norm.into())
+    }
+
     /// # Pure complex unity
     /// 
     /// Simply returns i.
@@ -141,6 +158,42 @@ impl Complex {
             re: self.re,
             im: -self.im
         }
+    }
+
+    /// # Argument for polar coordinates
+    /// 
+    /// Computes the argument in the polar plan.
+    /// 
+    /// ```
+    /// # use std::f64::consts::PI;
+    /// # use scilib::math::complex::Complex;
+    /// let c1 = Complex::from(1.0, 1.0);
+    /// let c2 = Complex::from(2.5, -1);
+    /// 
+    /// assert!((c1.arg() - PI/4.0).abs() < 1.0e-8);
+    /// assert!((c2.arg() - -0.3805063771).abs() < 1.0e-8);
+    /// ```
+    pub fn arg(&self) -> f64 {
+        self.im.atan2(self.re)
+    }
+
+    /// # The polar coordinates of the number
+    /// 
+    /// Returns a tuple where the zeroth element is the argument and the first
+    /// element is the modulus (or norm) of the number.
+    /// 
+    /// ```
+    /// # use std::f64::consts::PI;
+    /// # use std::f64::consts::SQRT_2;
+    /// # use scilib::math::complex::Complex;
+    /// let c = Complex::from(1, 1);
+    /// let p = c.polar();
+    /// 
+    /// assert!((p.0 - PI/4.0).abs() < 1.0e-8);
+    /// assert!((p.1 - SQRT_2).abs() < 1.0e-8);
+    /// ```
+    pub fn polar(&self) -> (f64, f64) {
+        (self.arg(), self.modulus())
     }
 
     /// # Raising to an integer power
