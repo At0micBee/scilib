@@ -1,6 +1,13 @@
 # Scilib
 
-> A rust crate for science
+![](https://img.shields.io/docsrs/scilib?label=Tests&style=flat-square)
+![](https://img.shields.io/crates/v/scilib?style=flat-square)
+![](https://img.shields.io/crates/l/scilib?style=flat-square)
+
+> A Rust crate for scientific processes
+
+
+---
 
 # Overview
 
@@ -54,12 +61,12 @@ println!("{}", c1 + c2);
 Essential in many maths and physics domain, bessel function are solutions of Bessel's differential equation ([Wiki page](https://en.wikipedia.org/wiki/Bessel_function)). This crate provides functions for both real and complex numbers, and for integer or real function order.
 
 All functions are implemented:
-- **J**: First kind
-- **Y**: Second Kind
-- **I**: Modified first kind
-- **K**: Modified second kind
-- **H1**: Hankel first kind
-- **H2**: Hankel second kind
+- $J_\alpha(z)$: First kind
+- $Y_\alpha(z)$: Second Kind
+- $I_\alpha(z)$: Modified first kind
+- $K_\alpha(z)$: Modified second kind
+- $H_\alpha^{(1)}(z)$: Hankel first kind
+- $H_\alpha^{(2)}(z)$: Hankel second kind
 
 ```rust
 // All functions support complex numbers, and real orders
@@ -70,13 +77,11 @@ let res = bessel::hankel_first(2, -2)   // Hankel first kind
 
 Values are compared to known results (thanks, [WolframAlpha](https://www.wolframalpha.com/)), and the results are within small margins of error.
 
-***Documentation and tests are missing for I, K, H1 and H2, it's coming.***
-
 ---
 
 ## Typical polynomials
 
-Useful polynomials will be implemented to facilitate their uses to everyone; as it stands, both the Legendre and Laguerre polynomials have been implemented.
+Useful polynomials will be implemented to facilitate their uses to everyone; as it stands, both the Legendre ($P_l^m(x)$) and Laguerre ($L_l^m(x)$) polynomials have been implemented, where $-l\leq m \leq l$.
 
 ```rust
 // Legendre supports derivative (and negative m)
@@ -88,8 +93,13 @@ let lag = polynomial::Laguerre::new(3, -2); // l=3, m=-2
 
 ---
 
-## Spherical harmonics
+## Quantum mechanics
 
-A first draft of a working solution for the spherical harmonics equation is implemented, and will be improved.
+The spherical harmonics $Y_l^m(\theta, \phi)$ function has been added to the quantum section, and is valid for acoustics as well.
+
+```rust
+// Computing Ylm for l=3, m=1, theta = 0.2 and phi = -0.3
+let res = spherical_harmonics(3, 1, 0.2, -0.3);
+```
 
 ---
