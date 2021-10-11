@@ -61,12 +61,12 @@ println!("{}", c1 + c2);
 Essential in many maths and physics domain, bessel function are solutions of Bessel's differential equation ([Wiki page](https://en.wikipedia.org/wiki/Bessel_function)). This crate provides functions for both real and complex numbers, and for integer or real function order.
 
 All functions are implemented:
-- $J_\alpha(z)$: First kind
-- $Y_\alpha(z)$: Second Kind
-- $I_\alpha(z)$: Modified first kind
-- $K_\alpha(z)$: Modified second kind
-- $H_\alpha^{(1)}(z)$: Hankel first kind
-- $H_\alpha^{(2)}(z)$: Hankel second kind
+- **J**: First kind
+- **Y**: Second Kind
+- **I**: Modified first kind
+- **K**: Modified second kind
+- **H1**: Hankel first kind
+- **H2**: Hankel second kind
 
 ```rust
 // All functions support complex numbers, and real orders
@@ -81,7 +81,7 @@ Values are compared to known results (thanks, [WolframAlpha](https://www.wolfram
 
 ## Typical polynomials
 
-Useful polynomials will be implemented to facilitate their uses to everyone; as it stands, both the Legendre ($P_l^m(x)$) and Laguerre ($L_l^m(x)$) polynomials have been implemented, where $-l\leq m \leq l$.
+Useful polynomials will be implemented to facilitate their uses to everyone; as it stands, both the Legendre (Plm(x)) and Laguerre (Llm(x)) polynomials have been implemented, where -l <= m <= l.
 
 ```rust
 // Legendre supports derivative (and negative m)
@@ -95,7 +95,7 @@ let lag = polynomial::Laguerre::new(3, -2); // l=3, m=-2
 
 ## Quantum mechanics
 
-The spherical harmonics $Y_l^m(\theta, \phi)$ function has been added to the quantum section, and is valid for acoustics as well.
+The spherical harmonics Ylm(theta, phi) function has been added to the quantum section, and is valid for acoustics as well.
 
 ```rust
 // Computing Ylm for l=3, m=1, theta = 0.2 and phi = -0.3
