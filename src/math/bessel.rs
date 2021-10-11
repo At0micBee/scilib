@@ -1,5 +1,74 @@
 //!
-//! Implementation of the Bessel functions
+//! # Bessel functions
+//! 
+//! The Bessel functions are the solution to the [Bessel differential equation](https://en.wikipedia.org/wiki/Bessel_function#Spherical_Bessel_functions).
+//! There are multiple variants of these solutions, and this sub-module provides functions for all of them.
+//! 
+//! ## First kind: J
+//! 
+//! The Jn(x) function is the simplest solution to Bessel's equation. The most generalized case is for
+//! a real index `n` and a complex number `x`, which is possible with this crate. Additionally, two methods are
+//! provided for this equation, one for a integer order (named `j`) and one for a real order (named `jf`). The integer
+//! order one is limited but is faster than it's counterpart. The real order function is slower, but can compute any
+//! order. Note that `jf` will attempt to fall back on `j` when it finds an integer order.
+//! 
+//! ```rust
+//! # use scilib::math::complex::Complex;
+//! # use scilib::math::bessel::{ j, jf };
+//! let c = Complex::from(-0.75, 3);
+//! let res_i = j(c, 1);                // Faster for integer order
+//! let res_f = jf(c, 1.5);             // Would also work with 1.0
+//! ```
+//! 
+//! ## Second kind: Y
+//! 
+//! Similar to the first kind, the Y equation are solution of Bessel's equation with a singularity at the origin.
+//! The Y function is itself based on the J function. The function is undefined for any integer order, in which
+//! case the limit has to be taken.
+//! 
+//! ```rust
+//! # use scilib::math::complex::Complex;
+//! # use scilib::math::bessel::y;
+//! let c = Complex::from(2, -1.2);
+//! let res_f = y(c, 1.5);              // Not a problem
+//! let res_i = y(c, 1);                // The function takes the limit in this case
+//! ```
+//! 
+//! ## Modified first kind: I
+//! 
+//! Also known as the hyperbolic Bessel function of the first kind. Its definition is similar to J, but lacks the
+//! alternating `(-1)^k` term in the sum.
+//! 
+//! ```rust
+//! # use scilib::math::complex::Complex;
+//! # use scilib::math::bessel::i;
+//! let c = Complex::from(0.2, 1);
+//! let res = i(c, -1.2);
+//! ```
+//! 
+//! ## Modified second kind: K
+//! 
+//! Also known as the hyperbolic Bessel function of the second kind. Its definition is similar to Y, but lacks the
+//! `cos(n*pi)`, and is normalized by `pi/2`.
+//! 
+//! ```rust
+//! # use scilib::math::complex::Complex;
+//! # use scilib::math::bessel::k;
+//! let c = Complex::from(0, 7);
+//! let res = k(c, 0);
+//! ```
+//! 
+//! ## Hankel functions: H1 and H2
+//! 
+//! Hankel functions are two linearly independent solutions to Bessel's equation.
+//! 
+//! ```rust
+//! # use scilib::math::complex::Complex;
+//! # use scilib::math::bessel::{ hankel_first, hankel_second };
+//! let c = Complex::from(-0.3, 1.52);
+//! let res_1 = hankel_first(c, -2.3);
+//! let res_2 = hankel_second(c, -2.3);
+//! ```
 //! 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
