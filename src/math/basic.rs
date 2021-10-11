@@ -87,7 +87,7 @@ pub fn binomial(n: usize, k: usize) -> usize {
 /// assert_eq!(res, 120);
 /// ```
 pub fn factorial<T>(n: T) -> usize
-    where T: Into<usize> {
+where T: Into<usize> {
     (1..=n.into()).fold(1, |res, val| res * val)
 }
 
@@ -110,7 +110,14 @@ pub fn factorial<T>(n: T) -> usize
 /// With the current computation scheme, we limit the precision of the computation in exchange for speed.
 /// Typical values are achieve within a `1.0e-5` margin of error. Changing the method to another one
 /// might grant some more speed and lower the error on the results.
-pub fn gamma(x: f64) -> f64 {
+pub fn gamma<T: Into<f64>>(value: T) -> f64 {
+
+    let x: f64 = value.into();
+
+    // If the number is an integer, we can simple return the factorial
+    if x.fract() == 0.0 {
+        return factorial(x as usize) as f64;
+    }
 
     let mut n: f64 = 1.0;      // Order counter
 
@@ -138,6 +145,27 @@ pub fn gamma(x: f64) -> f64 {
     }
 
     res * (-x * constant::EULER_MASCHERONI).exp() / x
+}
+
+/// # Euler Beta function
+/// 
+/// The computation of the result is based on results from the gamma function. It is also possible to define
+/// it with infinite series (or products), which could have some advantages, I'll investigate this possibility later.
+/// 
+/// ```
+/// # use scilib::math::basic::beta;
+/// let res: f64 = beta(1, 1.1);
+/// 
+/// assert!((res - 0.909090).abs() < 1.0e-5);
+/// ```
+pub fn beta<T, U>(x: T, y: U) -> f64
+where T: Into<f64> + Copy, U: Into<f64> + Copy {
+
+    let t1: f64 = gamma(x);
+    let t2: f64 = gamma(y);
+    let b: f64 = gamma(x.into() + y.into());
+    
+    t1 * t2 / b
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

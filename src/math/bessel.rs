@@ -248,15 +248,15 @@ pub fn i<T, U>(x: T, order: U) -> Complex
 
 /// # K modified Bessel function
 pub fn k<T, U>(x: T, order: U) -> Complex
-    where T: Into<Complex> + Copy, U: Into<f64> {
-    
-        let n: f64 = order.into();
+where T: Into<Complex> + Copy, U: Into<f64> {
 
-        let pos = i(x, n);
-        let neg = i(x, -n);
-        let factor: f64 = FRAC_PI_2 / (n * PI).sin();
-        
-        factor * (neg - pos)
+    let n: f64 = order.into();
+
+    let pos = i(x, n);
+    let neg = i(x, -n);
+    let factor: f64 = FRAC_PI_2 / (n * PI).sin();
+    
+    factor * (neg - pos)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -265,7 +265,7 @@ pub fn k<T, U>(x: T, order: U) -> Complex
 /// 
 /// Computes the first kind of Hankel function, accepts complex input.
 pub fn hankel_first<T, U>(x: T, order: U) -> Complex
-    where T: Into<Complex> + Copy, U: Into<f64> {
+where T: Into<Complex> + Copy, U: Into<f64> {
 
     let n: f64 = order.into();
     let res_j = jf(x, n);
@@ -279,7 +279,7 @@ pub fn hankel_first<T, U>(x: T, order: U) -> Complex
 /// Computes the second kind of Hankel function, accepts complex input.
 /// We simplify the computation by simply conjugating the first kind
 pub fn hankel_second<T, U>(x: T, order: U) -> Complex
-    where T: Into<Complex> + Copy, U: Into<f64> {
+where T: Into<Complex> + Copy, U: Into<f64> {
     
     hankel_first(x, order).conjugate()
 }

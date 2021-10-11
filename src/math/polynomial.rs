@@ -8,7 +8,7 @@ use super::basic;           // Calling the basic math functions
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/// The Legendre polynomials
+/// # Legendre polynomials
 #[derive(Debug, Default)]
 pub struct Legendre {
     /// The order of the polynomial
@@ -16,11 +16,11 @@ pub struct Legendre {
     /// The derivative order
     pub m: i32,
     /// The factor of each term
-    pub factor: Vec<f64>,
+    factor: Vec<f64>,
     /// The power at each term
-    pub power: Vec<i32>,
+    power: Vec<i32>,
     /// The pre-factor associated to m
-    pub pre_f: f64
+    pre_f: f64
 }
 
 /// Display for the Legendre polynomials
@@ -152,7 +152,7 @@ impl Legendre {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/// The Laguerre polynomials
+/// # Laguerre polynomials
 #[derive(Debug, Default)]
 pub struct Laguerre {
     /// The order of the polynomial
@@ -160,12 +160,12 @@ pub struct Laguerre {
     /// The derivative order
     pub m: i32,
     /// The factor of each term
-    pub factor: Vec<f64>,
+    factor: Vec<f64>,
     /// The power at each term
-    pub power: Vec<i32>
+    power: Vec<i32>
 }
 
-/// Display for the Legendre polynomials
+/// Display for the Laguerre polynomials
 impl std::fmt::Display for Laguerre {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         

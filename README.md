@@ -4,7 +4,7 @@
 
 # Overview
 
-This crate is designed to help any mathematical or scientific process for the rust community. It compiles many useful concepts and items that are key in scientific applications, such as Bessel functions, statistical analysis, physical constants, etc...
+This crate is designed to help any mathematical or scientific process for the Rust community. It compiles many useful concepts and items that are key in scientific applications, such as Bessel functions, statistical analysis, physical constants, etc...
 
 The aim is to provide classical functions in pure Rust, for ease of operability.
 
@@ -16,18 +16,18 @@ As of the creation of this readme, I am working on this project alone which mean
 
 1. The progression will be linked to my schedule
 2. I will work firsts on concept with which I am familiar with
-3. I am a self-taught developer, and thus some solutions could be sub-optimal and thus improved
+3. I am a self-taught developer, some solutions could be sub-optimal and thus improved
 
 ## What's coming?
 
-The order of the development of the crate is not clear, as I am for now writing this as a side project. I plan on adding many useful functions from a physics point of view, but will expand as I go. For now, my objectives are:
+The schedule of the development of the crate is not clear, as I am for now writing this as a side project. I plan on adding many useful functions from a physics point of view, but will expand as I go. For now, my objectives are:
 
 - Astrophysics
 - Thermodynamics
 - Quantum mechanics (and statistical physics)
 - Electromagnetism
 
-And hopefully more when this is done!
+And hopefully more when this is done (statistics for example)!
 
 ---
 
@@ -51,15 +51,15 @@ println!("{}", c1 + c2);
 
 ## Bessel functions
 
-Essential in many maths and physics domain, bessel function solution of Bessel's differential equation ([Wiki page](https://en.wikipedia.org/wiki/Bessel_function)). This crate provides functions for both real and complex numbers, and for integer or real function order.
+Essential in many maths and physics domain, bessel function are solutions of Bessel's differential equation ([Wiki page](https://en.wikipedia.org/wiki/Bessel_function)). This crate provides functions for both real and complex numbers, and for integer or real function order.
 
 All functions are implemented:
 - **J**: First kind
 - **Y**: Second Kind
 - **I**: Modified first kind
 - **K**: Modified second kind
-
-Both Hankel function (H1 and H2), also solutions of the Bessel equation.
+- **H1**: Hankel first kind
+- **H2**: Hankel second kind
 
 ```rust
 // All functions support complex numbers, and real orders
@@ -68,7 +68,7 @@ let res = bessel::y(3.5, 1);            // Y computes the limit for integer orde
 let res = bessel::hankel_first(2, -2)   // Hankel first kind
 ```
 
-Values are compared to known results (thanks, [WorlframAlpha](https://www.wolframalpha.com/)), and the results are within small margins of error.
+Values are compared to known results (thanks, [WolframAlpha](https://www.wolframalpha.com/)), and the results are within small margins of error.
 
 ***Documentation and tests are missing for I, K, H1 and H2, it's coming.***
 
