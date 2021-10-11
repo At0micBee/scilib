@@ -6,7 +6,6 @@
 
 > A Rust crate for scientific processes
 
-
 ---
 
 # Overview
@@ -31,14 +30,34 @@ The schedule of the development of the crate is not clear, as I am for now writi
 
 - Astrophysics
 - Thermodynamics
-- Quantum mechanics (and statistical physics)
+- Quantum mechanics *(Under way)*
 - Electromagnetism
 
-And hopefully more when this is done (statistics for example)!
+And hopefully more when this is done (statistics for example).
 
 ---
 
 # Contents
+
+## Useful mathematics function
+
+The Rust library doesn't provide some functions that are quite common in scientific processes, and this crate attempts to provide as many as it can. Euler's Gamma and Beta function, Newton's binomial, factorial, the error functions (erf, erfc, erfi), ...
+
+Some functions are still missing as of the writing of this document, but will be added later on.
+
+```rust
+// These functions can be found in the math crate
+use scilib::math::basic::*;
+
+let g = gamma(3.2);
+let b = beta(-1.2, 2.5);
+
+// The erf function can compute Complex numbers (erc, erfi as well)
+let c = Complex::from(-0.1, 0.7);
+let e = erf(c);
+```
+
+---
 
 ## Complex numbers
 
@@ -47,6 +66,9 @@ This crate provides basic functionalities for complex numbers, mainly to support
 Basic operations have been implemented to facilitate their use, and should be pretty easy to manipulate.
 
 ```rust
+// They are found in the complex crate
+use scilib::math::complex::Complex;
+
 let c1 = Complex::from(2, 3.5);
 let c2 = Complex::from(-1.2, 4) * 2;
 println!("{}", c1 + c2);
@@ -69,6 +91,9 @@ All functions are implemented:
 - **H2**: Hankel second kind
 
 ```rust
+// Found in the math crate
+use scilib::math::bessel;
+
 // All functions support complex numbers, and real orders
 let res = bessel::jf(-1.2, 2.3);        // Computes -1.2 with order 2.3 in J
 let res = bessel::y(3.5, 1);            // Y computes the limit for integer order
@@ -84,6 +109,9 @@ Values are compared to known results (thanks, [WolframAlpha](https://www.wolfram
 Useful polynomials will be implemented to facilitate their uses to everyone; as it stands, both the Legendre (Plm(x)) and Laguerre (Llm(x)) polynomials have been implemented, where -l <= m <= l.
 
 ```rust
+// They are found in the polynomial crate
+use scilib::math::polynomial;
+
 // Legendre supports derivative (and negative m)
 let leg = polynomial::Legendre::new(2, 1);  // l=2, m=1
 
@@ -98,6 +126,9 @@ let lag = polynomial::Laguerre::new(3, -2); // l=3, m=-2
 The spherical harmonics Ylm(theta, phi) function has been added to the quantum section, and is valid for acoustics as well.
 
 ```rust
+// Found in the quantum crate
+use scilib::quantum;
+
 // Computing Ylm for l=3, m=1, theta = 0.2 and phi = -0.3
 let res = spherical_harmonics(3, 1, 0.2, -0.3);
 ```
