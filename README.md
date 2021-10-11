@@ -10,7 +10,7 @@
 
 # Overview
 
-This crate is designed to help any mathematical or scientific process for the Rust community. It compiles many useful concepts and items that are key in scientific applications, such as Bessel functions, statistical analysis, physical constants, etc...
+This crate is designed to help any mathematical or scientific processes for the Rust community. It compiles many useful concepts and items that are key in scientific applications, such as Bessel functions, statistical analysis, physical constants, etc...
 
 The aim is to provide classical functions in pure Rust, for ease of operability.
 
@@ -30,10 +30,10 @@ The schedule of the development of the crate is not clear, as I am for now writi
 
 - Astrophysics
 - Thermodynamics
-- Quantum mechanics *(Under way)*
+- Quantum mechanics
 - Electromagnetism
 
-And hopefully more when this is done (statistics for example).
+And hopefully more when this is done (statistics, integration tool, calculus, ...).
 
 ---
 
