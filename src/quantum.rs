@@ -6,11 +6,68 @@
 
 use std::f64::consts::PI;           // Value of pi
 
-use crate::math::{                  // Calling other modules
-    basic,
-    complex::Complex,
-    polynomial
+use crate::{                        // Calling other modules
+    math::{                  
+        basic,
+        complex::Complex,
+        polynomial
+    },
+    constant as cst
 };
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/// # Computing legal angular momentum numbers l based on n
+/// 
+/// This quantum number exists in the range [0, n-1].
+/// 
+/// ```
+/// # use scilib::quantum::get_l;
+/// let l = get_l(3);
+/// assert_eq!(l, vec![0, 1, 2]);
+/// ```
+fn get_l(n: usize) -> Vec<usize> {
+    (0..n).collect()
+}
+
+/// # Computing legal magnetic quantum numbers m based on l
+/// 
+/// This quantum number exists in the range [-l, l].
+/// 
+/// ```
+/// # use scilib::quantum::get_m;
+/// let m = get_m(2);
+/// assert_eq!(m, vec![-2, -1, 0, 1, 2]);
+/// ```
+fn get_m(l: usize) -> Vec<isize> {
+    let li: isize = l as isize;
+    (-li..=li).collect()
+}
+
+/// # Radial wavefunctions
+/// 
+/// They are quite costly to derive properly, due to the normalization process. Luckily, we can 
+/// compute them manually and implement them this way. 
+fn radial_wavefunction(n: usize, l: usize, r: f64) -> f64 {
+
+    match (n, l) {
+        // n=1, l=0
+        (1, 0) => {
+            2.0 * (1.0 / cst::A_0).powf(3.0 / 2.0) * (-r / cst::A_0).exp()
+        },
+        // n=2, l=0
+        (2, 0) => {
+            2.0 * (0.5 / cst::A_0).powf(3.0 / 2.0) * (1.0 - r / (2.0 * cst::A_0)) * (-r / (2.0 * cst::A_0)).exp()
+        },
+        // n=2, l=1
+        (2, 1) => {
+            (1.0 / 3.0_f64.sqrt()) * (0.5 / cst::A_0).powf(3.0 / 2.0) * (r / cst::A_0) * (-r / (2.0 * cst::A_0)).exp()
+        }
+        // Either impossible case, or not computed
+        _ => 0.0
+    }
+
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
