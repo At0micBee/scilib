@@ -18,3 +18,5 @@
 pub mod constant;
 
 pub mod math;
+
+pub mod quantum;

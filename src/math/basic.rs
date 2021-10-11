@@ -1,10 +1,12 @@
 //!
 //! # Basic math functions
 //! 
+//! This module provides access to many useful function that are not provided by the base Rust.
+//! 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-use std::f64::consts::FRAC_2_SQRT_PI;
+use std::f64::consts::FRAC_2_SQRT_PI;   // 2 / sqrt(pi)
 
 use super::{                            // Calling the submodules
     super::constant,

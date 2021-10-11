@@ -323,7 +323,7 @@ where T: Into<Complex> + Copy, U: Into<f64> {
 /// 
 /// let c = Complex::from(-1.2, 0.5);
 /// let r2 = i(c, -1.6);
-/// assert!((r2.re - 0.549831).abs() < 1.0e-5 && (r2.im - -0.123202).abs() < 1.0e-5)
+/// assert!((r2.re - 0.549831).abs() < 1.0e-5 && (r2.im - -0.123202).abs() < 1.0e-5);
 /// ```
 pub fn i<T, U>(x: T, order: U) -> Complex
 where T: Into<Complex>, U: Into<f64> + Copy {
