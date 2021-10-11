@@ -4,7 +4,12 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-use super::super::constant;     // Calling the constants from the module
+use std::f64::consts::FRAC_2_SQRT_PI;
+
+use super::{                            // Calling the submodules
+    super::constant,
+    complex::Complex
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -166,6 +171,89 @@ where T: Into<f64> + Copy, U: Into<f64> + Copy {
     let b: f64 = gamma(x.into() + y.into());
     
     t1 * t2 / b
+}
+
+/// # Error function
+/// 
+/// We define the error function for complex number, as its counterpart erfi requires.
+/// 
+/// ```
+/// # use scilib::math::complex::Complex;
+/// # use scilib::math::basic::erf;
+/// let r = erf(2.1);
+/// let c = erf(Complex::from(-0.1, 0.7));
+/// 
+/// assert!((r.re - 0.997021).abs() < 1.0e-5);
+/// assert!((c.re - -0.18297754).abs() < 1.0e-5 && (c.im - 0.92747498).abs() < 1.0e-5);
+/// ```
+pub fn erf<T>(val: T) -> Complex
+where T: Into<Complex> {
+
+    let x: Complex = val.into();
+
+    let mut n: f64 = 0.0;               // Index of iteration
+    let mut d1: f64 = 1.0;              // First div
+    let mut d2: f64;                    // Second div
+    let mut sg: f64 = 1.0;              // Sign of the term
+    
+    let mut term: Complex = x;          // Term at each iter
+    let mut res: Complex = 0.0.into();  // Result
+
+    // If the term is too small we exit
+    if term.modulus().abs() < PRECISION {
+        return res;
+    }
+
+    'convergence: loop {
+        res += term;
+
+        // We exit when convergence reaches the precision
+        if (term / res).modulus().abs() < PRECISION {
+            break 'convergence;
+        }
+
+        n += 1.0;
+        sg *= -1.0;
+        d1 *= n;
+        d2 = 2.0 * n + 1.0;
+        term = sg * x.powf(d2) / (d1 * d2);
+    }
+
+    FRAC_2_SQRT_PI * res
+}
+
+/// # Complementary error function
+/// 
+/// This function simply returns the complement of the error function, that is `1 - erf(z)`.
+/// 
+/// ```
+/// # use scilib::math::complex::Complex;
+/// # use scilib::math::basic::erfc;
+/// let c = Complex::from(1.25, 0.3);
+/// let res = erfc(c);
+/// 
+/// assert!((res.re - 0.0505570).abs() < 1.0e-5 && (res.im - -0.0663174).abs() < 1.0e-5);
+/// ```
+pub fn erfc<T>(val: T) -> Complex
+where T: Into<Complex> {
+    Complex::from(1, 0) - erf(val)
+}
+
+/// # Imaginary error function
+/// 
+/// This function is defined as `-i * erf(i*z)`, which we take literally.
+/// 
+/// ```
+/// # use scilib::math::complex::Complex;
+/// # use scilib::math::basic::erfi;
+/// let c = Complex::from(0.07, -1.1);
+/// let res = erfi(c);
+/// 
+/// assert!((res.re - 0.02349883).abs() < 1.0e-5 && (res.im - -0.88201955).abs() < 1.0e-5);
+/// ```
+pub fn erfi<T>(val: T) -> Complex
+where T: Into<Complex> {
+    -Complex::i() * erf(Complex::i() * val)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
