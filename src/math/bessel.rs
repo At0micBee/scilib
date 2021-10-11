@@ -330,6 +330,18 @@ where T: Into<Complex> + Copy, U: Into<f64> {
 /// # First Hankel function: H1
 /// 
 /// Computes the first kind of Hankel function, accepts complex input.
+/// 
+/// ```
+/// # use scilib::math::complex::Complex;
+/// # use scilib::math::bessel::hankel_first;
+/// let c1 = Complex::from(-1.1, 2.3);
+/// let r1 = hankel_first(c1, 1);
+/// assert!((r1.re - -0.0112027).abs() < 1.0e-5 && (r1.im - 0.0551947).abs() < 1.0e-5);
+/// 
+/// let c2 = Complex::from(5.2, -3);
+/// let r2 = hankel_first(c2, -2.35);
+/// assert!((r2.re - -4.2809477).abs() < 1.0e-5 && (r2.im - 3.2123502).abs() < 1.0e-5);
+/// ```
 pub fn hankel_first<T, U>(x: T, order: U) -> Complex
 where T: Into<Complex> + Copy, U: Into<f64> {
 
@@ -344,10 +356,25 @@ where T: Into<Complex> + Copy, U: Into<f64> {
 /// 
 /// Computes the second kind of Hankel function, accepts complex input.
 /// We simplify the computation by simply conjugating the first kind
+/// 
+/// ```
+/// # use scilib::math::complex::Complex;
+/// # use scilib::math::bessel::hankel_second;
+/// let c1 = Complex::from(-1.1, 2.3);
+/// let r1 = hankel_second(c1, 1);
+/// assert!((r1.re - -3.54421).abs() < 1.0e-5 && (r1.im - 2.2983539).abs() < 1.0e-5);
+/// 
+/// let c2 = Complex::from(5.2, -3);
+/// let r2 = hankel_second(c2, -2.35);
+/// assert!((r2.re - -0.0068184520).abs() < 1.0e-5 && (r2.im - -0.0193698).abs() < 1.0e-5);
 pub fn hankel_second<T, U>(x: T, order: U) -> Complex
 where T: Into<Complex> + Copy, U: Into<f64> {
     
-    hankel_first(x, order).conjugate()
+    let n: f64 = order.into();
+    let res_j = jf(x, n);
+    let res_y = Complex::i() * y(x, n);
+
+    res_j - res_y
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
