@@ -33,7 +33,6 @@ const DISTANCE_Y_LIM: f64 = 0.001;
 /// The bessel function depend on an infinite sum of terms; which we can't have.
 /// The criterion chosen here is check each new term impacts the results significantly enough.
 /// The default value selected in the program is defined by `const PRECISION_CONVERGENCE: f64 = 1.0e-8;`.
-/// The J Bessel function cannot return values for `x < 0`, as they should be complex. We return 0 in those cases.
 /// 
 /// ```
 /// # use scilib::math::complex::Complex;
@@ -115,7 +114,8 @@ pub fn j<T: Into<Complex>>(x: T, n: i32) -> Complex {
 /// 
 /// Similar to the other J Bessel method, but this one allows the use of a real (float) index, rather
 /// than an integer. This method is more costly to use than the other, and thus isn't recommended for
-/// integer orders.
+/// integer orders. The function tries to prevent this by trying to fall back on the integer order version
+/// when possible, but could fail in edge cases.
 /// 
 /// ```
 /// # use scilib::math::complex::Complex;
@@ -196,8 +196,7 @@ pub fn jf<T, U>(x: T, order: U) -> Complex
 /// 
 /// Because the function is not continuous for integer values of `n`, we need to compute the limit around these points.
 /// We set the limit distance with `DISTANCE_Y_LIM`, compute the limit above and below the desired point and take the average.
-/// We achieve precision under `1.0e-5` for non-integer`n`, and integer `n` using this approach. The functions are designed to
-/// work with real numbers, thus the Y function cannot return a value for `x < 0`, as they become complex (returns 0).
+/// We achieve precision under `1.0e-5` for non-integer`n`, and integer `n` using this approach.
 /// 
 /// ```
 /// # use scilib::math::complex::Complex;
@@ -226,7 +225,7 @@ pub fn jf<T, U>(x: T, order: U) -> Complex
 /// assert!((res_c.re - -0.79108492).abs() < 1.0e-5 && (res_c.im - 0.60211151).abs() < 1.0e-5);
 /// ```
 pub fn y<T, U>(x: T, order: U) -> Complex
-    where T: Into<Complex> + Copy, U: Into<f64> {
+where T: Into<Complex> + Copy, U: Into<f64> {
 
     let n: f64 = order.into();
 
@@ -239,24 +238,91 @@ pub fn y<T, U>(x: T, order: U) -> Complex
 }
 
 /// # I modified Bessel function
+/// 
+/// The I modified First Bessel function represent another kind of solution to the Bessel differential equation.
+/// 
+/// `x` is the value to evaluate, and `n` the order of the function.
+/// 
+/// We use a definition of I based on an infinite series (similar to J). This way, we ensure good precision in
+/// the computation.
+/// 
+/// ```
+/// # use scilib::math::complex::Complex;
+/// # use scilib::math::bessel::i;
+/// let res = i(1.2, 0);
+/// assert!((res.re - 1.39373).abs() < 1.0e-4 && res.im == 0.0);
+/// 
+/// let c = Complex::from(-1.2, 0.5);
+/// let r2 = i(c, -1.6);
+/// assert!((r2.re - 0.549831).abs() < 1.0e-5 && (r2.im - -0.123202).abs() < 1.0e-5)
+/// ```
 pub fn i<T, U>(x: T, order: U) -> Complex
-    where T: Into<Complex>, U: Into<f64> + Copy {
+where T: Into<Complex>, U: Into<f64> + Copy {
     
-        // i^(-n) * jn(ix)
-        Complex::i().powf(-order.into()) * jf(Complex::i() * x, order)
+    let n: f64 = order.into();
+
+    let x2: Complex = x.into() / 2.0;           // Halving x
+    let mut k: f64 = 0.0;                       // Order counter
+    let mut d1: f64 = 1.0;                      // First div
+    let mut d2: f64 = basic::gamma(n + 1.0);    // Second div
+
+    let mut term: Complex = x2.powf(n) / d2;    // The term at each step
+    let mut res: Complex = Complex::default();  // The result of the operation
+    
+    // If the first term is already too small we exit directly
+    if term.modulus().abs() < PRECISION_CONVERGENCE {
+        return res;
+    }
+
+    // Computing the terms of the infinite series
+    'convergence: loop {
+        res += term;
+
+        // If the changed compared to the final value is small we break
+        if (term / res).modulus().abs() < PRECISION_CONVERGENCE {
+            break 'convergence;
+        }
+
+        k += 1.0;                       // Incrementing value
+        d1 *= k;                        // Next value in the n! term
+        d2 *= n + k;                    // Next value in the gamma(n+k+1) term
+        term = x2.powf(n + 2.0 * k) / (d1 * d2);
+    }
+
+    res
 }
 
 /// # K modified Bessel function
+/// 
+/// The K modified Second Bessel function represent another kind of solution to the Bessel differential equation.
+/// 
+/// `x` is the value to evaluate, and `n` the order of the function.
+/// 
+/// The definition of K is similar to Y, but is based on I and not J.
+/// 
+/// ```
+/// # use scilib::math::complex::Complex;
+/// # use scilib::math::bessel::k;
+/// let c1 = Complex::from(2, -1);
+/// let res = k(c1, -3.5);
+/// assert!((res.re - -0.32113627).abs() < 1.0e-5 && (res.im - 0.76751785).abs() < 1.0e-5);
+/// 
+/// // Similar to Y, we take the limit for integer orders
+/// let c2 = Complex::from(-1.1, 0.6);
+/// let res_i = k(c2, 1);
+/// assert!((res_i.re - -1.6153940).abs() < 1.0e-5 && (res_i.im - -2.1056846).abs() < 1.0e-5);
+/// ```
 pub fn k<T, U>(x: T, order: U) -> Complex
 where T: Into<Complex> + Copy, U: Into<f64> {
 
     let n: f64 = order.into();
 
-    let pos = i(x, n);
-    let neg = i(x, -n);
-    let factor: f64 = FRAC_PI_2 / (n * PI).sin();
-    
-    factor * (neg - pos)
+    // If n is whole, we have to take the limit, otherwise it's direct
+    if n.fract() == 0.0 {
+        (k(x, n + DISTANCE_Y_LIM) + k(x, n - DISTANCE_Y_LIM)) / 2.0
+    } else {
+        (FRAC_PI_2 / (n * PI).sin()) * (i(x, -n) - i(x, n))
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
