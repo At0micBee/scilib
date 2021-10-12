@@ -4,6 +4,11 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+use std::f64::consts::{
+    PI,
+    FRAC_PI_2
+};
+
 use std::ops::{     // Implementing basic operations
     Add,            // Addition
     AddAssign,      // Assigning addition
@@ -102,10 +107,18 @@ impl Spherical {
 impl<T: Into<f64>> Mul<T> for Spherical {
     type Output = Self;
     fn mul(self, rhs: T) -> Self::Output {
-        Self {
-            r: self.r * rhs.into(),
+        let f: f64 = rhs.into();
+        let res: Self = Self {
+            r: self.r * f.abs(),
             theta: self.theta,
             phi: self.phi
+        };
+
+        // If the sign is negative, we need to flip the angles
+        if f.is_sign_negative() {
+            -res
+        } else {
+            res
         }
     }
 }
@@ -124,7 +137,14 @@ impl<T: Into<f64>> Mul<T> for Spherical {
 /// ```
 impl<T: Into<f64>> MulAssign<T> for Spherical {
     fn mul_assign(&mut self, rhs: T) {
-        self.r *= rhs.into();
+        let f: f64 = rhs.into();
+        self.r *= f.abs();
+
+        // If the sign is negative, we need to flip the angles
+        if f.is_sign_negative() {
+            self.theta += PI;
+            self.phi += FRAC_PI_2;
+        }
     }
 }
 
@@ -143,10 +163,18 @@ impl<T: Into<f64>> MulAssign<T> for Spherical {
 impl<T: Into<f64>> Div<T> for Spherical {
     type Output = Self;
     fn div(self, rhs: T) -> Self::Output {
-        Self {
-            r: self.r / rhs.into(),
+        let f: f64 = rhs.into();
+        let res: Self = Self {
+            r: self.r / f.abs(),
             theta: self.theta,
             phi: self.phi
+        };
+
+        // If the sign is negative, we need to flip the angles
+        if f.is_sign_negative() {
+            -res
+        } else {
+            res
         }
     }
 }
@@ -165,14 +193,37 @@ impl<T: Into<f64>> Div<T> for Spherical {
 /// ```
 impl<T: Into<f64>> DivAssign<T> for Spherical {
     fn div_assign(&mut self, rhs: T) {
-        self.r /= rhs.into();
+        let f: f64 = rhs.into();
+        self.r /= f.abs();
+
+        // If the sign is negative, we need to flip the angles
+        if f.is_sign_negative() {
+            self.theta += PI;
+            self.phi += FRAC_PI_2;
+        }
     }
 }
 
+/// # Negation
+/// 
+/// Going to the opposite point.
+/// 
+/// ```
+/// # use scilib::coordinate::cartesian::Cartesian;
+/// let c1 = Cartesian::from(-2, 5, 6.0);
+/// let c2 = -c1;
+/// let expected = Cartesian::from(2, -5.0, -6);
+/// 
+/// assert_eq!(c2, expected);
+/// ```
 impl Neg for Spherical {
     type Output = Self;
     fn neg(self) -> Self::Output {
-        self * -1
+        Self {
+            r: self.r,
+            theta: self.theta + PI,
+            phi: self.phi + FRAC_PI_2
+        }
     }
 }
 
