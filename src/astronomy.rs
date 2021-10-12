@@ -16,7 +16,7 @@ use std::fmt::{             // Formatter display
 /// # Radec coordinate system
 /// 
 /// Right ascension and declination of the object in the sky. The values are stored as `f64` internally, and in radians.
-#[derive(Debug, Default, PartialEq)]
+#[derive(Debug, Default, Clone, Copy, PartialEq)]
 pub struct Radec {
     pub ra: f64,
     pub dec: f64

@@ -17,6 +17,8 @@
 
 pub mod astronomy;
 
+pub mod coordinate;
+
 pub mod constant;
 
 pub mod math;
