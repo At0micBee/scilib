@@ -15,6 +15,8 @@
 //! first implement concept I am familiar with, and work towards other domains later on.
 //! 
 
+pub mod astronomy;
+
 pub mod constant;
 
 pub mod math;

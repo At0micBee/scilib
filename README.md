@@ -52,7 +52,7 @@ use scilib::math::basic::*;
 let g = gamma(3.2);
 let b = beta(-1.2, 2.5);
 
-// The erf function can compute Complex numbers (erc, erfi as well)
+// The erf function can compute Complex numbers (erfc, erfi as well)
 let c = Complex::from(-0.1, 0.7);
 let e = erf(c);
 ```

@@ -26,6 +26,7 @@ use crate::{                        // Calling other modules
 /// let l = get_l(3);
 /// assert_eq!(l, vec![0, 1, 2]);
 /// ```
+#[allow(unused)]
 fn get_l(n: usize) -> Vec<usize> {
     (0..n).collect()
 }
@@ -39,6 +40,7 @@ fn get_l(n: usize) -> Vec<usize> {
 /// let m = get_m(2);
 /// assert_eq!(m, vec![-2, -1, 0, 1, 2]);
 /// ```
+#[allow(unused)]
 fn get_m(l: usize) -> Vec<isize> {
     let li: isize = l as isize;
     (-li..=li).collect()
@@ -47,7 +49,8 @@ fn get_m(l: usize) -> Vec<isize> {
 /// # Radial wavefunctions
 /// 
 /// They are quite costly to derive properly, due to the normalization process. Luckily, we can 
-/// compute them manually and implement them this way. 
+/// compute them manually and implement them this way.
+#[allow(unused)]
 fn radial_wavefunction(n: usize, l: usize, r: f64) -> f64 {
 
     match (n, l) {
@@ -66,7 +69,6 @@ fn radial_wavefunction(n: usize, l: usize, r: f64) -> f64 {
         // Either impossible case, or not computed
         _ => 0.0
     }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
