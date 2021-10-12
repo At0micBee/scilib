@@ -70,9 +70,63 @@ impl Cartesian {
     /// # Distance between two points
     /// 
     /// Computes the distance between two points in space.
+    /// 
+    /// ```
+    /// # use scilib::coordinate::Cartesian;
+    /// let f = Cartesian::from(1.0, 2, 0.5);
+    /// let p = Cartesian::from(2, -1, 3.5);
+    /// 
+    /// assert!((f.distance(p) - 4.358898943540674).abs() < 1.0e-15);
+    /// ```
     pub fn distance(&self, other: Self) -> f64 {
+        let dist: Self = other - self;
+        (dist.x.powi(2) + dist.y.powi(2) + dist.z.powi(2)).sqrt()
+    }
 
-        ((other.x - self.x).powi(2) + (other.y - self.y).powi(2) + (other.z - self.z).powi(2)).sqrt()
+    /// # Coordinate rotation
+    /// 
+    /// Computes the resulting coordinates after an arbitrary rotation in 3D. The rotation
+    /// arguments are the yaw, pitch and roll in radians.
+    /// 
+    /// - Yaw is the rotation around the `z` axis
+    /// - Pitch is the rotation around the `y` axis
+    /// - Roll is the rotation around the `x` axis
+    /// 
+    /// ```
+    /// # use std::f64::consts::FRAC_PI_2;
+    /// # use scilib::coordinate::Cartesian;
+    /// 
+    /// // Setting a point in y=0, and rotating it 90° trigonometry-wise
+    /// let f = Cartesian::from(0, 1, 0);
+    /// let res = f.rotate(FRAC_PI_2, 0.0, 0.0);
+    /// 
+    /// assert_eq!(res.x, -1.0);
+    /// assert!((res.y - 0.0).abs() < 1.0e-15);
+    /// assert_eq!(res.z, 0.0);
+    /// ```
+    pub fn rotate(&self, yaw: f64, pitch: f64, roll: f64) -> Self {
+
+        // First row of the matrix
+        let a11: f64 = yaw.cos() * pitch.cos();
+        let a12: f64 = yaw.cos() * pitch.sin() * roll.sin() - yaw.sin() * roll.cos();
+        let a13: f64 = yaw.cos() * pitch.sin() * roll.cos() + yaw.sin() * roll.sin();
+
+        // Second row
+        let a21: f64 = yaw.sin() * pitch.cos();
+        let a22: f64 = yaw.sin() * pitch.sin() * roll.sin() + yaw.cos() * roll.cos();
+        let a23: f64 = yaw.sin() * pitch.sin() * roll.cos() - yaw.cos() * roll.sin();
+
+        // Third row
+        let a31: f64 = -pitch.sin();
+        let a32: f64 = pitch.cos() * roll.sin();
+        let a33: f64 = pitch.cos() * roll.cos();
+
+        // Following matrix multiplication
+        Self {
+            x: a11 * self.x + a12 * self.y + a13 * self.z,
+            y: a21 * self.x + a22 * self.y + a23 * self.z,
+            z: a31 * self.x + a32 * self.y + a33 * self.z
+        }
     }
 }
 
@@ -100,6 +154,28 @@ impl Add for Cartesian {
     }
 }
 
+/// # Addition with reference
+/// 
+/// ```
+/// # use scilib::coordinate::Cartesian;
+/// let c1 = Cartesian::from(1.0, 2.5, 3.0);
+/// let c2 = Cartesian::from(-1.0, 1, 0.0);
+/// let res = c1 + &c2;
+/// let expected = Cartesian::from(0.0, 3.5, 3.0);
+/// 
+/// assert_eq!(res, expected);
+/// ```
+impl Add<&Self> for Cartesian {
+    type Output = Self;
+    fn add(self, rhs: &Self) -> Self::Output {
+        Self {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+            z: self.z + rhs.z
+        }
+    }
+}
+
 /// # Assigning addition
 /// 
 /// ```
@@ -113,6 +189,25 @@ impl Add for Cartesian {
 /// ```
 impl AddAssign for Cartesian {
     fn add_assign(&mut self, rhs: Self) {
+        self.x += rhs.x;
+        self.y += rhs.y;
+        self.z += rhs.z;
+    }
+}
+
+/// # Assigning addition with reference
+/// 
+/// ```
+/// # use scilib::coordinate::Cartesian;
+/// let mut c1 = Cartesian::from(1.0, 2.5, 3.0);
+/// let c2 = Cartesian::from(-1.0, 1, 0.0);
+/// c1 += &c2;
+/// let expected = Cartesian::from(0.0, 3.5, 3.0);
+/// 
+/// assert_eq!(c1, expected);
+/// ```
+impl AddAssign<&Self> for Cartesian {
+    fn add_assign(&mut self, rhs: &Self) {
         self.x += rhs.x;
         self.y += rhs.y;
         self.z += rhs.z;
@@ -141,6 +236,28 @@ impl Sub for Cartesian {
     }
 }
 
+/// # Subtraction with reference
+/// 
+/// ```
+/// # use scilib::coordinate::Cartesian;
+/// let c1 = Cartesian::from(1.0, 2.5, 3.0);
+/// let c2 = Cartesian::from(-1.0, 1, 0.0);
+/// let res = c1 - &c2;
+/// let expected = Cartesian::from(2, 1.5, 3.0);
+/// 
+/// assert_eq!(res, expected);
+/// ```
+impl Sub<&Self> for Cartesian {
+    type Output = Self;
+    fn sub(self, rhs: &Self) -> Self::Output {
+        Self {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+            z: self.z - rhs.z
+        }
+    }
+}
+
 /// # Assigning subtraction
 /// 
 /// ```
@@ -153,6 +270,24 @@ impl Sub for Cartesian {
 /// assert_eq!(c1, expected);
 impl SubAssign for Cartesian {
     fn sub_assign(&mut self, rhs: Self) {
+        self.x -= rhs.x;
+        self.y -= rhs.y;
+        self.z -= rhs.z;
+    }
+}
+
+/// # Assigning subtraction with reference
+/// 
+/// ```
+/// # use scilib::coordinate::Cartesian;
+/// let mut c1 = Cartesian::from(1.0, 2.5, 3.0);
+/// let c2 = Cartesian::from(-1.0, 1, 0.0);
+/// c1 -= &c2;
+/// let expected = Cartesian::from(2, 1.5, 3.0);
+/// 
+/// assert_eq!(c1, expected);
+impl SubAssign<&Self> for Cartesian {
+    fn sub_assign(&mut self, rhs: &Self) {
         self.x -= rhs.x;
         self.y -= rhs.y;
         self.z -= rhs.z;
