@@ -1,5 +1,5 @@
 //!
-//! # Coordinates systems
+//! # Cartesian coordinates
 //! 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -16,18 +16,34 @@ use std::ops::{     // Implementing basic operations
     Neg             // Negation
 };
 
+use std::fmt::{     // Formatter display
+    Display,        // The display itself
+    Result as DRes  // The associated result
+};
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # Cartesian coordinates
 /// 
 /// Defined for 3D space.
-#[derive(Debug, Default, Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct Cartesian {
     pub x: f64,
     pub y: f64,
     pub z: f64
 }
 
+/// # Display for Cartesian
+/// 
+/// Simply shows each value associated to an axis.
+impl Display for Cartesian {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> DRes {
+        write!(f, "x={} :: y={} :: z={}", self.x, self.y, self.z)?;
+        Ok(())
+    }
+}
+
+/// Implementing required methods
 impl Cartesian {
 
     /// # Creates a new entity
@@ -35,7 +51,7 @@ impl Cartesian {
     /// Returns the same value as `Self::default()`, all elements are equal to zero.
     /// 
     /// ```
-    /// # use scilib::coordinate::Cartesian;
+    /// # use scilib::coordinate::cartesian::Cartesian;
     /// let m = Cartesian { x: 0.0, y: 0.0, z: 0.0 };
     /// let n = Cartesian::new();
     /// let d = Cartesian::default();
@@ -52,7 +68,7 @@ impl Cartesian {
     /// Creates a Cartesian struct from three given points in space.
     /// 
     /// ```
-    /// # use scilib::coordinate::Cartesian;
+    /// # use scilib::coordinate::cartesian::Cartesian;
     /// let m = Cartesian { x: 3.2, y: -2.0, z: 0.5e-3 };
     /// let f = Cartesian::from(3.2, -2, 0.5e-3);
     /// 
@@ -67,12 +83,27 @@ impl Cartesian {
         }
     }
 
+    /// # Computes the vector norm
+    /// 
+    /// We follow the convention of the l2 norm in this implementation.
+    /// 
+    /// ```
+    /// # use scilib::coordinate::cartesian::Cartesian;
+    /// let v = Cartesian::from(1, -2.5, 5.2);
+    /// let n = v.norm();
+    /// 
+    /// assert!((n - 5.85576638878294).abs() < 1.0e-14);
+    /// ```
+    pub fn norm(&self) -> f64 {
+        (self.x.powi(2) + self.y.powi(2) + self.z.powi(2)).sqrt()
+    }
+
     /// # Distance between two points
     /// 
     /// Computes the distance between two points in space.
     /// 
     /// ```
-    /// # use scilib::coordinate::Cartesian;
+    /// # use scilib::coordinate::cartesian::Cartesian;
     /// let f = Cartesian::from(1.0, 2, 0.5);
     /// let p = Cartesian::from(2, -1, 3.5);
     /// 
@@ -94,32 +125,37 @@ impl Cartesian {
     /// 
     /// ```
     /// # use std::f64::consts::FRAC_PI_2;
-    /// # use scilib::coordinate::Cartesian;
+    /// # use scilib::coordinate::cartesian::Cartesian;
     /// 
     /// // Setting a point in y=0, and rotating it 90° trigonometry-wise
     /// let f = Cartesian::from(0, 1, 0);
-    /// let res = f.rotate(FRAC_PI_2, 0.0, 0.0);
+    /// let res = f.rotate(FRAC_PI_2, 0, 0);
     /// 
     /// assert_eq!(res.x, -1.0);
     /// assert!((res.y - 0.0).abs() < 1.0e-15);
     /// assert_eq!(res.z, 0.0);
     /// ```
-    pub fn rotate(&self, yaw: f64, pitch: f64, roll: f64) -> Self {
+    pub fn rotate<T, U, V>(&self, yaw: T, pitch: U, roll: V) -> Self
+    where T: Into<f64>, U: Into<f64>, V: Into<f64> {
+
+        let y: f64 = yaw.into();
+        let p: f64 = pitch.into();
+        let r: f64 = roll.into();
 
         // First row of the matrix
-        let a11: f64 = yaw.cos() * pitch.cos();
-        let a12: f64 = yaw.cos() * pitch.sin() * roll.sin() - yaw.sin() * roll.cos();
-        let a13: f64 = yaw.cos() * pitch.sin() * roll.cos() + yaw.sin() * roll.sin();
+        let a11: f64 = y.cos() * p.cos();
+        let a12: f64 = y.cos() * p.sin() * r.sin() - y.sin() * r.cos();
+        let a13: f64 = y.cos() * p.sin() * r.cos() + y.sin() * r.sin();
 
         // Second row
-        let a21: f64 = yaw.sin() * pitch.cos();
-        let a22: f64 = yaw.sin() * pitch.sin() * roll.sin() + yaw.cos() * roll.cos();
-        let a23: f64 = yaw.sin() * pitch.sin() * roll.cos() - yaw.cos() * roll.sin();
+        let a21: f64 = y.sin() * p.cos();
+        let a22: f64 = y.sin() * p.sin() * r.sin() + y.cos() * r.cos();
+        let a23: f64 = y.sin() * p.sin() * r.cos() - y.cos() * r.sin();
 
         // Third row
-        let a31: f64 = -pitch.sin();
-        let a32: f64 = pitch.cos() * roll.sin();
-        let a33: f64 = pitch.cos() * roll.cos();
+        let a31: f64 = -p.sin();
+        let a32: f64 = p.cos() * r.sin();
+        let a33: f64 = p.cos() * r.cos();
 
         // Following matrix multiplication
         Self {
@@ -135,7 +171,7 @@ impl Cartesian {
 /// # Addition
 /// 
 /// ```
-/// # use scilib::coordinate::Cartesian;
+/// # use scilib::coordinate::cartesian::Cartesian;
 /// let c1 = Cartesian::from(1.0, 2.5, 3.0);
 /// let c2 = Cartesian::from(-1.0, 1, 0.0);
 /// let res = c1 + c2;
@@ -157,7 +193,7 @@ impl Add for Cartesian {
 /// # Addition with reference
 /// 
 /// ```
-/// # use scilib::coordinate::Cartesian;
+/// # use scilib::coordinate::cartesian::Cartesian;
 /// let c1 = Cartesian::from(1.0, 2.5, 3.0);
 /// let c2 = Cartesian::from(-1.0, 1, 0.0);
 /// let res = c1 + &c2;
@@ -179,7 +215,7 @@ impl Add<&Self> for Cartesian {
 /// # Assigning addition
 /// 
 /// ```
-/// # use scilib::coordinate::Cartesian;
+/// # use scilib::coordinate::cartesian::Cartesian;
 /// let mut c1 = Cartesian::from(1.0, 2.5, 3.0);
 /// let c2 = Cartesian::from(-1.0, 1, 0.0);
 /// c1 += c2;
@@ -198,7 +234,7 @@ impl AddAssign for Cartesian {
 /// # Assigning addition with reference
 /// 
 /// ```
-/// # use scilib::coordinate::Cartesian;
+/// # use scilib::coordinate::cartesian::Cartesian;
 /// let mut c1 = Cartesian::from(1.0, 2.5, 3.0);
 /// let c2 = Cartesian::from(-1.0, 1, 0.0);
 /// c1 += &c2;
@@ -217,7 +253,7 @@ impl AddAssign<&Self> for Cartesian {
 /// # Subtraction
 /// 
 /// ```
-/// # use scilib::coordinate::Cartesian;
+/// # use scilib::coordinate::cartesian::Cartesian;
 /// let c1 = Cartesian::from(1.0, 2.5, 3.0);
 /// let c2 = Cartesian::from(-1.0, 1, 0.0);
 /// let res = c1 - c2;
@@ -239,7 +275,7 @@ impl Sub for Cartesian {
 /// # Subtraction with reference
 /// 
 /// ```
-/// # use scilib::coordinate::Cartesian;
+/// # use scilib::coordinate::cartesian::Cartesian;
 /// let c1 = Cartesian::from(1.0, 2.5, 3.0);
 /// let c2 = Cartesian::from(-1.0, 1, 0.0);
 /// let res = c1 - &c2;
@@ -261,7 +297,7 @@ impl Sub<&Self> for Cartesian {
 /// # Assigning subtraction
 /// 
 /// ```
-/// # use scilib::coordinate::Cartesian;
+/// # use scilib::coordinate::cartesian::Cartesian;
 /// let mut c1 = Cartesian::from(1.0, 2.5, 3.0);
 /// let c2 = Cartesian::from(-1.0, 1, 0.0);
 /// c1 -= c2;
@@ -279,7 +315,7 @@ impl SubAssign for Cartesian {
 /// # Assigning subtraction with reference
 /// 
 /// ```
-/// # use scilib::coordinate::Cartesian;
+/// # use scilib::coordinate::cartesian::Cartesian;
 /// let mut c1 = Cartesian::from(1.0, 2.5, 3.0);
 /// let c2 = Cartesian::from(-1.0, 1, 0.0);
 /// c1 -= &c2;
@@ -299,7 +335,7 @@ impl SubAssign<&Self> for Cartesian {
 /// Multiplies each field by the scalar.
 /// 
 /// ```
-/// # use scilib::coordinate::Cartesian;
+/// # use scilib::coordinate::cartesian::Cartesian;
 /// let c1 = Cartesian::from(-1.0, 2.5, 3.0);
 /// let res = c1 * 2;
 /// let expected = Cartesian::from(-2, 5, 6.0);
@@ -323,7 +359,7 @@ impl<T: Into<f64>> Mul<T> for Cartesian {
 /// Multiplies each field by the scalar in place.
 /// 
 /// ```
-/// # use scilib::coordinate::Cartesian;
+/// # use scilib::coordinate::cartesian::Cartesian;
 /// let mut c1 = Cartesian::from(-1.0, 2.5, 3.0);
 /// c1 *= 2;
 /// let expected = Cartesian::from(-2, 5, 6.0);
@@ -344,7 +380,7 @@ impl<T: Into<f64>> MulAssign<T> for Cartesian {
 /// Divises each field by the scalar.
 /// 
 /// ```
-/// # use scilib::coordinate::Cartesian;
+/// # use scilib::coordinate::cartesian::Cartesian;
 /// let c1 = Cartesian::from(-2, 5, 6.0);
 /// let res = c1 / 2;
 /// let expected = Cartesian::from(-1.0, 2.5, 3.0);
@@ -368,7 +404,7 @@ impl<T: Into<f64>> Div<T> for Cartesian {
 /// Divises each field by the scalar in place.
 /// 
 /// ```
-/// # use scilib::coordinate::Cartesian;
+/// # use scilib::coordinate::cartesian::Cartesian;
 /// let mut c1 = Cartesian::from(-2, 5, 6.0);
 /// c1 /= 2;
 /// let expected = Cartesian::from(-1.0, 2.5, 3.0);
@@ -389,7 +425,7 @@ impl<T: Into<f64>> DivAssign<T> for Cartesian {
 /// Changes the values to their opposites.
 /// 
 /// ```
-/// # use scilib::coordinate::Cartesian;
+/// # use scilib::coordinate::cartesian::Cartesian;
 /// let c1 = Cartesian::from(-2, 5, 6.0);
 /// let c2 = -c1;
 /// let expected = Cartesian::from(2, -5.0, -6);
