@@ -28,8 +28,11 @@ use std::fmt::{     // Formatter display
 /// Defined for 3D space.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct Cartesian {
+    /// x axis
     pub x: f64,
+    /// y axis
     pub y: f64,
+    /// z axis
     pub z: f64
 }
 
@@ -63,7 +66,7 @@ impl Cartesian {
         Self::default()
     }
 
-    /// # From three points
+    /// # From each point
     /// 
     /// Creates a Cartesian struct from three given points in space.
     /// 
