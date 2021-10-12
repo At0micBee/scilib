@@ -4,6 +4,15 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+use std::f64::consts::PI;   // Calling constants
+
+use std::fmt::{             // Formatter display
+    Display,                // The display itself
+    Result as DRes          // The associated result
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /// # Radec coordinate system
 /// 
 /// Right ascension and declination of the object in the sky. The values are stored as `f64` internally, and in radians.
@@ -11,6 +20,16 @@
 pub struct Radec {
     pub ra: f64,
     pub dec: f64
+}
+
+/// # Display
+/// 
+/// Shows both ra and dec in degrees, which are more easily readable.
+impl Display for Radec {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> DRes {
+        write!(f, "ra={}° :: dec={}°", self.ra.to_degrees(), self.dec.to_degrees())?;
+        Ok(())
+    }
 }
 
 /// Implementing required methods
@@ -53,7 +72,15 @@ impl Radec {
     /// # Angular distance computation
     /// 
     /// We use the Vincenty formula to compute the angular distance, as it should remain stable no matter
-    /// the distances and positions of the objects.
+    /// the distances and positions of the objects. The resulting distance will be in the range [0, pi];
+    /// 
+    /// ```
+    /// use scilib::astronomy::Radec;
+    /// let c1 = Radec::from_rad(1.0, -1.2);
+    /// let c2 = Radec::from_rad(-2.02, 0.13);
+    /// 
+    /// assert!((c1.distance(c2) - 2.0685709648870154).abs() < 1.0e-15);
+    /// ```
     pub fn distance(&self, other: Self) -> f64 {
 
         // Difference in right ascension
@@ -66,7 +93,13 @@ impl Radec {
         // Computing the bottom term
         let b: f64 = self.dec.sin() * other.dec.sin() + self.dec.cos() * other.dec.cos() * da.cos();
         
-        ((t1 + t2).sqrt() / b).atan()
+        let res: f64 = ((t1 + t2).sqrt() / b).atan();
+        
+        if res < 0.0 {
+            res + PI
+        } else {
+            res
+        }
     }
 }
 

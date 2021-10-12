@@ -39,7 +39,7 @@ pub struct Complex {
 
 /// # Display
 /// 
-/// Simply display the value of the number as a String
+/// Returns the complex in the for a + bi, whe the sign of b is always showing.
 impl Display for Complex {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> DRes {
         write!(f, "{}", format!("{} {:+}i", self.re, self.im))?;
