@@ -4,6 +4,18 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+use std::ops::{     // Implementing basic operations
+    Add,            // Addition
+    AddAssign,      // Assigning addition
+    Sub,            // Subtraction
+    SubAssign,      // Assigning addition
+    Mul,            // Multiplication
+    MulAssign,      // Assigning multiplication
+    Div,            // Division
+    DivAssign,      // Assigning division
+    Neg             // Negation
+};
+
 use std::fmt::{     // Formatter display
     Display,        // The display itself
     Result as DRes  // The associated result
@@ -70,6 +82,97 @@ impl Spherical {
             theta: theta.into(),
             phi: phi.into()
         }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/// # Scalar multiplication
+/// 
+/// Multiplies the radius by a scalar.
+/// 
+/// ```
+/// # use scilib::coordinate::spherical::Spherical;
+/// let s = Spherical::from(1, 0.2, 2.1);
+/// let res = s * 2;
+/// let expected = Spherical::from(2, 0.2, 2.1);
+/// 
+/// assert_eq!(res, expected);
+/// ```
+impl<T: Into<f64>> Mul<T> for Spherical {
+    type Output = Self;
+    fn mul(self, rhs: T) -> Self::Output {
+        Self {
+            r: self.r * rhs.into(),
+            theta: self.theta,
+            phi: self.phi
+        }
+    }
+}
+
+/// # Assigning scalar multiplication
+/// 
+/// Multiplies the radius by a scalar in place.
+/// 
+/// ```
+/// # use scilib::coordinate::spherical::Spherical;
+/// let mut s = Spherical::from(1, 0.2, 2.1);
+/// s *= 2;
+/// let expected = Spherical::from(2, 0.2, 2.1);
+/// 
+/// assert_eq!(s, expected);
+/// ```
+impl<T: Into<f64>> MulAssign<T> for Spherical {
+    fn mul_assign(&mut self, rhs: T) {
+        self.r *= rhs.into();
+    }
+}
+
+/// # Scalar division
+/// 
+/// Divides the radius by a scalar.
+/// 
+/// ```
+/// # use scilib::coordinate::spherical::Spherical;
+/// let s = Spherical::from(2, 0.2, 2.1);
+/// let res = s / 2;
+/// let expected = Spherical::from(1, 0.2, 2.1);
+/// 
+/// assert_eq!(res, expected);
+/// ```
+impl<T: Into<f64>> Div<T> for Spherical {
+    type Output = Self;
+    fn div(self, rhs: T) -> Self::Output {
+        Self {
+            r: self.r / rhs.into(),
+            theta: self.theta,
+            phi: self.phi
+        }
+    }
+}
+
+/// # Assigning scalar division
+/// 
+/// Divides the radius by a scalar in place.
+/// 
+/// ```
+/// # use scilib::coordinate::spherical::Spherical;
+/// let mut s = Spherical::from(2, 0.2, 2.1);
+/// s /= 2;
+/// let expected = Spherical::from(1, 0.2, 2.1);
+/// 
+/// assert_eq!(s, expected);
+/// ```
+impl<T: Into<f64>> DivAssign<T> for Spherical {
+    fn div_assign(&mut self, rhs: T) {
+        self.r /= rhs.into();
+    }
+}
+
+impl Neg for Spherical {
+    type Output = Self;
+    fn neg(self) -> Self::Output {
+        self * -1
     }
 }
 
