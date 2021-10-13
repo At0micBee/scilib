@@ -59,6 +59,20 @@ let e = erf(c);
 
 ---
 
+## Coordinate systems
+
+This crate provides functionalities for coordinate systems, such as Cartesian and Spherical, with many standard operations, and conversions.
+
+```rust
+// They are found in the coordinate crate
+use scilib::coordinate::*;
+
+let c = cartesian::Cartesian::from(2.0, 1, 0.25);
+let s = spherical::Spherical::from_degree(1.2, 30, 60.2);
+```
+
+---
+
 ## Complex numbers
 
 This crate provides basic functionalities for complex numbers, mainly to support its other goals. The implementation uses `f64` for both the real and imaginary parts, to ensure precision in the computations.
@@ -127,7 +141,7 @@ The spherical harmonics Ylm(theta, phi) function has been added to the quantum s
 
 ```rust
 // Found in the quantum crate
-use scilib::quantum;
+use scilib::quantum::*;
 
 // Computing Ylm for l=3, m=1, theta = 0.2 and phi = -0.3
 let res = spherical_harmonics(3, 1, 0.2, -0.3);

@@ -7,7 +7,7 @@ keywords = ["mathematics", "science", "physics", "equation"]
 categories = ["science", "mathematics"]
 repository = "https://github.com/At0micBee/scilib"
 license = "GPL-3.0"
-version = "0.2.3"
+version = "0.2.4"
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

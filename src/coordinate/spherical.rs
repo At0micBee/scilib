@@ -6,6 +6,8 @@
 //! - r: distance to origin, `[0, +∞`[
 //! - theta: azimuth (longitude) of the point, `[0, 2π[`
 //! - phi: elevation (latitude) of the point, `[0, π[`
+//! 
+//! Support conversion to and from Cartesian coordinates.
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

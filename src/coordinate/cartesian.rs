@@ -1,6 +1,9 @@
 //!
 //! # Cartesian coordinates
 //! 
+//! Cartesian coordinates store the distance of the point compared to the origin for each axis.
+//! 
+//! Support conversion to and from Spherical coordinates.
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

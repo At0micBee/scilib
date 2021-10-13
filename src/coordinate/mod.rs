@@ -5,9 +5,9 @@
 //! 
 //! Currently available:
 //! - Cartesian
+//! - Spherical
 //! 
 //! Planned:
-//! - Spherical
 //! - Cylindrical
 //! - Orbital (might be added in the astrophysics crate)
 
