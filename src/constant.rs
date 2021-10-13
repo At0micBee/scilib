@@ -180,11 +180,11 @@ pub const Z_0: f64 = 376.730_313_668;
 
 /// # Euler-Mascheroni constant (γ)
 /// 
-/// - Value: 0.57721566490153286060651209008240243104215933593992
+/// - Value: 0.577 215 664 901 532 860 606 512 090 082 402 431 042 159 335 939 92
 /// - Unit: /
 /// 
 /// Not to be confused with Euler's number 2.71... (in standard consts of Rust).
-pub const EULER_MASCHERONI: f64 = 0.57721566490153286060651209008240243104215933593992;
+pub const EULER_MASCHERONI: f64 = 0.577_215_664_901_532_860_606_512_090_082_402_431_042_159_335_939_92;
 
 /// # Avogadro constant
 ///
@@ -224,13 +224,13 @@ pub const A_0: f64 = 5.291_772_109_03e-11;
 ///
 /// - Value: 9.274 010 08×10⁻²⁴
 /// - Unit: `J.T-1` = `kg2.m2.s-4.A-1`
-pub const BOHR_MAG: f64 = 9.27401008e-24;
+pub const BOHR_MAG: f64 = 9.274_010_08e-24;
 
 /// # Wien wavelength
 ///
-/// - Value: 0.00289777196
+/// - Value: 0.002 897 771 96
 /// - Unit: `m.K`
-pub const WIEN_B: f64 = 0.00289777196;
+pub const WIEN_B: f64 = 0.002_897_771_96;
 
 /// # Classical electron radius
 ///
@@ -288,8 +288,8 @@ pub const SIGMA_SB: f64 = 5.670_374_419e-8;
 
 /// # Thomson scattering cross section
 ///
-/// - Value: 6.65245873×10⁻²⁹
+/// - Value: 6.652 458 73×10⁻²⁹
 /// - Unit: `m2`
-pub const SIGMA_T: f64 = 6.65245873e-29;
+pub const SIGMA_T: f64 = 6.652_458_73e-29;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
