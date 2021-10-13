@@ -21,11 +21,11 @@ use crate::{                        // Calling other modules
 /// 
 /// This quantum number exists in the range [0, n-1].
 /// 
-/// ```
+/* /// ```
 /// # use scilib::quantum::get_l;
 /// let l = get_l(3);
 /// assert_eq!(l, vec![0, 1, 2]);
-/// ```
+/// ``` */
 #[allow(unused)]
 fn get_l(n: usize) -> Vec<usize> {
     (0..n).collect()
@@ -35,11 +35,11 @@ fn get_l(n: usize) -> Vec<usize> {
 /// 
 /// This quantum number exists in the range [-l, l].
 /// 
-/// ```
+/* /// ```
 /// # use scilib::quantum::get_m;
 /// let m = get_m(2);
 /// assert_eq!(m, vec![-2, -1, 0, 1, 2]);
-/// ```
+/// ``` */
 #[allow(unused)]
 fn get_m(l: usize) -> Vec<isize> {
     let li: isize = l as isize;
