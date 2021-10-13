@@ -1,6 +1,11 @@
 //!
 //! # Spherical coordinates
 //! 
+//! Spherical coordinates use the distance to the origin of the point, as well as two angles from reference axis.
+//! In this implementation, we use the following convention:
+//! - r: distance to origin, `[0, +∞`[
+//! - theta: azimuth (longitude) of the point, `[0, 2π[`
+//! - phi: elevation (latitude) of the point, `[0, π[`
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -11,9 +16,7 @@ use std::f64::consts::{
 
 use std::ops::{     // Implementing basic operations
     Add,            // Addition
-    AddAssign,      // Assigning addition
     Sub,            // Subtraction
-    SubAssign,      // Assigning addition
     Mul,            // Multiplication
     MulAssign,      // Assigning multiplication
     Div,            // Division
@@ -113,6 +116,25 @@ impl Spherical {
             phi: pd.to_radians() % PI
         }
     }
+
+    /// # Distance between two points
+    /// 
+    /// ```
+    /// # use std::f64::consts::SQRT_2;
+    /// # use scilib::coordinate::spherical::Spherical;
+    /// let s1 = Spherical::from_degree(SQRT_2, 45, 90);
+    /// let s2 = Spherical::from_degree(SQRT_2, -45, 90);
+    /// 
+    /// assert_eq!(s1.distance(s2), 2.0);
+    /// ```
+    pub fn distance(&self, other: Self) -> f64 {
+        let r1: f64 = self.r.powi(2);
+        let r2: f64 = other.r.powi(2);
+        let a1: f64 = self.phi.sin() * other.phi.sin() * (self.theta - other.theta).cos();
+        let a2: f64 = self.phi.cos() * other.phi.cos();
+
+        (r1 + r2 - 2.0 * r1 * r2 * (a1 + a2)).sqrt()
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -145,6 +167,30 @@ impl Into<Cartesian> for Spherical {
             y: self.r * self.theta.sin() * self.phi.sin(),
             z: self.r * self.phi.cos()
         }
+    }
+}
+
+/// # Addition
+/// 
+/// Converts the coordinate in cartesian for addition, then returns them as spherical.
+impl Add for Spherical {
+    type Output = Self;
+    fn add(self, rhs: Self) -> Self::Output {
+        let s: Cartesian = self.into();
+        let r: Cartesian = rhs.into();
+        (s + r).into()
+    }
+}
+
+/// # Subtraction
+/// 
+/// Converts the coordinate in cartesian for subtraction, then returns them as spherical.
+impl Sub for Spherical {
+    type Output = Self;
+    fn sub(self, rhs: Self) -> Self::Output {
+        let s: Cartesian = self.into();
+        let r: Cartesian = rhs.into();
+        (s - r).into()
     }
 }
 

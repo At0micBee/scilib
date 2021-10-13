@@ -225,9 +225,10 @@ impl Into<Spherical> for Cartesian {
 /// 
 /// assert_eq!(res, expected);
 /// ```
-impl Add for Cartesian {
+impl<T: Into<Self>> Add<T> for Cartesian {
     type Output = Self;
-    fn add(self, rhs: Self) -> Self::Output {
+    fn add(self, rhs: T) -> Self::Output {
+        let rhs: Self = rhs.into();
         Self {
             x: self.x + rhs.x,
             y: self.y + rhs.y,
@@ -269,8 +270,9 @@ impl Add<&Self> for Cartesian {
 /// 
 /// assert_eq!(c1, expected);
 /// ```
-impl AddAssign for Cartesian {
-    fn add_assign(&mut self, rhs: Self) {
+impl<T: Into<Self>> AddAssign<T> for Cartesian {
+    fn add_assign(&mut self, rhs: T) {
+        let rhs: Self = rhs.into();
         self.x += rhs.x;
         self.y += rhs.y;
         self.z += rhs.z;
@@ -307,9 +309,10 @@ impl AddAssign<&Self> for Cartesian {
 /// 
 /// assert_eq!(res, expected);
 /// ```
-impl Sub for Cartesian {
+impl<T: Into<Self>> Sub<T> for Cartesian {
     type Output = Self;
-    fn sub(self, rhs: Self) -> Self::Output {
+    fn sub(self, rhs: T) -> Self::Output {
+        let rhs: Self = rhs.into();
         Self {
             x: self.x - rhs.x,
             y: self.y - rhs.y,
@@ -350,8 +353,9 @@ impl Sub<&Self> for Cartesian {
 /// let expected = Cartesian::from(2, 1.5, 3.0);
 /// 
 /// assert_eq!(c1, expected);
-impl SubAssign for Cartesian {
-    fn sub_assign(&mut self, rhs: Self) {
+impl<T: Into<Self>> SubAssign<T> for Cartesian {
+    fn sub_assign(&mut self, rhs: T) {
+        let rhs: Self = rhs.into();
         self.x -= rhs.x;
         self.y -= rhs.y;
         self.z -= rhs.z;
