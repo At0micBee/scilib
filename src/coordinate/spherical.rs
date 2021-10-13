@@ -6,7 +6,7 @@
 
 use std::f64::consts::{
     PI,
-    FRAC_PI_2
+    TAU
 };
 
 use std::ops::{     // Implementing basic operations
@@ -25,6 +25,8 @@ use std::fmt::{     // Formatter display
     Display,        // The display itself
     Result as DRes  // The associated result
 };
+
+use super::cartesian::Cartesian;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -84,13 +86,67 @@ impl Spherical {
     where T: Into<f64>, U: Into<f64>, V: Into<f64> {
         Self {
             r: r.into(),
-            theta: theta.into(),
-            phi: phi.into()
+            theta: theta.into() % TAU,
+            phi: phi.into() % PI
+        }
+    }
+
+    /// # From the point (degrees)
+    /// 
+    /// Creates a Cartesian struct from three given points in space, with the angles in degrees.
+    /// 
+    /// ```
+    /// # use scilib::coordinate::spherical::Spherical;
+    /// let m = Spherical { r: 1.0, theta: 45.0_f64.to_radians(), phi: 60.0_f64.to_radians() };
+    /// let f = Spherical::from_degree(1, 45, 60);
+    /// 
+    /// assert_eq!(m, f);
+    /// ```
+    pub fn from_degree<T, U, V>(r: T, theta: U, phi: V) -> Self
+    where T: Into<f64>, U: Into<f64>, V: Into<f64> {
+        let td: f64 = theta.into();
+        println!("td {}", td);
+        let pd: f64 = phi.into();
+        Self {
+            r: r.into(),
+            theta: td.to_radians() % TAU,
+            phi: pd.to_radians() % PI
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/// # Conversion to cartesian coordinates
+/// 
+/// ```
+/// # use std::f64::consts::SQRT_2;
+/// # use scilib::coordinate::cartesian::Cartesian;
+/// # use scilib::coordinate::spherical::Spherical;
+/// let s = Spherical::from_degree(SQRT_2, 0, 45);
+/// let conv: Cartesian = s.into();
+/// let expected = Cartesian::from(1, 0, 1);
+/// 
+/// assert_eq!(conv.x, expected.x);
+/// assert_eq!(conv.y, expected.y);
+/// assert!((conv.z - expected.z).abs() < 1.0e-15);
+/// 
+/// let s = Spherical::from_degree(SQRT_2, 45, 90);
+/// let conv: Cartesian = s.into();
+/// let expected = Cartesian::from(1, 1, 0);
+/// assert!((conv.x - expected.x).abs() < 1.0e-15);
+/// assert_eq!(conv.y, expected.y);
+/// assert!((conv.z - expected.z).abs() < 1.0e-15);
+/// ```
+impl Into<Cartesian> for Spherical {
+    fn into(self) -> Cartesian {
+        Cartesian {
+            x: self.r * self.theta.cos() * self.phi.sin(),
+            y: self.r * self.theta.sin() * self.phi.sin(),
+            z: self.r * self.phi.cos()
+        }
+    }
+}
 
 /// # Scalar multiplication
 /// 
@@ -142,8 +198,8 @@ impl<T: Into<f64>> MulAssign<T> for Spherical {
 
         // If the sign is negative, we need to flip the angles
         if f.is_sign_negative() {
-            self.theta += PI;
-            self.phi += FRAC_PI_2;
+            self.theta = (self.theta + PI) % TAU;
+            self.phi = (PI - self.phi) % PI;
         }
     }
 }
@@ -198,8 +254,8 @@ impl<T: Into<f64>> DivAssign<T> for Spherical {
 
         // If the sign is negative, we need to flip the angles
         if f.is_sign_negative() {
-            self.theta += PI;
-            self.phi += FRAC_PI_2;
+            self.theta = (self.theta + PI) % TAU;
+            self.phi = (PI - self.phi) % PI;
         }
     }
 }
@@ -221,8 +277,8 @@ impl Neg for Spherical {
     fn neg(self) -> Self::Output {
         Self {
             r: self.r,
-            theta: self.theta + PI,
-            phi: self.phi + FRAC_PI_2
+            theta: (self.theta + PI) % TAU,
+            phi: (PI - self.phi) % PI
         }
     }
 }

@@ -4,6 +4,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+use std::f64::consts::PI;
+
 use std::ops::{     // Implementing basic operations
     Add,            // Addition
     AddAssign,      // Assigning addition
@@ -20,6 +22,8 @@ use std::fmt::{     // Formatter display
     Display,        // The display itself
     Result as DRes  // The associated result
 };
+
+use super::spherical::Spherical;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -170,6 +174,45 @@ impl Cartesian {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/// # Conversion to spherical coordinates
+/// 
+/// ```
+/// # use std::f64::consts::SQRT_2;
+/// use scilib::coordinate::spherical::Spherical;
+/// use scilib::coordinate::cartesian::Cartesian;
+/// 
+/// let s = Cartesian::from(1, 1, 0);
+/// let conv: Spherical = s.into();
+/// let expected = Spherical::from_degree(SQRT_2, 45, 90);
+/// 
+/// assert_eq!(conv, expected);
+/// 
+/// let s = Cartesian::from(1, 0, 1);
+/// let conv: Spherical = s.into();
+/// let expected = Spherical::from_degree(SQRT_2, 0, 45);
+/// 
+/// assert_eq!(conv.r, expected.r);
+/// assert_eq!(conv.theta, expected.theta);
+/// assert!((conv.phi - expected.phi).abs() < 1.0e-15);
+/// ```
+impl Into<Spherical> for Cartesian {
+    fn into(self) -> Spherical {
+        let rho: f64 = self.norm();
+        let mut nt: f64 = (self.y / self.x).atan();
+
+        // If we were in the wrong quadrants, the atan range doesn't work
+        if self.x.is_sign_negative() {
+            nt += PI;
+        }
+
+        Spherical {
+            r: rho,
+            theta: nt,
+            phi: (self.z / rho).acos()
+        }
+    }
+}
 
 /// # Addition
 /// 
