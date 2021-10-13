@@ -19,7 +19,8 @@ use std::fmt::{             // Formatter display
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct Radec {
     pub ra: f64,
-    pub dec: f64
+    pub dec: f64,
+    pub dist_earth: Option<f64>
 }
 
 /// # Display
@@ -28,6 +29,12 @@ pub struct Radec {
 impl Display for Radec {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> DRes {
         write!(f, "ra={}° :: dec={}°", self.ra.to_degrees(), self.dec.to_degrees())?;
+
+        // If there is a distance, we print it as well
+        match self.dist_earth {
+            Some(d) => write!(f, " :: distance={}ly", d)?,
+            None => {}
+        }
         Ok(())
     }
 }
@@ -41,14 +48,16 @@ impl Radec {
     /// # use std::f64::consts::{ FRAC_PI_3, FRAC_PI_6 };
     /// # use scilib::astronomy::Radec;
     /// let coord1 = Radec::from_rad(FRAC_PI_6, FRAC_PI_3);
-    /// let coord2 = Radec { ra: FRAC_PI_6, dec: FRAC_PI_3 };
+    /// let coord2 = Radec { ra: FRAC_PI_6, dec: FRAC_PI_3, dist_earth: None };
     /// assert!((coord1.ra - coord2.ra).abs() < 1.0e-15);
     /// assert!((coord1.dec - coord2.dec).abs() < 1.0e-15);
     /// ```
-    pub fn from_rad(ra: f64, dec: f64) -> Self {
+    pub fn from_rad<T, U>(ra: T, dec: U) -> Self
+    where T: Into<f64>, U: Into<f64> {
         Self {
-            ra,
-            dec
+            ra: ra.into(),
+            dec: dec.into(),
+            dist_earth: None
         }
     }
 
@@ -58,30 +67,32 @@ impl Radec {
     /// # use std::f64::consts::{ FRAC_PI_3, FRAC_PI_6 };
     /// # use scilib::astronomy::Radec;
     /// let coord1 = Radec::from_degrees(30.0, 60.0);
-    /// let coord2 = Radec { ra: FRAC_PI_6, dec: FRAC_PI_3 };
+    /// let coord2 = Radec { ra: FRAC_PI_6, dec: FRAC_PI_3, dist_earth: None };
     /// assert!((coord1.ra - coord2.ra).abs() < 1.0e-15);
     /// assert!((coord1.dec - coord2.dec).abs() < 1.0e-15);
     /// ```
-    pub fn from_degrees(ra: f64, dec: f64) -> Self {
+    pub fn from_degrees<T, U>(ra: T, dec: U) -> Self
+    where T: Into<f64>, U: Into<f64> {
         Self {
-            ra: ra.to_radians(),
-            dec: dec.to_radians()
+            ra: ra.into().to_radians(),
+            dec: dec.into().to_radians(),
+            dist_earth: None
         }
     }
 
-    /// # Angular distance computation
+    /// # Angular separation computation
     /// 
-    /// We use the Vincenty formula to compute the angular distance, as it should remain stable no matter
-    /// the distances and positions of the objects. The resulting distance will be in the range [0, pi];
+    /// We use the Vincenty formula to compute the angular separation, as it should remain stable no matter
+    /// the separations and positions of the objects. The resulting separation will be in the range [0, pi];
     /// 
     /// ```
     /// use scilib::astronomy::Radec;
     /// let c1 = Radec::from_rad(1.0, -1.2);
     /// let c2 = Radec::from_rad(-2.02, 0.13);
     /// 
-    /// assert!((c1.distance(c2) - 2.0685709648870154).abs() < 1.0e-15);
+    /// assert!((c1.separation(c2) - 2.0685709648870154).abs() < 1.0e-15);
     /// ```
-    pub fn distance(&self, other: Self) -> f64 {
+    pub fn separation(&self, other: Self) -> f64 {
 
         // Difference in right ascension
         let da: f64 = self.ra - other.ra;

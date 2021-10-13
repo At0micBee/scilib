@@ -110,7 +110,6 @@ impl Spherical {
     pub fn from_degree<T, U, V>(r: T, theta: U, phi: V) -> Self
     where T: Into<f64>, U: Into<f64>, V: Into<f64> {
         let td: f64 = theta.into();
-        println!("td {}", td);
         let pd: f64 = phi.into();
         Self {
             r: r.into(),

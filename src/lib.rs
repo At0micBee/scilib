@@ -18,6 +18,8 @@
 
 pub mod astronomy;
 
+pub mod range;
+
 pub mod coordinate;
 
 pub mod constant;
