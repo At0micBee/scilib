@@ -182,8 +182,8 @@ impl Cartesian {
 /// 
 /// ```
 /// # use std::f64::consts::SQRT_2;
-/// use scilib::coordinate::spherical::Spherical;
-/// use scilib::coordinate::cartesian::Cartesian;
+/// # use scilib::coordinate::spherical::Spherical;
+/// # use scilib::coordinate::cartesian::Cartesian;
 /// 
 /// let s = Cartesian::from(1, 1, 0);
 /// let conv: Spherical = s.into();
