@@ -24,23 +24,24 @@ use crate::math::complex::Complex;
 /// 
 /// assert_eq!(res, expected);
 /// ```
-pub fn convolve(a_i: &Vec<f64>, b_i: &Vec<f64>) -> Vec<f64> {
+pub fn convolve<T>(a_i: &[T], b_i: &[T]) -> Vec<T>
+where T: std::ops::Mul<Output = T> + std::ops::AddAssign + Default + Copy {
 
     // We check which box is the smallest
-    let (a, b): (&Vec<f64>, &Vec<f64>) = match a_i.len() < b_i.len() {
+    let (a, b): (&[T], &[T]) = match a_i.len() < b_i.len() {
         true => (b_i, a_i),
         false => (a_i, b_i)
     };
 
     // We initialize our variables
-    let mut sum: f64;
+    let mut sum: T;
     let l_a: usize = a.len();
     let l_b: usize = b.len();
-    let mut res: Vec<f64> = Vec::with_capacity(a.len());
+    let mut res: Vec<T> = Vec::with_capacity(a.len());
 
     // Box b starts to slide over a
     for n in 0..(l_b - 1) {
-        sum = 0.0;
+        sum = T::default();
         for m in 0..=n {
             sum += a[n-m] * b[m];
 
@@ -50,7 +51,7 @@ pub fn convolve(a_i: &Vec<f64>, b_i: &Vec<f64>) -> Vec<f64> {
 
     // Box b covers a completely
     for n in (l_b - 1)..=(l_a - 1) {
-        sum = 0.0;
+        sum = T::default();
         for m in 0..l_b {
             sum += a[n-m] * b[m];
         }
@@ -59,7 +60,7 @@ pub fn convolve(a_i: &Vec<f64>, b_i: &Vec<f64>) -> Vec<f64> {
 
     // Box b exits the slide over a
     for n in l_a..(l_a + l_b - 1) {
-        sum = 0.0;
+        sum = T::default();
         for m in (n - l_a + 1)..l_b {
             sum += a[n-m] * b[m];
         }
@@ -92,7 +93,7 @@ pub fn convolve(a_i: &Vec<f64>, b_i: &Vec<f64>) -> Vec<f64> {
 /// assert!((res[9].re - -0.02709553).abs() < 1.0e-8 && (res[9].im - 1.02037473).abs() < 1.0e-8);
 /// assert!((res[14].re - 4.77371673).abs() < 1.0e-8 && (res[14].im - -2.58964065).abs() < 1.0e-8);
 /// ```
-pub fn fft<T>(data: &Vec<T>) -> Vec<Complex>
+pub fn fft<T>(data: &[T]) -> Vec<Complex>
 where T: Into<Complex> + Copy {
 
     let length: isize = data.len() as isize;
@@ -108,7 +109,7 @@ where T: Into<Complex> + Copy {
     let mut sum_k: Complex;
 
     for k in 0..length {
-        sum_k = 0.into();
+        sum_k = Complex::default();
         bk_star = (k.pow(2) as f64 * ipi_n).exp().conjugate();
 
         for (n, val) in data.iter().enumerate() {
@@ -144,7 +145,7 @@ where T: Into<Complex> + Copy {
 ///     assert!((ori - comp.re).abs() < 1.0e-14 && comp.im < 1.0e-14);
 /// }
 /// ```
-pub fn ifft<T>(data: &Vec<T>) -> Vec<Complex>
+pub fn ifft<T>(data: &[T]) -> Vec<Complex>
 where T: Into<Complex> + Copy {
 
     let length: isize = data.len() as isize;
@@ -161,7 +162,7 @@ where T: Into<Complex> + Copy {
     let mut sum_k: Complex;
 
     for k in 0..length {
-        sum_k = 0.into();
+        sum_k = Complex::default();
         bk_star = (k.pow(2) as f64 * ipi_n).exp().conjugate();
 
         for (n, val) in data.iter().enumerate() {

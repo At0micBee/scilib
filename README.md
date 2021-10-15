@@ -109,7 +109,7 @@ Values are compared to known results (thanks, [WolframAlpha](https://www.wolfram
 
 ---
 
-## Signal function
+## Signal functions
 
 Support to conduct both fast Fourier transform (`fft`) and the inverse fast Fourier transform (`ifft`) is available. Computations are
 done using [Bluestein's algorithm](https://en.wikipedia.org/wiki/Chirp_Z-transform#Bluestein.27s_algorithm). Convolution is also possible,
