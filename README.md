@@ -109,14 +109,15 @@ Values are compared to known results (thanks, [WolframAlpha](https://www.wolfram
 
 ---
 
-## Fast Fourier transform
+## Signal function
 
 Support to conduct both fast Fourier transform (`fft`) and the inverse fast Fourier transform (`ifft`) is available. Computations are
-done using [Bluestein's algorithm](https://en.wikipedia.org/wiki/Chirp_Z-transform#Bluestein.27s_algorithm).
+done using [Bluestein's algorithm](https://en.wikipedia.org/wiki/Chirp_Z-transform#Bluestein.27s_algorithm). Convolution is also possible,
+with any two vector sizes.
 
 ```rust
 // Found in the fourier crate
-use scilib::fourier::*
+use scilib::signal::*
 
 // Computing values of the sinus
 let r = range::linear(0.0, 10.0, 15);
@@ -124,6 +125,7 @@ let s: Vec<Complex> = r.iter().map(|val| val.sin()).collect();
 
 let res = fft(&s);
 let res2 = ifft(&res);
+let res3 = convolve(&r, &s);
 ```
 
 ---

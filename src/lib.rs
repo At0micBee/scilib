@@ -22,7 +22,7 @@
 //! - **Math**: Provides many base utilities, from complex numbers to bessel functions.
 //! - **Coordinate**: Provides support for coordinate systems, and their respective operations.
 //! - **Constant**: Contains many useful constants for physics
-//! - **Fourier**: The fast Fourier transform functions
+//! - **Signal**: Convolution and fast Fourier transform functions
 //! 
 //! ### Specific purpose
 //! 

@@ -13,8 +13,26 @@ use crate::math::complex::Complex;
 /// # Convolution
 /// 
 /// Computes the convolution of two vectors, including the edges.
-pub fn convolve(a: &Vec<f64>, b: &Vec<f64>) -> Vec<f64> {
+/// 
+/// ```
+/// # use scilib::signal::convolve;
+/// // Creating two vectors to convolve
+/// let a1: Vec<f64> = vec![2.8, 2.5, 1.0, 0.5, 3.2, 0.25];
+/// let a2: Vec<f64> = vec![0.25, 1.0, 0.5];
+/// let res = convolve(&a1, &a2);
+/// let expected: Vec<f64> = vec![0.7, 3.425, 4.15, 2.375, 1.8, 3.5125, 1.85, 0.125];
+/// 
+/// assert_eq!(res, expected);
+/// ```
+pub fn convolve(a_i: &Vec<f64>, b_i: &Vec<f64>) -> Vec<f64> {
 
+    // We check which box is the smallest
+    let (a, b): (&Vec<f64>, &Vec<f64>) = match a_i.len() < b_i.len() {
+        true => (b_i, a_i),
+        false => (a_i, b_i)
+    };
+
+    // We initialize our variables
     let mut sum: f64;
     let l_a: usize = a.len();
     let l_b: usize = b.len();
