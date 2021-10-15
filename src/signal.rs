@@ -10,6 +10,49 @@ use crate::math::complex::Complex;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/// # Convolution
+/// 
+/// Computes the convolution of two vectors, including the edges.
+pub fn convolve(a: &Vec<f64>, b: &Vec<f64>) -> Vec<f64> {
+
+    let mut sum: f64;
+    let l_a: usize = a.len();
+    let l_b: usize = b.len();
+    let mut res: Vec<f64> = Vec::with_capacity(a.len());
+
+    // Box b starts to slide over a
+    for n in 0..(l_b - 1) {
+        sum = 0.0;
+        for m in 0..=n {
+            sum += a[n-m] * b[m];
+
+        }
+        res.push(sum);
+    }
+
+    // Box b covers a completely
+    for n in (l_b - 1)..=(l_a - 1) {
+        sum = 0.0;
+        for m in 0..l_b {
+            sum += a[n-m] * b[m];
+        }
+        res.push(sum);
+    }
+
+    // Box b exits the slide over a
+    for n in l_a..(l_a + l_b - 1) {
+        sum = 0.0;
+        for m in (n - l_a + 1)..l_b {
+            sum += a[n-m] * b[m];
+        }
+        res.push(sum);
+    }
+
+    res
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /// # Fast Fourier transform
 /// 
 /// Computes the FFT for a one-dimensional array, based on the discrete fourier transform.
@@ -19,7 +62,7 @@ use crate::math::complex::Complex;
 /// ```
 /// # use scilib::range;
 /// # use scilib::math::complex::Complex;
-/// # use scilib::fourier::fft;
+/// # use scilib::signal::fft;
 /// // We create a Vec with the value sin(v) + cos(v)i
 /// let r = range::linear(0.0, 10.0, 15);
 /// let s: Vec<Complex> = r.iter().map(|val| (Complex::i() * val.cos()) + val.sin()).collect();
@@ -73,7 +116,7 @@ where T: Into<Complex> + Copy {
 /// ```
 /// # use scilib::range;
 /// # use scilib::math::complex::Complex;
-/// # use scilib::fourier::{ fft, ifft };
+/// # use scilib::signal::{ fft, ifft };
 /// // We create a Vec with the value sin(v) + cos(v)i
 /// let r = range::linear(0.0, 10.0, 15);
 /// let s: Vec<f64> = r.iter().map(|val| val.sin()).collect();
