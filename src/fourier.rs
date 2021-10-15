@@ -1,5 +1,5 @@
 //!
-//! # Convolution
+//! # Fourier transform algorithms
 //! 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,5 +62,57 @@ where T: Into<Complex> + Copy {
     res
 }
 
+/// # Inverse fast Fourier transform
+/// 
+/// Computes the IFFT for a one-dimensional array, based on the discrete fourier transform.
+/// This function accepts complex input. The FFT is computed using
+/// [Bluestein's algorithm](https://en.wikipedia.org/wiki/Chirp_Z-transform#Bluestein.27s_algorithm).
+/// 
+/// This function yields `v = ifft(fft(v))`, within numerical errors.
+/// 
+/// ```
+/// # use scilib::range;
+/// # use scilib::math::complex::Complex;
+/// # use scilib::fourier::{ fft, ifft };
+/// // We create a Vec with the value sin(v) + cos(v)i
+/// let r = range::linear(0.0, 10.0, 15);
+/// let s: Vec<f64> = r.iter().map(|val| val.sin()).collect();
+/// let res = ifft(&fft(&s));
+/// 
+/// for (ori, comp) in s.iter().zip(&res) {
+///     assert!((ori - comp.re).abs() < 1.0e-14 && comp.im < 1.0e-14);
+/// }
+/// ```
+pub fn ifft<T>(data: &Vec<T>) -> Vec<Complex>
+where T: Into<Complex> + Copy {
+
+    let length: isize = data.len() as isize;
+    let norm: f64 = length as f64;
+
+    // The pre-factor in the exponential terms
+    let ipi_n: Complex = -Complex::i() * PI / length as f64;
+
+    let mut res: Vec<Complex> = Vec::with_capacity(data.len());
+
+    let mut an: Complex;
+    let mut bkn: Complex;
+    let mut bk_star: Complex;
+    let mut sum_k: Complex;
+
+    for k in 0..length {
+        sum_k = 0.into();
+        bk_star = (k.pow(2) as f64 * ipi_n).exp().conjugate();
+
+        for (n, val) in data.iter().enumerate() {
+            an = (- (n.pow(2) as f64) * ipi_n).exp() * (*val).into();
+            bkn = ((k - n as isize).pow(2) as f64 * ipi_n).exp();
+            sum_k += an * bkn;
+        }
+
+        res.push(bk_star * sum_k / norm);
+    }
+
+    res
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

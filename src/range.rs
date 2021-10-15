@@ -18,19 +18,23 @@
 /// assert_eq!(res.len(), 7);
 /// 
 /// ```
-pub fn by_increment(start: f64, stop: f64, inc: f64) -> Vec<f64> {
+pub fn by_increment<T, U, V>(start: T, stop: U, step: V) -> Vec<f64>
+where T: Into<f64>, U: Into<f64>, V: Into<f64> {
 
     let mut res: Vec<f64> = Vec::new();
 
+    // Casting values
+    let mut computed: f64 = start.into();
+    let end: f64 = stop.into();
+    let inc: f64 = step.into();
+
     // If the sign of this is pos, the increment doesn't make sense
-    if ((start - stop) / inc).is_sign_positive() {
+    if ((computed - end) / inc).is_sign_positive() {
         return res;
     }
 
-    let mut computed: f64 = start;
-
     'pushing: loop {
-        if ((computed - stop) / inc).is_sign_positive() {
+        if ((computed - end) / inc).is_sign_positive() {
             break 'pushing;
         }
         res.push(computed);
@@ -53,18 +57,21 @@ pub fn by_increment(start: f64, stop: f64, inc: f64) -> Vec<f64> {
 /// assert_eq!(r.last().unwrap(), &-10.0);
 /// assert_eq!(r.len(), 15);
 /// ```
-pub fn linear(start: f64, stop: f64, n_points: usize) -> Vec<f64> {
+pub fn linear<T, U>(start: T, stop: U, n_points: usize) -> Vec<f64>
+where T: Into<f64>, U: Into<f64> {
     
-    let step: f64 = stop - start;
+    let start_f: f64 = start.into();
+    let stop_f: f64 = stop.into();
+    let step: f64 = stop_f - start_f;
     let mut res: Vec<f64> = Vec::with_capacity(n_points);
 
     if n_points == 1 {
-        res.push(start);
+        res.push(start_f);
         return res;
     }
 
     for i in (0..n_points).map(|j| j as f64 / (n_points - 1) as f64) {
-        res.push(start + i * step);
+        res.push(start_f + i * step);
     }
 
     res
@@ -84,25 +91,30 @@ pub fn linear(start: f64, stop: f64, n_points: usize) -> Vec<f64> {
 /// assert_eq!(r.last().unwrap(), &10.0);   // End is correct
 /// assert_eq!(r.len(), 15);                // Number of points is correct
 /// ```
-pub fn logarithmic(start: f64, stop: f64, n_points: usize, base: f64) -> Vec<f64> {
+pub fn logarithmic<T, U, V>(start: T, stop: U, n_points: usize, base: V) -> Vec<f64>
+where T: Into<f64>, U: Into<f64>, V: Into<f64> {
+
+    let start_f: f64 = start.into();
+    let stop_f: f64 = stop.into();
+    let base_f: f64 = base.into();
 
     // If the scale includes 0.0, it doesn't work
-    if start == 0.0 || stop == 0.0 || start.signum() != stop.signum() {
+    if start_f == 0.0 || stop_f == 0.0 || start_f.signum() != stop_f.signum() {
         return vec![];
     }
 
     if n_points == 1 {
-        return vec![start];
+        return vec![start_f];
     }
 
-    let sg: f64 = start.signum();
-    let start_l: f64 = start.abs().log(base);
-    let stop_l: f64 = stop.abs().log(base);
+    let sg: f64 = start_f.signum();
+    let start_l: f64 = start_f.abs().log(base_f);
+    let stop_l: f64 = stop_f.abs().log(base_f);
 
     let mut res: Vec<f64> = linear(start_l, stop_l, n_points);
 
     for elem in res.iter_mut() {
-        *elem = sg * base.powf(*elem);
+        *elem = sg * base_f.powf(*elem);
     }
 
     res
