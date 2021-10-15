@@ -16,7 +16,7 @@ The aim is to provide classical functions in pure Rust, for ease of operability.
 
 ---
 
-## Work in progress
+## Work in progress; What's coming?
 
 As of the creation of this readme, I am working on this project alone which means a few things:
 
@@ -24,14 +24,7 @@ As of the creation of this readme, I am working on this project alone which mean
 2. I will work firsts on concept with which I am familiar with
 3. I am a self-taught developer, some solutions could be sub-optimal and thus improved
 
-## What's coming?
-
-The schedule of the development of the crate is not clear, as I am for now writing this as a side project. I plan on adding many useful functions from a physics point of view, but will expand as I go. For now, my objectives are:
-
-- Astrophysics
-- Thermodynamics
-- Quantum mechanics
-- Electromagnetism
+The schedule of the development of the crate is not clear, as I am for now writing this as a side project. I plan on adding many useful functions from a physics point of view, but will expand as I go. For now, my long term objectives are: Astrophysics, Thermodynamics, Quantum mechanics, Electromagnetism.
 
 And hopefully more when this is done (statistics, integration tool, calculus, ...).
 
@@ -39,11 +32,9 @@ And hopefully more when this is done (statistics, integration tool, calculus, ..
 
 # Contents
 
-## Useful mathematics function
+## Useful mathematical functions
 
 The Rust library doesn't provide some functions that are quite common in scientific processes, and this crate attempts to provide as many as it can. Euler's Gamma and Beta function, Newton's binomial, factorial, the error functions (erf, erfc, erfi), ...
-
-Some functions are still missing as of the writing of this document, but will be added later on.
 
 ```rust
 // These functions can be found in the math crate
@@ -61,7 +52,7 @@ let e = erf(c);
 
 ## Coordinate systems
 
-This crate provides functionalities for coordinate systems, such as Cartesian and Spherical, with many standard operations, and conversions.
+This crate provides functionalities for coordinate systems, such as Cartesian and Spherical, with many standard operations and conversions.
 
 ```rust
 // They are found in the coordinate crate
@@ -115,6 +106,25 @@ let res = bessel::hankel_first(2, -2)   // Hankel first kind
 ```
 
 Values are compared to known results (thanks, [WolframAlpha](https://www.wolframalpha.com/)), and the results are within small margins of error.
+
+---
+
+## Fast Fourier transform
+
+Support to conduct both fast Fourier transform (`fft`) and the inverse fast Fourier transform (`ifft`) is available. Computations are
+done using [Bluestein's algorithm](https://en.wikipedia.org/wiki/Chirp_Z-transform#Bluestein.27s_algorithm).
+
+```rust
+// Found in the fourier crate
+use scilib::fourier::*
+
+// Computing values of the sinus
+let r = range::linear(0.0, 10.0, 15);
+let s: Vec<Complex> = r.iter().map(|val| val.sin()).collect();
+
+let res = fft(&s);
+let res2 = ifft(&res);
+```
 
 ---
 
