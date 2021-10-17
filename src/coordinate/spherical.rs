@@ -48,12 +48,12 @@ pub struct Spherical {
     pub phi: f64
 }
 
-/// # Display for Cartesian
+/// # Display for Spherical
 /// 
-/// Simply shows each value associated to an axis.
+/// Simply shows each value.
 impl Display for Spherical {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> DRes {
-        write!(f, "r={} :: theta={} :: phi={}", self.r, self.theta, self.phi)?;
+        write!(f, "r={} :: theta={}° :: phi={}°", self.r, self.theta.to_degrees(), self.phi.to_degrees())?;
         Ok(())
     }
 }
@@ -78,7 +78,7 @@ impl Spherical {
 
     /// # From the point
     /// 
-    /// Creates a Cartesian struct from three given points in space.
+    /// Creates a Spherical struct from three given points in space.
     /// 
     /// ```
     /// # use scilib::coordinate::spherical::Spherical;
@@ -98,7 +98,7 @@ impl Spherical {
 
     /// # From the point (degrees)
     /// 
-    /// Creates a Cartesian struct from three given points in space, with the angles in degrees.
+    /// Creates a SPherical struct from three given points in space, with the angles in degrees.
     /// 
     /// ```
     /// # use scilib::coordinate::spherical::Spherical;
