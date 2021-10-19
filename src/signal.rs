@@ -70,6 +70,52 @@ where T: std::ops::Mul<Output = T> + std::ops::AddAssign + Default + Copy {
     res
 }
 
+/// # Exact convolution
+/// 
+/// Computes the convolution of two vectors, only for points where both vectors
+/// are completely covered.
+/// 
+/// ```
+/// # use scilib::signal::convolve_full;
+/// // Creating two vectors to convolve
+/// let a1: Vec<f64> = vec![2.8, 2.5, 1.0, 12.2];
+/// let a2: Vec<f64> = vec![0.25, 1.0, 23.2, 0.25, 1.3, 2.1];
+/// let res = convolve_full(&a1, &a2);
+/// let expected: Vec<f64> = vec![62.75, 39.665, 292.42];
+/// 
+/// for (e, c) in expected.iter().zip(&res) {
+///     assert!((e - c).abs() < 1.0e-10);
+/// }
+/// ```
+pub fn convolve_full<T>(a_i: &[T], b_i: &[T]) -> Vec<T>
+where T: std::ops::Mul<Output = T> + std::ops::AddAssign + Default + Copy {
+
+    // We check which box is the smallest
+    let (a, b): (&[T], &[T]) = match a_i.len() < b_i.len() {
+        true => (b_i, a_i),
+        false => (a_i, b_i)
+    };
+
+    // We initialize our variables
+    let mut sum: T;
+    let l_a: usize = a.len();
+    let l_b: usize = b.len();
+    let mut res: Vec<T> = Vec::with_capacity(a.len());
+
+    // Box b covers a completely only
+    for n in (l_b - 1)..=(l_a - 1) {
+        sum = T::default();
+        for m in 0..l_b {
+            sum += a[n-m] * b[m];
+            println!("n={} :: m={} :: n-m={}", n, m, n-m);
+        }
+        println!();
+        res.push(sum);
+    }
+
+    res
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # Fast Fourier transform
