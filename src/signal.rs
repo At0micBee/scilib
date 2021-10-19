@@ -37,7 +37,7 @@ where T: std::ops::Mul<Output = T> + std::ops::AddAssign + Default + Copy {
     let mut sum: T;
     let l_a: usize = a.len();
     let l_b: usize = b.len();
-    let mut res: Vec<T> = Vec::with_capacity(a.len());
+    let mut res: Vec<T> = Vec::with_capacity(l_a + 2 * l_b - 2);    // Complete convolution length
 
     // Box b starts to slide over a
     for n in 0..(l_b - 1) {
@@ -100,16 +100,14 @@ where T: std::ops::Mul<Output = T> + std::ops::AddAssign + Default + Copy {
     let mut sum: T;
     let l_a: usize = a.len();
     let l_b: usize = b.len();
-    let mut res: Vec<T> = Vec::with_capacity(a.len());
+    let mut res: Vec<T> = Vec::with_capacity(l_a - l_b + 1);    // Exact convolution length
 
     // Box b covers a completely only
     for n in (l_b - 1)..=(l_a - 1) {
         sum = T::default();
         for m in 0..l_b {
             sum += a[n-m] * b[m];
-            println!("n={} :: m={} :: n-m={}", n, m, n-m);
         }
-        println!();
         res.push(sum);
     }
 

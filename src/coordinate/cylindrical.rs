@@ -11,7 +11,20 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-use std::f64::consts::TAU;
+use std::f64::consts::{
+    PI,
+    TAU
+};
+
+use std::ops::{     // Implementing basic operations
+    Add,            // Addition
+    Sub,            // Subtraction
+    Mul,            // Multiplication
+    MulAssign,      // Assigning multiplication
+    Div,            // Division
+    DivAssign,      // Assigning division
+    Neg             // Negation
+};
 
 use std::fmt::{     // Formatter display
     Display,        // The display itself
@@ -108,10 +121,10 @@ impl Cylindrical {
     /// ```
     /// # use std::f64::consts::SQRT_2;
     /// # use scilib::coordinate::cylindrical::Cylindrical;
-    /// let s1 = Cylindrical::from_degree(SQRT_2, 45, 0.0);
-    /// let s2 = Cylindrical::from_degree(SQRT_2, -45, 0.0);
+    /// let s1 = Cylindrical::from_degree(SQRT_2, 45, 1.0);
+    /// let s2 = Cylindrical::from_degree(SQRT_2, -45, -1.0);
     /// 
-    /// assert_eq!(s1.distance(s2), 2.0);
+    /// assert_eq!(s1.distance(s2), 2.0 * SQRT_2);
     /// ```
     pub fn distance(&self, other: Self) -> f64 {
         let t1: f64 = self.r.powi(2) + other.r.powi(2);
@@ -119,6 +132,31 @@ impl Cylindrical {
         let t3: f64 = (self.z - other.z).powi(2);
 
         (t1 - t2 + t3).sqrt()
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/// # Negation
+/// 
+/// Going to the opposite point.
+/// 
+/// ```
+/// # use scilib::coordinate::cylindrical::Cylindrical;
+/// let c1 = Cylindrical::from_degree(2, 35, 6.0);
+/// let c2 = -c1;
+/// let expected = Cylindrical::from_degree(2, 215, -6);
+/// 
+/// assert_eq!(c2, expected);
+/// ```
+impl Neg for Cylindrical {
+    type Output = Self;
+    fn neg(self) -> Self::Output {
+        Self {
+            r: self.r,
+            theta: (self.theta + PI) % TAU,
+            z: -self.z
+        }
     }
 }
 

@@ -312,10 +312,10 @@ impl<T: Into<f64>> DivAssign<T> for Spherical {
 /// Going to the opposite point.
 /// 
 /// ```
-/// # use scilib::coordinate::cartesian::Cartesian;
-/// let c1 = Cartesian::from(-2, 5, 6.0);
+/// # use scilib::coordinate::spherical::Spherical;
+/// let c1 = Spherical::from_degree(2, 60, 30);
 /// let c2 = -c1;
-/// let expected = Cartesian::from(2, -5.0, -6);
+/// let expected = Spherical::from_degree(2, 240, 150);
 /// 
 /// assert_eq!(c2, expected);
 /// ```
