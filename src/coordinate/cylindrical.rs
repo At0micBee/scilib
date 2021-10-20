@@ -31,6 +31,11 @@ use std::fmt::{     // Formatter display
     Result as DRes  // The associated result
 };
 
+use super::{
+    cartesian::Cartesian,
+    spherical::Spherical
+};
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # Cylindrical coordinates
@@ -136,6 +141,188 @@ impl Cylindrical {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/// # Conversion to cartesian coordinates
+/// 
+/// ```
+/// # use scilib::coordinate::cartesian::Cartesian;
+/// # use scilib::coordinate::cylindrical::Cylindrical;
+/// let s = Cylindrical::from_degree(3, 60, 4);
+/// let conv: Cartesian = s.into();
+/// let expected = Cartesian::from(1.5, 2.598076211, 4);
+/// 
+/// assert!((conv.x - expected.x).abs() < 1.0e-9);
+/// assert!((conv.y - expected.y).abs() < 1.0e-9);
+/// assert_eq!(conv.z, expected.z);
+/// 
+/// let s = Cylindrical::from_degree(5, 30, -2);
+/// let conv: Cartesian = s.into();
+/// let expected = Cartesian::from(4.330127019, 2.5, -2);
+/// 
+/// assert!((conv.x - expected.x).abs() < 1.0e-9);
+/// assert!((conv.y - expected.y).abs() < 1.0e-9);
+/// assert_eq!(conv.z, expected.z);
+/// ```
+impl Into<Cartesian> for Cylindrical {
+    fn into(self) -> Cartesian {
+        Cartesian {
+            x: self.r * self.theta.cos(),
+            y: self.r * self.theta.sin(),
+            z: self.z
+        }
+    }
+}
+
+/// # Conversion to spherical coordinates
+/// 
+/// ```
+/// # use scilib::coordinate::spherical::Spherical;
+/// # use scilib::coordinate::cylindrical::Cylindrical;
+/// 
+/// let s = Cylindrical::from_degree(3, 60, 4);
+/// let conv: Spherical = s.into();
+/// let expected = Spherical::from_degree(5, 60, 36.86989765);
+/// 
+/// assert_eq!(conv.r, expected.r);
+/// assert_eq!(conv.theta, expected.theta);
+/// assert!((conv.phi - expected.phi).abs() < 1.0e-9);
+/// 
+/// let s = Cylindrical::from_degree(3, 60, -4);
+/// let conv: Spherical = s.into();
+/// let expected = Spherical::from_degree(5, 60, 143.1301024);
+/// 
+/// assert_eq!(conv.r, expected.r);
+/// assert_eq!(conv.theta, expected.theta);
+/// assert!((conv.phi - expected.phi).abs() < 1.0e-9);
+/// ```
+impl Into<Spherical> for Cylindrical {
+    fn into(self) -> Spherical {
+        let rho: f64 = (self.r.powi(2) + self.z.powi(2)).sqrt();
+        let mut np: f64 = (self.r / self.z).atan();
+
+        if self.z.is_sign_negative() {
+            np += PI;
+        }
+
+        Spherical {
+            r: rho,
+            theta: self.theta,
+            phi: np
+        }
+    }
+}
+
+/// # Scalar multiplication
+/// 
+/// Multiplies the radius by a scalar.
+/// 
+/// ```
+/// # use scilib::coordinate::cylindrical::Cylindrical;
+/// let s = Cylindrical::from_degree(1, 180, 2.1);
+/// let res = s * -2;
+/// let expected = Cylindrical::from(2, 0, -4.2);
+/// 
+/// assert_eq!(res, expected);
+/// ```
+impl<T: Into<f64>> Mul<T> for Cylindrical {
+    type Output = Self;
+    fn mul(self, rhs: T) -> Self::Output {
+        let f: f64 = rhs.into();
+        let res: Self = Self {
+            r: self.r * f.abs(),
+            theta: self.theta,
+            z: self.z * f.abs()
+        };
+
+        // If the sign is negative, we need to flip the angles
+        if f.is_sign_negative() {
+            -res
+        } else {
+            res
+        }
+    }
+}
+
+/// # Assigning scalar multiplication
+/// 
+/// Multiplies the radius by a scalar in place.
+/// 
+/// ```
+/// # use scilib::coordinate::cylindrical::Cylindrical;
+/// let mut s = Cylindrical::from_degree(1, 180, 2.1);
+/// s *= -2;
+/// let expected = Cylindrical::from_degree(2, 0, -4.2);
+/// 
+/// assert_eq!(s, expected);
+/// ```
+impl<T: Into<f64>> MulAssign<T> for Cylindrical {
+    fn mul_assign(&mut self, rhs: T) {
+        let f: f64 = rhs.into();
+        self.r *= f.abs();
+        self.z *= f;
+
+        // If the sign is negative, we need to flip the angles
+        if f.is_sign_negative() {
+            self.theta = (self.theta + PI) % TAU;
+        }
+    }
+}
+
+/// # Scalar division
+/// 
+/// Divides the radius by a scalar.
+/// 
+/// ```
+/// # use scilib::coordinate::cylindrical::Cylindrical;
+/// let s = Cylindrical::from_degree(2, 60, 2.1);
+/// let res = s / 2;
+/// let expected = Cylindrical::from_degree(1, 60, 1.05);
+/// 
+/// assert_eq!(res, expected);
+/// ```
+impl<T: Into<f64>> Div<T> for Cylindrical {
+    type Output = Self;
+    fn div(self, rhs: T) -> Self::Output {
+        let f: f64 = rhs.into();
+        let res: Self = Self {
+            r: self.r / f.abs(),
+            theta: self.theta,
+            z: self.z / f.abs()
+        };
+
+        // If the sign is negative, we need to flip the angles
+        if f.is_sign_negative() {
+            -res
+        } else {
+            res
+        }
+    }
+}
+
+/// # Assigning scalar division
+/// 
+/// Divides the radius by a scalar in place.
+/// 
+/// ```
+/// # use scilib::coordinate::cylindrical::Cylindrical;
+/// let mut s = Cylindrical::from_degree(2, 30, 2.1);
+/// s /= 2;
+/// let expected = Cylindrical::from_degree(1, 30, 1.05);
+/// 
+/// assert_eq!(s, expected);
+/// ```
+impl<T: Into<f64>> DivAssign<T> for Cylindrical {
+    fn div_assign(&mut self, rhs: T) {
+        let f: f64 = rhs.into();
+        self.r /= f.abs();
+        self.z /= f;
+
+        // If the sign is negative, we need to flip the angles
+        if f.is_sign_negative() {
+            self.theta = (self.theta + PI) % TAU;
+        }
+    }
+}
 
 /// # Negation
 /// 

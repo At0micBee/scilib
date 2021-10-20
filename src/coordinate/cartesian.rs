@@ -26,7 +26,10 @@ use std::fmt::{     // Formatter display
     Result as DRes  // The associated result
 };
 
-use super::spherical::Spherical;
+use super::{
+    cylindrical::Cylindrical,
+    spherical::Spherical
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -213,6 +216,43 @@ impl Into<Spherical> for Cartesian {
             r: rho,
             theta: nt,
             phi: (self.z / rho).acos()
+        }
+    }
+}
+
+/// # Conversion to cylindrical coordinates
+/// 
+/// ```
+/// # use std::f64::consts::SQRT_2;
+/// # use scilib::coordinate::cylindrical::Cylindrical;
+/// # use scilib::coordinate::cartesian::Cartesian;
+/// 
+/// let s = Cartesian::from(1, 1, 1.2);
+/// let conv: Cylindrical = s.into();
+/// let expected = Cylindrical::from_degree(SQRT_2, 45, 1.2);
+/// 
+/// assert_eq!(conv, expected);
+/// 
+/// let s = Cartesian::from(1, 0, 1);
+/// let conv: Cylindrical = s.into();
+/// let expected = Cylindrical::from_degree(1.0, 0, 1.0);
+/// 
+/// assert_eq!(conv, expected);
+/// ```
+impl Into<Cylindrical> for Cartesian {
+    fn into(self) -> Cylindrical {
+        let rho: f64 = (self.x.powi(2) + self.y.powi(2)).sqrt();
+        let mut nt: f64 = (self.y / self.x).atan();
+
+        // If we were in the wrong quadrants, the atan range doesn't work
+        if self.x.is_sign_negative() {
+            nt += PI;
+        }
+
+        Cylindrical {
+            r: rho,
+            theta: nt,
+            z: self.z
         }
     }
 }

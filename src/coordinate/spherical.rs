@@ -31,7 +31,10 @@ use std::fmt::{     // Formatter display
     Result as DRes  // The associated result
 };
 
-use super::cartesian::Cartesian;
+use super::{
+    cartesian::Cartesian,
+    cylindrical::Cylindrical
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -166,6 +169,36 @@ impl Into<Cartesian> for Spherical {
         Cartesian {
             x: self.r * self.theta.cos() * self.phi.sin(),
             y: self.r * self.theta.sin() * self.phi.sin(),
+            z: self.r * self.phi.cos()
+        }
+    }
+}
+
+/// # Conversion to cylindrical coordinates
+/// 
+/// ```
+/// # use scilib::coordinate::cylindrical::Cylindrical;
+/// # use scilib::coordinate::spherical::Spherical;
+/// let s = Spherical::from_degree(5, 60, 30);
+/// let conv: Cylindrical = s.into();
+/// let expected = Cylindrical::from_degree(2.5, 60, 4.330127019);
+/// 
+/// assert!((conv.r - expected.r).abs() < 1.0e-15);
+/// assert_eq!(conv.theta, expected.theta);
+/// assert!((conv.z - expected.z).abs() < 1.0e-9);
+/// 
+/// let s = Spherical::from_degree(4, 30, 60);
+/// let conv: Cylindrical = s.into();
+/// let expected = Cylindrical::from_degree(3.464101615, 30, 2);
+/// assert!((conv.r - expected.r).abs() < 1.0e-9);
+/// assert_eq!(conv.theta, expected.theta);
+/// assert!((conv.z - expected.z).abs() < 1.0e-9);
+/// ```
+impl Into<Cylindrical> for Spherical {
+    fn into(self) -> Cylindrical {
+        Cylindrical {
+            r: self.r * self.phi.sin(),
+            theta: self.theta,
             z: self.r * self.phi.cos()
         }
     }
