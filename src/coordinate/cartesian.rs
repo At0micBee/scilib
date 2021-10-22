@@ -96,6 +96,28 @@ impl Cartesian {
         }
     }
 
+    /// # From another coordinate system
+    /// 
+    /// Creates an Cartesian struct from another coordinate system. Calls the `Into<Cartesian>` method,
+    /// which is verified in its implementation.
+    /// 
+    /// ```
+    /// # use scilib::coordinate::cartesian::Cartesian;
+    /// # use scilib::coordinate::spherical::Spherical;
+    /// # use scilib::coordinate::cylindrical::Cylindrical;
+    /// let s: Spherical = Spherical::from(2.4, 65, 15);
+    /// let c: Cylindrical = Cylindrical::from_degree(1.2, 32, -3);
+    /// let res1: Cartesian = Cartesian::from_coord(s);
+    /// let res2: Cartesian = Cartesian::from_coord(c);
+    /// 
+    /// assert_eq!(res1, s.into());
+    /// assert_eq!(res2, c.into());
+    /// ```
+    pub fn from_coord<T>(c: T) -> Self
+    where T: Into<Self> {
+        c.into()
+    }
+
     /// # Computes the vector norm
     /// 
     /// We follow the convention of the l2 norm in this implementation.

@@ -7,7 +7,6 @@
 //! - theta: azimuth (longitude) of the point, `[0, 2π[`
 //! - z: elevation (altitude) of the point, `]-∞, +∞`[
 //! 
-//! 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -50,7 +49,6 @@ pub struct Cylindrical {
     /// Altitude
     pub z: f64
 }
-
 
 /// # Display for Cartesian
 /// 
@@ -98,7 +96,7 @@ impl Cylindrical {
             theta: theta.into() % TAU,
             z: z.into()
         }
-    }
+    }    
 
     /// # From the point (degrees)
     /// 
@@ -119,6 +117,28 @@ impl Cylindrical {
             theta: td.to_radians() % TAU,
             z: z.into()
         }
+    }
+
+    /// # From another coordinate system
+    /// 
+    /// Creates an Cylindrical struct from another coordinate system. Calls the `Into<Cylindrical>` method,
+    /// which is verified in its implementation.
+    /// 
+    /// ```
+    /// # use scilib::coordinate::cartesian::Cartesian;
+    /// # use scilib::coordinate::spherical::Spherical;
+    /// # use scilib::coordinate::cylindrical::Cylindrical;
+    /// let c: Cartesian = Cartesian::from(0, 12, 3.2);
+    /// let s: Spherical = Spherical::from_degree(1.2, 32, 60);
+    /// let res1: Cylindrical = Cylindrical::from_coord(c);
+    /// let res2: Cylindrical = Cylindrical::from_coord(s);
+    /// 
+    /// assert_eq!(res1, c.into());
+    /// assert_eq!(res2, s.into());
+    /// ```
+    pub fn from_coord<T>(c: T) -> Self
+    where T: Into<Self> {
+        c.into()
     }
 
     /// # Distance between two points
@@ -209,6 +229,30 @@ impl Into<Spherical> for Cylindrical {
             theta: self.theta,
             phi: np
         }
+    }
+}
+
+/// # Addition
+/// 
+/// Converts the coordinate in cartesian for addition, then returns them as spherical.
+impl<T: Into<Cartesian>> Add<T> for Cylindrical {
+    type Output = Self;
+    fn add(self, rhs: T) -> Self::Output {
+        let s: Cartesian = self.into();
+        let r: Cartesian = rhs.into();
+        (s + r).into()
+    }
+}
+
+/// # Subtraction
+/// 
+/// Converts the coordinate in cartesian for subtraction, then returns them as spherical.
+impl<T: Into<Cartesian>> Sub<T> for Cylindrical {
+    type Output = Self;
+    fn sub(self, rhs: T) -> Self::Output {
+        let s: Cartesian = self.into();
+        let r: Cartesian = rhs.into();
+        (s - r).into()
     }
 }
 

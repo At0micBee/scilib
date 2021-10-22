@@ -121,6 +121,28 @@ impl Spherical {
         }
     }
 
+    /// # From another coordinate system
+    /// 
+    /// Creates an Spherical struct from another coordinate system. Calls the `Into<Spherical>` method,
+    /// which is verified in its implementation.
+    /// 
+    /// ```
+    /// # use scilib::coordinate::cartesian::Cartesian;
+    /// # use scilib::coordinate::spherical::Spherical;
+    /// # use scilib::coordinate::cylindrical::Cylindrical;
+    /// let ca: Cartesian = Cartesian::from(0, 12, 3.2);
+    /// let cy: Cylindrical = Cylindrical::from_degree(1.2, 32, -3);
+    /// let res1: Spherical = Spherical::from_coord(ca);
+    /// let res2: Spherical = Spherical::from_coord(cy);
+    /// 
+    /// assert_eq!(res1, ca.into());
+    /// assert_eq!(res2, cy.into());
+    /// ```
+    pub fn from_coord<T>(c: T) -> Self
+    where T: Into<Self> {
+        c.into()
+    }
+
     /// # Distance between two points
     /// 
     /// ```
@@ -207,9 +229,9 @@ impl Into<Cylindrical> for Spherical {
 /// # Addition
 /// 
 /// Converts the coordinate in cartesian for addition, then returns them as spherical.
-impl Add for Spherical {
+impl<T: Into<Cartesian>> Add<T> for Spherical {
     type Output = Self;
-    fn add(self, rhs: Self) -> Self::Output {
+    fn add(self, rhs: T) -> Self::Output {
         let s: Cartesian = self.into();
         let r: Cartesian = rhs.into();
         (s + r).into()
@@ -219,9 +241,9 @@ impl Add for Spherical {
 /// # Subtraction
 /// 
 /// Converts the coordinate in cartesian for subtraction, then returns them as spherical.
-impl Sub for Spherical {
+impl<T: Into<Cartesian>> Sub<T> for Spherical {
     type Output = Self;
-    fn sub(self, rhs: Self) -> Self::Output {
+    fn sub(self, rhs: T) -> Self::Output {
         let s: Cartesian = self.into();
         let r: Cartesian = rhs.into();
         (s - r).into()
