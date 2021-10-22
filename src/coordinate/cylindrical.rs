@@ -7,32 +7,33 @@
 //! - theta: azimuth (longitude) of the point, `[0, 2π[`
 //! - z: elevation (altitude) of the point, `]-∞, +∞`[
 //! 
+//! Support conversion to and from Cartesian and Spherical coordinates.
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-use std::f64::consts::{
-    PI,
-    TAU
+use std::f64::consts::{         // Using std lib constants
+    PI,                         // Pi
+    TAU                         // Tau
 };
 
-use std::ops::{     // Implementing basic operations
-    Add,            // Addition
-    Sub,            // Subtraction
-    Mul,            // Multiplication
-    MulAssign,      // Assigning multiplication
-    Div,            // Division
-    DivAssign,      // Assigning division
-    Neg             // Negation
+use std::ops::{                 // Implementing basic operations
+    Add,                        // Addition
+    Sub,                        // Subtraction
+    Mul,                        // Multiplication
+    MulAssign,                  // Assigning multiplication
+    Div,                        // Division
+    DivAssign,                  // Assigning division
+    Neg                         // Negation
 };
 
-use std::fmt::{     // Formatter display
-    Display,        // The display itself
-    Result as DRes  // The associated result
+use std::fmt::{                 // Formatter display
+    Display,                    // The display itself
+    Result as DRes              // The associated result
 };
 
-use super::{
-    cartesian::Cartesian,
-    spherical::Spherical
+use super::{                    // Using parts from the crate
+    cartesian::Cartesian,       // Cartesian coordinates
+    spherical::Spherical        // Spherical coordinates
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -234,7 +235,7 @@ impl Into<Spherical> for Cylindrical {
 
 /// # Addition
 /// 
-/// Converts the coordinate in cartesian for addition, then returns them as spherical.
+/// Converts the coordinate in cartesian for addition, then returns them as Cylindrical.
 impl<T: Into<Cartesian>> Add<T> for Cylindrical {
     type Output = Self;
     fn add(self, rhs: T) -> Self::Output {
@@ -246,7 +247,7 @@ impl<T: Into<Cartesian>> Add<T> for Cylindrical {
 
 /// # Subtraction
 /// 
-/// Converts the coordinate in cartesian for subtraction, then returns them as spherical.
+/// Converts the coordinate in cartesian for subtraction, then returns them as Cylindrical.
 impl<T: Into<Cartesian>> Sub<T> for Cylindrical {
     type Output = Self;
     fn sub(self, rhs: T) -> Self::Output {

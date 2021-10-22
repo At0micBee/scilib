@@ -7,33 +7,33 @@
 //! - theta: azimuth (longitude) of the point, `[0, 2π[`
 //! - phi: elevation (latitude) of the point, `[0, π[`
 //! 
-//! Support conversion to and from Cartesian coordinates.
+//! Support conversion to and from Cartesian and Cylindrical coordinates.
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-use std::f64::consts::{
-    PI,
-    TAU
+use std::f64::consts::{         // Using std lib constants
+    PI,                         // Pi
+    TAU                         // Tau
 };
 
-use std::ops::{     // Implementing basic operations
-    Add,            // Addition
-    Sub,            // Subtraction
-    Mul,            // Multiplication
-    MulAssign,      // Assigning multiplication
-    Div,            // Division
-    DivAssign,      // Assigning division
-    Neg             // Negation
+use std::ops::{                 // Implementing basic operations
+    Add,                        // Addition
+    Sub,                        // Subtraction
+    Mul,                        // Multiplication
+    MulAssign,                  // Assigning multiplication
+    Div,                        // Division
+    DivAssign,                  // Assigning division
+    Neg                         // Negation
 };
 
-use std::fmt::{     // Formatter display
-    Display,        // The display itself
-    Result as DRes  // The associated result
+use std::fmt::{                 // Formatter display
+    Display,                    // The display itself
+    Result as DRes              // The associated result
 };
 
-use super::{
-    cartesian::Cartesian,
-    cylindrical::Cylindrical
+use super::{                    // Using parts from the crate
+    cartesian::Cartesian,       // Cartesian coordinates
+    cylindrical::Cylindrical    // Cylindrical coordinates
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

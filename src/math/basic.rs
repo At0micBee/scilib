@@ -6,11 +6,13 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-use std::f64::consts::FRAC_2_SQRT_PI;   // 2 / sqrt(pi)
+use std::f64::consts::{     // Using std lib constants
+    FRAC_2_SQRT_PI          // 2 / sqrt(Pi)
+};
 
-use super::{                            // Calling the submodules
-    super::constant,
-    complex::Complex
+use super::{                // Using parts from the crate
+    super::constant,        // Calling scilib constants
+    complex::Complex        // Using Complex numbers
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

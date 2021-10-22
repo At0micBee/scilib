@@ -3,32 +3,34 @@
 //! 
 //! Cartesian coordinates store the distance of the point compared to the origin for each axis.
 //! 
-//! Support conversion to and from Spherical coordinates.
+//! Support conversion to and from Spherical and Cylindrical coordinates.
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-use std::f64::consts::PI;
-
-use std::ops::{     // Implementing basic operations
-    Add,            // Addition
-    AddAssign,      // Assigning addition
-    Sub,            // Subtraction
-    SubAssign,      // Assigning addition
-    Mul,            // Multiplication
-    MulAssign,      // Assigning multiplication
-    Div,            // Division
-    DivAssign,      // Assigning division
-    Neg             // Negation
+use std::f64::consts::{         // Using std lib constants
+    PI                          // Pi
 };
 
-use std::fmt::{     // Formatter display
-    Display,        // The display itself
-    Result as DRes  // The associated result
+use std::ops::{                 // Implementing basic operations
+    Add,                        // Addition
+    AddAssign,                  // Assigning addition
+    Sub,                        // Subtraction
+    SubAssign,                  // Assigning addition
+    Mul,                        // Multiplication
+    MulAssign,                  // Assigning multiplication
+    Div,                        // Division
+    DivAssign,                  // Assigning division
+    Neg                         // Negation
 };
 
-use super::{
-    cylindrical::Cylindrical,
-    spherical::Spherical
+use std::fmt::{                 // Formatter display
+    Display,                    // The display itself
+    Result as DRes              // The associated result
+};
+
+use super::{                    // Using parts from the crate
+    cylindrical::Cylindrical,   // Cylindrical coordinates
+    spherical::Spherical        // Spherical coordinates
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -73,14 +73,14 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-use std::f64::consts::{                 // Calling constants
-    PI,
-    FRAC_PI_2
+use std::f64::consts::{     // Using std lib constants
+    PI,                     // Pi
+    FRAC_PI_2               // Pi / 2
 };
 
-use super::{                           // Calling sub-modules
-    basic,
-    complex::Complex
+use super::{                // Using parts from the crate
+    basic,                  // Basic functions
+    complex::Complex        // Using Complex numbers
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

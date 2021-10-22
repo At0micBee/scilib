@@ -4,15 +4,17 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-use std::f64::consts::PI;           // Value of pi
+use std::f64::consts::{     // Using std lib constants
+    PI                      // Pi
+};
 
-use crate::{                        // Calling other modules
-    math::{                  
-        basic,
-        complex::Complex,
-        polynomial
+use crate::{                // Calling other modules
+    math::{                 // Math crate
+        basic,              // Basic functions
+        complex::Complex,   // Using Complex numbers
+        polynomial          // Special polynomials
     },
-    constant as cst
+    constant as cst         // Calling scilib constants
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
