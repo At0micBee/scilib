@@ -98,7 +98,7 @@ impl Complex {
     /// 
     /// assert!(res.re == 0.0 && res.im ==1.0);
     /// ```
-    pub fn i() -> Self {
+    pub const fn i() -> Self {
         Self {
             re: 0.0,
             im: 1.0
@@ -123,6 +123,63 @@ impl Complex {
             re: self.im.cos() * e,
             im: self.im.sin() * e
         }
+    }
+
+    /// # Cosine function
+    /// 
+    /// Computes the cosine value of the given complex number.
+    /// Formula: `cos(a + ib) = cos(a)cosh(b) - i sin(a)sinh(b)`.
+    /// 
+    /// ```
+    /// # use scilib::math::complex::Complex;
+    /// let c = Complex::from(3, 2.1);
+    /// let res = c.cos();
+    /// 
+    /// assert!((res.re - -4.102838942268).abs() < 1.0e-10);
+    /// assert!((res.im - -0.567564455868).abs() < 1.0e-10);
+    /// ```
+    pub fn cos(&self) -> Self {
+        Self {
+            re: self.re.cos() * self.im.cosh(),
+            im: -self.re.sin() * self.im.sinh()
+        }
+    }
+
+    /// # Sinus function
+    /// 
+    /// Computes the sinus value of the given complex number.
+    /// Formula: `sin(a + ib) = sin(a)cosh(b) + i cos(a)sinh(b)`
+    /// 
+    /// ```
+    /// # use scilib::math::complex::Complex;
+    /// let c = Complex::from(3, 2.1);
+    /// let res = c.sin();
+    /// 
+    /// assert!((res.re - 0.5848455080109).abs() < 1.0e-10);
+    /// assert!((res.im - -3.9816079971376).abs() < 1.0e-10);
+    /// ```
+    pub fn sin(&self) -> Self {
+        Self {
+            re: self.re.sin() * self.im.cosh(),
+            im: self.re.cos() * self.im.sinh()
+        }
+    }
+
+    /// # Tangent function
+    /// 
+    /// Computes the tangent value of the given complex number.
+    /// Formula: `tan(x) = sin(x) / cos(x)`.
+    /// 
+    /// ```
+    /// # use scilib::math::complex::Complex;
+    /// let c = Complex::from(3, 2.1);
+    /// let res = c.tan();
+    /// 
+    /// assert!((res.re - -0.0081436522788).abs() < 1.0e-10);
+    /// assert!((res.im - 0.97157848523977).abs() < 1.0e-10);
+    /// ```
+    pub fn tan(&self) -> Self {
+        self.sin() / self.cos()
     }
 
     /// # Complex conjugation

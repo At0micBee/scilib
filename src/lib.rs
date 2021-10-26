@@ -40,6 +40,8 @@ pub mod coordinate;
 
 pub mod math;
 
+pub mod planck;
+
 pub mod quantum;
 
 pub mod range;

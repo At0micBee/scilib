@@ -74,7 +74,7 @@ impl Radec {
     /// assert!((coord1.ra - coord2.ra).abs() < 1.0e-15);
     /// assert!((coord1.dec - coord2.dec).abs() < 1.0e-15);
     /// ```
-    pub fn from_degrees<T, U>(ra: T, dec: U) -> Self
+    pub fn from_degree<T, U>(ra: T, dec: U) -> Self
     where T: Into<f64>, U: Into<f64> {
         Self {
             ra: ra.into().to_radians(),
