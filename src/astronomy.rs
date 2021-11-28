@@ -69,7 +69,7 @@ impl Radec {
     /// ```
     /// # use std::f64::consts::{ FRAC_PI_3, FRAC_PI_6 };
     /// # use scilib::astronomy::Radec;
-    /// let coord1 = Radec::from_degrees(30.0, 60.0);
+    /// let coord1 = Radec::from_degree(30.0, 60.0);
     /// let coord2 = Radec { ra: FRAC_PI_6, dec: FRAC_PI_3, dist_earth: None };
     /// assert!((coord1.ra - coord2.ra).abs() < 1.0e-15);
     /// assert!((coord1.dec - coord2.dec).abs() < 1.0e-15);

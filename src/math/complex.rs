@@ -90,18 +90,35 @@ impl Complex {
 
     /// # Pure complex unity
     /// 
-    /// Simply returns i.
+    /// Simply returns 0 +1i.
     /// 
     /// ```
     /// # use scilib::math::complex::Complex;
     /// let res = Complex::i();
     /// 
-    /// assert!(res.re == 0.0 && res.im ==1.0);
+    /// assert!(res.re == 0.0 && res.im == 1.0);
     /// ```
     pub const fn i() -> Self {
         Self {
             re: 0.0,
             im: 1.0
+        }
+    }
+
+    /// # Pure real unity
+    /// 
+    /// Simply returns 1 + 0i.
+    /// 
+    /// ```
+    /// # use scilib::math::complex::Complex;
+    /// let res = Complex::unity();
+    /// 
+    /// assert!(res.re == 1.0 && res.im == 0.0);
+    /// ```
+    pub const fn unity() -> Self {
+        Self {
+            re: 1.0,
+            im: 0.0
         }
     }
 

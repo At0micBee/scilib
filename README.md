@@ -143,6 +143,9 @@ let leg = polynomial::Legendre::new(2, 1);  // l=2, m=1
 
 // So does Laguerre
 let lag = polynomial::Laguerre::new(3, -2); // l=3, m=-2
+
+// Bernoulli numbers and polynomials
+let ber = polynomial::Bernoulli::new(3);    // n=3
 ```
 
 ---

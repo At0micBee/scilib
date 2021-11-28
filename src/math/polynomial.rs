@@ -243,3 +243,123 @@ impl Laguerre {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/// # Bernoulli polynomials
+#[derive(Debug, Default)]
+pub struct Bernoulli {
+    /// The order of the polynomial
+    pub n: usize,
+    /// The factor of each term
+    factor: Vec<f64>,
+    /// The power at each term
+    power: Vec<i32>
+}
+
+/// Display for the Laguerre polynomials
+impl std::fmt::Display for Bernoulli {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        
+        let mut s: String = String::from("");
+
+        for (f, p) in self.factor.iter().zip(&self.power) {
+            match p {
+                0 => s += &format!("{:+} ", f),
+                1 => s += &format!("{:+}x ", f),
+                _ => s += &format!("{:+}x^{} ", f, p)
+            }
+            
+        }
+        write!(f, "[n={}] :: {}", self.n, s)?;
+        Ok(())
+    }
+}
+
+/// Implementing the required methods
+impl Bernoulli {
+
+    /// Bernoulli number generator
+    /// 
+    /// Following the Bm- convention.
+    /// ```
+    /// # use scilib::math::polynomial::Bernoulli;
+    /// let num_0: f64 = Bernoulli::gen_number(0);
+    /// let num_1: f64 = Bernoulli::gen_number(1);
+    /// let num_2: f64 = Bernoulli::gen_number(2);
+    /// 
+    /// assert!((num_0 - 1.0).abs() <= 1.0e-8);
+    /// assert!((num_1 - -0.5).abs() <= 1.0e-8);
+    /// assert!((num_2 - 1.0 / 6.0).abs() <= 1.0e-8);
+    /// ```
+    pub fn gen_number(m: usize) -> f64 {
+
+        let mut res: f64 = 0.0;     // Resulting number
+        
+        // First loop
+        for k in 0..=m {
+            // Precomputing the factor
+            let k1: f64 = (k + 1) as f64;
+            // Inner loop
+            for v in 0..=k {
+                let sign: f64 = (-1.0_f64).powi(v as i32);      // -1^v
+                let binom: f64 = basic::binomial(k, v) as f64;  // The binomial value
+                let frac: f64 = (v as f64).powi(m as i32) / k1; // The fraction
+
+                res += sign * binom * frac;                     // Summing the current value
+            }
+        }
+
+        // Returning the result
+        res
+    }
+
+    /// Produces the factors and powers for nth order polynomial.
+    /// 
+    /// Returns: `Self`, the corresponding struct
+    /// ```
+    /// # use scilib::math::polynomial::Bernoulli;
+    /// let p2 = Bernoulli::new(1);         // n=2
+    /// let p3 = Bernoulli::new(3);         // n=3
+    /// ```
+    pub fn new(n: usize) -> Self {
+
+        // Initializing the vectors
+        let mut factor: Vec<f64> = Vec::new();
+        let mut power: Vec<i32> = Vec::new();
+
+        for k in 0..=n {
+            power.push(k as i32);
+            let coef: f64 = basic::binomial(n, k) as f64 * Self::gen_number(n - k);
+            factor.push(coef);
+        }
+
+        // Returning associated struct
+        Self {
+            n,
+            factor,
+            power
+        }
+    }
+
+    /// Computes the value of `x` for the given polynomial.
+    /// 
+    /// Returns: the result of the polynomial Bn(x)
+    /// 
+    /// ```
+    /// # use scilib::math::polynomial::Bernoulli;
+    /// let x = 2.5;                        // Example value
+    /// 
+    /// let p = Bernoulli::new(3);          // n=3
+    /// 
+    /// // Computing the results for the polynomial
+    /// let res = p.compute(x);
+    ///
+    /// // Comparing to tabulated values
+    /// assert!((res - 7.5).abs() <= 1.0e-8);
+    /// ```
+    pub fn compute(&self, x: f64) -> f64 {
+        // Iterates through the values of the factors and powers
+        self.factor.iter().zip(&self.power).fold(0.0, |res, (f, p)| res + f * x.powi(*p))
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
