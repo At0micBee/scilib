@@ -100,6 +100,34 @@ where T: Into<usize> {
     (1..=n.into()).fold(1, |res, val| res * val)
 }
 
+/* /// # Hurwitz Zeta function
+pub fn zeta<T, U>(s: T, a: U) -> Complex
+where T: Into<f64>, U: Into<Complex> {
+
+    // Order counter
+    let mut n: Complex = Complex::unity();
+
+    let a_c: Complex = a.into();
+    let s_f: f64 = s.into();
+
+    // Result
+    let mut term: Complex = Complex::unity() / a_c.powf(s_f);
+    let mut res: Complex = term;
+
+    'convergence: loop {
+
+        if term.modulus() < PRECISION {
+            break 'convergence;
+        }
+        term = Complex::unity() / (a_c + n).powf(s_f);
+        res += term;
+        n += 1;
+        //println!("{} {}", term, res);
+    }
+
+    res
+} */
+
 /// # Gamma function
 /// 
 /// `x` is the value to evaluate.
@@ -258,6 +286,26 @@ where T: Into<Complex> {
 pub fn erfi<T>(val: T) -> Complex
 where T: Into<Complex> {
     -Complex::i() * erf(Complex::i() * val)
+}
+
+/// # Builds the demanded Pascal's triangle line
+/// 
+/// The first position of the triangle is number as line 0, the rest follows from there.
+/// 
+/// ```
+/// # use scilib::math::basic::pascal_triangle;
+/// let l5: Vec<usize> = pascal_triangle(5);
+/// 
+/// assert_eq!(l5, vec![1, 5, 10, 10, 5, 1]);
+/// ```
+pub fn pascal_triangle(n: usize) -> Vec<usize> {
+    let mut res: Vec<usize> = Vec::with_capacity(n);
+
+    for k in 0..=n {
+        res.push(binomial(n, k));
+    }
+
+    res
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -363,3 +363,90 @@ impl Bernoulli {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/// # Bernoulli polynomials
+#[derive(Debug, Default)]
+pub struct Euler {
+    /// The order of the polynomial
+    pub n: usize,
+    /// The factor of each term
+    factor: Vec<f64>,
+    /// The power at each term
+    power: Vec<i32>
+}
+
+/// Display for the Laguerre polynomials
+impl std::fmt::Display for Euler {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        
+        let mut s: String = String::from("");
+
+        for (f, p) in self.factor.iter().zip(&self.power) {
+            match p {
+                0 => s += &format!("{:+} ", f),
+                1 => s += &format!("{:+}x ", f),
+                _ => s += &format!("{:+}x^{} ", f, p)
+            }
+            
+        }
+        write!(f, "[n={}] :: {}", self.n, s)?;
+        Ok(())
+    }
+}
+
+impl Euler {
+    pub fn gen_number(m: usize) -> f64 {
+
+        let mut res: f64 = 0.0;
+        
+        // All odd Euler numbers are 0
+        if m % 2 != 0 {
+            return res;
+        } else if m == 0 {
+            return 1.0;
+        }
+
+        for i in 1..=m {
+            let sign: f64 = (-1.0_f64).powi(i as i32);
+            let fact: f64 = 1.0 / 2.0_f64.powi(i as i32);
+            let mut term: f64 = 0.0;
+
+            for l in 0..=(2*i) {
+                let sign2: f64 = (-1.0_f64).powi(l as i32);
+                let binom: f64 = basic::binomial(2 * i, l) as f64;
+                let par: f64 = (i as f64 - l as f64).powi(m as i32);
+
+                term += sign2 * binom * par;
+            }
+
+            res += sign * fact * term;
+        }
+
+        res
+    }
+
+    pub fn new(n: usize) -> Self {
+
+        // Initializing the vectors
+        let mut factor: Vec<f64> = vec![0.0; n + 1];
+        let mut power: Vec<i32> = (0..=n).rev().map(|x| x as i32).collect();
+
+        for k in 0..=n {
+            let triangle: Vec<usize> = basic::pascal_triangle(n - k);
+            let pre: f64 = basic::binomial(n, k) as f64 * Self::gen_number(k) / 2.0_f64.powi(k as i32);
+
+            for (column, value) in triangle.iter().enumerate() {
+                factor[column] = factor[column] + *value as f64 * (-0.5_f64).powi(column as i32) * pre;
+            }
+        }
+
+        // Returning associated struct
+        Self {
+            n,
+            factor,
+            power
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
