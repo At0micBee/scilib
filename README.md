@@ -100,9 +100,12 @@ All functions are implemented:
 use scilib::math::bessel;
 
 // All functions support complex numbers, and real orders
-let res = bessel::jf(-1.2, 2.3);        // Computes -1.2 with order 2.3 in J
-let res = bessel::y(3.5, 1);            // Y computes the limit for integer order
-let res = bessel::hankel_first(2, -2)   // Hankel first kind
+let res_j = bessel::jf(-1.2, -2.3);             // J function; works for any input and order
+let res_y = bessel::y(3.5, 1);                  // Y function; computes the limit for integer order
+let res_i = bessel::i(7.2, 2.25);               // I function; similar to J
+let res_k = bessel::k(-1.1, 0.5)                // K function; computes the limit for integer order
+let res_1 = bessel::hankel_first(2, -2)         // Hankel first kind
+let res_2 = bessel::hankel_second(1, -1.32)     // Hankel first kind
 ```
 
 Values are compared to known results (thanks, [WolframAlpha](https://www.wolframalpha.com/)), and the results are within small margins of error.
