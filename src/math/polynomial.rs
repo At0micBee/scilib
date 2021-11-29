@@ -317,7 +317,7 @@ impl Bernoulli {
     /// Returns: `Self`, the corresponding struct
     /// ```
     /// # use scilib::math::polynomial::Bernoulli;
-    /// let p2 = Bernoulli::new(1);         // n=2
+    /// let p2 = Bernoulli::new(2);         // n=2
     /// let p3 = Bernoulli::new(3);         // n=3
     /// ```
     pub fn new(n: usize) -> Self {
@@ -395,6 +395,25 @@ impl std::fmt::Display for Euler {
 }
 
 impl Euler {
+    /// Euler number generator
+    /// 
+    /// ```
+    /// # use scilib::math::polynomial::Euler;
+    /// // We know that all odd Euler numbers are 0
+    /// for odd in vec![1, 3, 5, 7, 9, 11] {
+    ///     let ek: f64 = Euler::gen_number(odd);
+    ///     assert_eq!(ek, 0.0);
+    /// }
+    /// 
+    /// // The others oscillate between signs
+    /// let e0: f64 = Euler::gen_number(0);
+    /// let e2: f64 = Euler::gen_number(2);
+    /// let e10: f64 = Euler::gen_number(10);
+    /// 
+    /// assert_eq!(e0, 1.0);
+    /// assert_eq!(e2, -1.0);
+    /// assert_eq!(e10, -50_521.0);
+    /// ```
     pub fn gen_number(m: usize) -> f64 {
 
         let mut res: f64 = 0.0;
@@ -425,18 +444,30 @@ impl Euler {
         res
     }
 
+    /// Produces the factors and powers for nth order polynomial.
+    /// 
+    /// Returns: `Self`, the corresponding struct
+    /// ```
+    /// # use scilib::math::polynomial::Euler;
+    /// let p3 = Euler::new(3);             // n=3
+    /// let p7 = Euler::new(7);             // n=7
+    /// ```
     pub fn new(n: usize) -> Self {
 
         // Initializing the vectors
         let mut factor: Vec<f64> = vec![0.0; n + 1];
-        let mut power: Vec<i32> = (0..=n).rev().map(|x| x as i32).collect();
+        let power: Vec<i32> = (0..=n).map(|x| x as i32).collect();
 
         for k in 0..=n {
-            let triangle: Vec<usize> = basic::pascal_triangle(n - k);
-            let pre: f64 = basic::binomial(n, k) as f64 * Self::gen_number(k) / 2.0_f64.powi(k as i32);
+            let binom: f64 = basic::binomial(n, k) as f64;
+            let f: f64 = Self::gen_number(k) / 2.0_f64.powi(k as i32);
 
-            for (column, value) in triangle.iter().enumerate() {
-                factor[column] = factor[column] + *value as f64 * (-0.5_f64).powi(column as i32) * pre;
+            // Second loop from the (x - 1/2)^(n-k)
+            for p in 0..=(n-k) {
+                let pre: f64 = (-0.5_f64).powi(p as i32);
+                let triangle_val: f64 = basic::binomial(n-k, p) as f64;
+
+                factor[n-k-p] += binom * f * pre * triangle_val;
             }
         }
 
@@ -446,6 +477,27 @@ impl Euler {
             factor,
             power
         }
+    }
+
+    /// Computes the value of `x` for the given polynomial.
+    /// 
+    /// Returns: the result of the polynomial En(x)
+    /// 
+    /// ```
+    /// # use scilib::math::polynomial::Euler;
+    /// let x = -1.1;                    // Example value
+    /// 
+    /// let p = Euler::new(5);          // n=5
+    /// 
+    /// // Computing the results for the polynomial
+    /// let res = p.compute(x);
+    ///
+    /// // Comparing to tabulated values
+    /// assert!((res - -2.74576).abs() <= 1.0e-8);
+    /// ```
+    pub fn compute(&self, x: f64) -> f64 {
+        // Iterates through the values of the factors and powers
+        self.factor.iter().zip(&self.power).fold(0.0, |res, (f, p)| res + f * x.powi(*p))
     }
 }
 
