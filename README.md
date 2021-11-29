@@ -136,16 +136,15 @@ Useful polynomials will be implemented to facilitate their uses to everyone; as 
 
 ```rust
 // They are found in the polynomial crate
-use scilib::math::polynomial;
+use scilib::math::polynomial::*;
 
-// Legendre supports derivative (and negative m)
-let leg = polynomial::Legendre::new(2, 1);  // l=2, m=1
+// Legendre and Laguerre support derivative (and negative m)
+let leg = Legendre::new(2, 1);  // l=2, m=1
+let lag = Laguerre::new(3, -2); // l=3, m=-2
 
-// So does Laguerre
-let lag = polynomial::Laguerre::new(3, -2); // l=3, m=-2
-
-// Bernoulli numbers and polynomials
-let ber = polynomial::Bernoulli::new(3);    // n=3
+// Standard support for Bernoulli and Euler (numbers and polynomials)
+let ber = Bernoulli::new(3);    // n=3
+let eul = Euler::new(5);        // n=5
 ```
 
 ---
