@@ -4,7 +4,10 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-use super::basic;   // Basic functions
+use super::{            // Using parts from the crate
+    basic,              // Basic functions
+    complex::Complex    // Using Complex numbers
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -360,6 +363,14 @@ impl Bernoulli {
         // Iterates through the values of the factors and powers
         self.factor.iter().zip(&self.power).fold(0.0, |res, (f, p)| res + f * x.powi(*p))
     }
+
+    /// Computes the value of `z` for the given polynomial (z: complex).
+    /// 
+    /// Returns: the result of the polynomial Bn(z)
+    pub fn compute_complex(&self, z: Complex) -> Complex {
+        // Iterates through the values of the factors and powers
+        self.factor.iter().zip(&self.power).fold(Complex::unity(), |res, (f, p)| res + *f * z.powi(*p))
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -479,7 +490,7 @@ impl Euler {
         }
     }
 
-    /// Computes the value of `x` for the given polynomial.
+    /// Computes the value of `x` for the given polynomial (x: real).
     /// 
     /// Returns: the result of the polynomial En(x)
     /// 

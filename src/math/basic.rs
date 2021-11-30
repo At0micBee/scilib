@@ -12,7 +12,8 @@ use std::f64::consts::{     // Using std lib constants
 
 use super::{                // Using parts from the crate
     super::constant,        // Calling scilib constants
-    complex::Complex        // Using Complex numbers
+    complex::Complex,       // Using Complex numbers
+    polynomial::Bernoulli   // Bernoulli polynomials
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,7 +101,7 @@ where T: Into<usize> {
     (1..=n.into()).fold(1, |res, val| res * val)
 }
 
-/* /// # Hurwitz Zeta function
+/// # Hurwitz Zeta function
 pub fn zeta<T, U>(s: T, a: U) -> Complex
 where T: Into<f64>, U: Into<Complex> {
 
@@ -109,6 +110,12 @@ where T: Into<f64>, U: Into<Complex> {
 
     let a_c: Complex = a.into();
     let s_f: f64 = s.into();
+
+    // If a is negative and even, we use Bernoulli
+    if s_f == 0.0 || (s_f.is_sign_negative() && s_f % 2.0 == 0.0) {
+        let ber: Bernoulli = Bernoulli::new(-s_f as usize + 1);
+        return -ber.compute_complex(a_c) / (-s_f + 1.0);
+    }
 
     // Result
     let mut term: Complex = Complex::unity() / a_c.powf(s_f);
@@ -122,11 +129,10 @@ where T: Into<f64>, U: Into<Complex> {
         term = Complex::unity() / (a_c + n).powf(s_f);
         res += term;
         n += 1;
-        //println!("{} {}", term, res);
     }
 
     res
-} */
+}
 
 /// # Gamma function
 /// 
@@ -268,7 +274,7 @@ where T: Into<Complex> {
 /// ```
 pub fn erfc<T>(val: T) -> Complex
 where T: Into<Complex> {
-    Complex::from(1, 0) - erf(val)
+    Complex::unity() - erf(val)
 }
 
 /// # Imaginary error function
