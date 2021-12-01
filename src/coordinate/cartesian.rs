@@ -74,8 +74,12 @@ impl Cartesian {
     /// assert_eq!(m, n);
     /// assert_eq!(n, d);
     /// ```
-    pub fn new() -> Self {
-        Self::default()
+    pub const fn new() -> Self {
+        Self {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0
+        }
     }
 
     /// # From each point

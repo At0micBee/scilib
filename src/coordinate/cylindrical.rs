@@ -75,8 +75,12 @@ impl Cylindrical {
     /// assert_eq!(m, n);
     /// assert_eq!(n, d);
     /// ```
-    pub fn new() -> Self {
-        Self::default()
+    pub const fn new() -> Self {
+        Self {
+            r: 0.0,
+            theta: 0.0,
+            z: 0.0
+        }
     }
 
     /// # From the point

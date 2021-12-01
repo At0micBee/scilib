@@ -58,8 +58,9 @@ This crate provides functionalities for coordinate systems, such as Cartesian an
 // They are found in the coordinate crate
 use scilib::coordinate::*;
 
-let c = cartesian::Cartesian::from(2.0, 1, 0.25);
-let s = spherical::Spherical::from_degree(1.2, 30, 60.2);
+let car = cartesian::Cartesian::from(2.0, 1, 0.25);
+let sph = spherical::Spherical::from_degree(1.2, 30, 60.2);
+let cyl = spherical::Cylindrical::from_degree(1.2, 30, -2.55);
 ```
 
 ---

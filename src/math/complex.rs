@@ -49,6 +49,57 @@ impl Display for Complex {
 
 /// Implementing required methods
 impl Complex {
+    /// # New Complex
+    /// 
+    /// Simply returns 0 +0i.
+    /// 
+    /// ```
+    /// # use scilib::math::complex::Complex;
+    /// let res = Complex::new();
+    /// 
+    /// assert!(res.re == 0.0 && res.im == 0.0);
+    /// ```
+    pub const fn new() -> Self {
+        Self {
+            re: 0.0,
+            im: 0.0
+        }
+    }
+
+    /// # Pure complex unity
+    /// 
+    /// Simply returns 0 +1i.
+    /// 
+    /// ```
+    /// # use scilib::math::complex::Complex;
+    /// let res = Complex::i();
+    /// 
+    /// assert!(res.re == 0.0 && res.im == 1.0);
+    /// ```
+    pub const fn i() -> Self {
+        Self {
+            re: 0.0,
+            im: 1.0
+        }
+    }
+
+    /// # Pure real unity
+    /// 
+    /// Simply returns 1 + 0i.
+    /// 
+    /// ```
+    /// # use scilib::math::complex::Complex;
+    /// let res = Complex::unity();
+    /// 
+    /// assert!(res.re == 1.0 && res.im == 0.0);
+    /// ```
+    pub const fn unity() -> Self {
+        Self {
+            re: 1.0,
+            im: 0.0
+        }
+    }
+
     /// # From any numbers
     /// 
     /// Both parts can be any number that can be cast to `f64`.
@@ -86,40 +137,6 @@ impl Complex {
     pub fn from_polar<T, U>(arg: T, norm: U) -> Self
     where T: Into<f64> + Copy, U: Into<f64> + Copy {
         Self::from(arg.into().cos() * norm.into(), arg.into().sin() * norm.into())
-    }
-
-    /// # Pure complex unity
-    /// 
-    /// Simply returns 0 +1i.
-    /// 
-    /// ```
-    /// # use scilib::math::complex::Complex;
-    /// let res = Complex::i();
-    /// 
-    /// assert!(res.re == 0.0 && res.im == 1.0);
-    /// ```
-    pub const fn i() -> Self {
-        Self {
-            re: 0.0,
-            im: 1.0
-        }
-    }
-
-    /// # Pure real unity
-    /// 
-    /// Simply returns 1 + 0i.
-    /// 
-    /// ```
-    /// # use scilib::math::complex::Complex;
-    /// let res = Complex::unity();
-    /// 
-    /// assert!(res.re == 1.0 && res.im == 0.0);
-    /// ```
-    pub const fn unity() -> Self {
-        Self {
-            re: 1.0,
-            im: 0.0
-        }
     }
 
     /// # Exponential

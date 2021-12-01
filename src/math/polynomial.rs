@@ -369,7 +369,7 @@ impl Bernoulli {
     /// Returns: the result of the polynomial Bn(z)
     pub fn compute_complex(&self, z: Complex) -> Complex {
         // Iterates through the values of the factors and powers
-        self.factor.iter().zip(&self.power).fold(Complex::unity(), |res, (f, p)| res + *f * z.powi(*p))
+        self.factor.iter().zip(&self.power).fold(Complex::new(), |res, (f, p)| res + *f * z.powi(*p))
     }
 }
 
