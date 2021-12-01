@@ -109,12 +109,12 @@ where T: Into<usize> {
 /// # Stieltjes Gamma function
 /// 
 /// Computes Gamma_n(a).
-pub fn stieltjes(n: usize, a: f64) -> f64 {
+pub fn stieltjes(n: usize, a: Complex) -> Complex {
 
-    let mut res: f64 = - (STIELTJES_M as f64 + a).ln().powi(n as i32 + 1) / (n as f64 + 1.0);
+    let mut res: Complex = - (a + STIELTJES_M as f64).ln().powi(n as i32 + 1) / (n as f64 + 1.0);
 
     for k in 0..STIELTJES_M {
-        res += (k as f64 + a).ln().powi(n as i32) / (k as f64 + a);
+        res += (a + k as f64).ln().powi(n as i32) / (a + k as f64);
     }
 
     res
@@ -122,25 +122,25 @@ pub fn stieltjes(n: usize, a: f64) -> f64 {
 
 /// # Hurwitz Zeta function
 #[allow(dead_code)]
-pub fn zeta<T, U>(s: T, a: U) -> f64
-where T: Into<f64>, U: Into<f64> {
+pub fn zeta<T, U>(s: T, a: U) -> Complex
+where T: Into<f64>, U: Into<Complex> {
 
     // Conversions
-    let mut a_c: f64 = a.into();
+    let mut a_c: Complex = a.into();
     let s_f: f64 = s.into();
 
     // If a is negative and even, we use Bernoulli
     if s_f == 0.0 || (s_f.is_sign_negative() && s_f % 2.0 == 0.0) {
         let ber: Bernoulli = Bernoulli::new(-s_f as usize + 1);
-        return -ber.compute(a_c) / (-s_f + 1.0);
+        return -ber.compute_complex(a_c) / (-s_f + 1.0);
     }
 
-    let mut res: f64 = 1.0 / (s_f - 1.0);
+    let mut res: Complex = Complex::from(1.0 / (s_f - 1.0), 0.0);
 
     let mut n: usize = 0;
     let mut sign: f64 = -1.0;
     let mut div: f64;
-    let mut term: f64;
+    let mut term: Complex;
 
     'convergence: loop {
 

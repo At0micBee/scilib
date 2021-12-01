@@ -159,6 +159,26 @@ impl Complex {
         }
     }
 
+    /// # Natural logarithm
+    /// 
+    /// Computes the `ln` of self.
+    /// 
+    /// ```
+    /// # use scilib::math::complex::Complex;
+    /// let c = Complex::from(1.2, 5.35);
+    /// let res = c.ln();
+    /// 
+    /// assert!((res.re - 1.70163927393298).abs() < 1.0e-10);
+    /// assert!((res.im - 1.35014914413455).abs() < 1.0e-10);
+    /// ```
+    pub fn ln(&self) -> Self {
+        let (arg, norm): (f64, f64) = self.polar();
+        Self {
+            re: norm.ln(),
+            im: arg
+        }
+    }
+
     /// # Cosine function
     /// 
     /// Computes the cosine value of the given complex number.
