@@ -7,7 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 use std::f64::consts::{     // Using std lib constants
-    FRAC_2_SQRT_PI          // 2 / sqrt(Pi)
+    FRAC_PI_2,              // Pi / 2
+    FRAC_2_SQRT_PI,         // 2 / sqrt(Pi)
+    TAU                     // Tau constant
 };
 
 use super::{                // Using parts from the crate
@@ -20,6 +22,9 @@ use super::{                // Using parts from the crate
 
 /// Precision used for convergence
 const PRECISION: f64 = 1.0e-12;
+
+/// Stieltjes gamma computation precision
+const STIELTJES_M: usize = 1_000_000;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -101,19 +106,58 @@ where T: Into<usize> {
     (1..=n.into()).fold(1, |res, val| res * val)
 }
 
+/// # Stieltjes Gamma function
+/// 
+/// Computes Gamma_n(a).
+pub fn stieltjes(n: usize, a: f64) -> f64 {
+
+    let mut res: f64 = - (STIELTJES_M as f64 + a).ln().powi(n as i32 + 1) / (n as f64 + 1.0);
+
+    for k in 0..STIELTJES_M {
+        res += (k as f64 + a).ln().powi(n as i32) / (k as f64 + a);
+    }
+
+    res
+}
+
 /// # Hurwitz Zeta function
-fn zeta<T, U>(s: T, a: U) -> Complex
-where T: Into<f64>, U: Into<Complex> {
+#[allow(dead_code)]
+pub fn zeta<T, U>(s: T, a: U) -> f64
+where T: Into<f64>, U: Into<f64> {
 
     // Conversions
-    let mut a_c: Complex = a.into();
+    let mut a_c: f64 = a.into();
     let s_f: f64 = s.into();
 
     // If a is negative and even, we use Bernoulli
     if s_f == 0.0 || (s_f.is_sign_negative() && s_f % 2.0 == 0.0) {
         let ber: Bernoulli = Bernoulli::new(-s_f as usize + 1);
-        return -ber.compute_complex(a_c) / (-s_f + 1.0);
+        return -ber.compute(a_c) / (-s_f + 1.0);
     }
+
+    let mut res: f64 = 1.0 / (s_f - 1.0);
+
+    let mut n: usize = 0;
+    let mut sign: f64 = -1.0;
+    let mut div: f64;
+    let mut term: f64;
+
+    'convergence: loop {
+
+        if n >= 15 {
+            break 'convergence;
+        }
+
+        sign *= -1.0;
+        div = factorial(n) as f64;
+        term = stieltjes(n, a_c);
+
+        res += sign * term * (s_f - 1.0).powi(n as i32) / div;
+
+        n += 1;
+    }
+
+    res
 
     /* // Sum values
     let mut n: Complex = Complex::unity();
@@ -135,7 +179,7 @@ where T: Into<f64>, U: Into<Complex> {
 
     res */
 
-    a_c.re = a_c.re.fract();
+    /* a_c.re = a_c.re.fract();
 
     let mut res: Complex = Complex::new();
     let mut n: usize = 0;
@@ -156,7 +200,6 @@ where T: Into<f64>, U: Into<Complex> {
         for k in 0..=n {
             sign *= -1.0;
             binom = binomial(n, k) as f64;
-            println!("k: {}, pow: {}", k, sign);
             term += sign * binom * (a_c + k as f64).powf(1.0 - s_f);
         }
 
@@ -164,7 +207,39 @@ where T: Into<f64>, U: Into<Complex> {
         n += 1;
     }
 
-    res / (s_f - 1.0)
+    res / (s_f - 1.0) */
+
+    /* // For the case Re{s} < 0 and 0 < a <=1
+
+    let pre: f64 = 2.0 * gamma(1.0 - s_f) / (TAU).powf(1.0 - s_f);
+    let w_s: f64 = (FRAC_PI_2 * s_f).sin();
+    let w_c: f64 = (FRAC_PI_2 * s_f).cos();
+
+    let mut term_c: Complex = Complex::new();
+    let mut term_s: Complex = Complex::new();
+    let mut val: Complex;
+    let mut divisor: f64;
+
+    let mut n: usize = 1;
+
+    'convergence: loop {
+
+        if n >= 10 {
+            break 'convergence;
+        }
+
+        val = TAU * n as f64 * a_c;             // Pre-computing the value
+        divisor = (n as f64).powf(1.0 - s_f);   // Pre-computing the divisor
+        term_c += val.cos() / divisor;
+        term_s += val.sin() / divisor;
+
+        println!("{}", pre);
+
+        n += 1;
+    }
+
+    pre * (w_s * term_c + w_c * term_s) */
+
 }
 
 /// # Gamma function
