@@ -102,13 +102,11 @@ where T: Into<usize> {
 }
 
 /// # Hurwitz Zeta function
-pub fn zeta<T, U>(s: T, a: U) -> Complex
+fn zeta<T, U>(s: T, a: U) -> Complex
 where T: Into<f64>, U: Into<Complex> {
 
-    // Order counter
-    let mut n: Complex = Complex::unity();
-
-    let a_c: Complex = a.into();
+    // Conversions
+    let mut a_c: Complex = a.into();
     let s_f: f64 = s.into();
 
     // If a is negative and even, we use Bernoulli
@@ -117,21 +115,56 @@ where T: Into<f64>, U: Into<Complex> {
         return -ber.compute_complex(a_c) / (-s_f + 1.0);
     }
 
-    // Result
+    /* // Sum values
+    let mut n: Complex = Complex::unity();
     let mut term: Complex = Complex::unity() / a_c.powf(s_f);
     let mut res: Complex = term;
 
+    let mut counter: usize = 0;
+
     'convergence: loop {
 
-        if term.modulus() < PRECISION {
+        if term.modulus() < PRECISION || counter >= 100000 {
             break 'convergence;
         }
         term = Complex::unity() / (a_c + n).powf(s_f);
         res += term;
         n += 1;
+        counter += 1;
     }
 
-    res
+    res */
+
+    a_c.re = a_c.re.fract();
+
+    let mut res: Complex = Complex::new();
+    let mut n: usize = 0;
+
+    let mut sign: f64;
+    let mut term: Complex;
+    let mut binom: f64;
+
+    'convergence: loop {
+
+        if n >= 60 {
+            break 'convergence;
+        }
+
+        sign = -1.0;
+        term = Complex::new();
+
+        for k in 0..=n {
+            sign *= -1.0;
+            binom = binomial(n, k) as f64;
+            println!("k: {}, pow: {}", k, sign);
+            term += sign * binom * (a_c + k as f64).powf(1.0 - s_f);
+        }
+
+        res += term / (n + 1) as f64;
+        n += 1;
+    }
+
+    res / (s_f - 1.0)
 }
 
 /// # Gamma function

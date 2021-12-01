@@ -32,18 +32,18 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//pub mod astronomy;
+pub mod astronomy;
 
 pub mod constant;
 
-//pub mod coordinate;
+pub mod coordinate;
 
 pub mod math;
 
-/* pub mod planck;
+pub mod planck;
 
 pub mod quantum;
 
 pub mod range;
 
-pub mod signal; */
+pub mod signal;
