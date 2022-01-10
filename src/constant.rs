@@ -1,6 +1,6 @@
 //!
 //! # Constants
-//! 
+//!
 //! This file contains many physical constants useful for scientific applications.
 //! They are stored as `f64` to guarantee maximum precision, most are castable to `f32`.
 //!
@@ -45,6 +45,12 @@ pub const EARTH_RADIUS: f64 = 6_378_100.0;
 /// - Unit: `m3.s-2`
 pub const EARTH_GM: f64 = 3.986_004e14;
 
+/// # Earth Bond albedo
+///
+/// - Value: 0.306
+/// - Unit: /
+pub const EARTH_ALB: f64 = 0.306;
+
 /// # Jupiter mass
 ///
 /// - Value: 1.898_124_6×10²⁷
@@ -80,6 +86,12 @@ pub const SUN_RADIUS: f64 = 695_700_000.0;
 /// - Value: 1.327 124 4×10²⁰
 /// - Unit: `m3.s-2`
 pub const SUN_GM: f64 = 1.327_124_4e20;
+
+/// # Sun effective temperature
+///
+/// - Value: 5772
+/// - Unit: `K`
+pub const SUN_TEFF: f64 = 5772.0;
 
 /// # Sun luminosity
 ///
@@ -179,10 +191,10 @@ pub const Z_0: f64 = 376.730_313_668;
 // Defined
 
 /// # Euler-Mascheroni constant (γ)
-/// 
+///
 /// - Value: 0.577 215 664 901 532 860 606 512 090 082 402 431 042 159 335 939 92
 /// - Unit: /
-/// 
+///
 /// Not to be confused with Euler's number 2.71... (in standard consts of Rust).
 pub const EULER_MASCHERONI: f64 = 0.577_215_664_901_532_860_606_512_090_082_402_431_042_159_335_939_92;
 
