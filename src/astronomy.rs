@@ -4,7 +4,9 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-use std::f64::consts::PI;   // Calling constants
+use std::f64::consts::{     // Using std lib constants
+    PI                      // Pi
+};
 
 use std::fmt::{             // Formatter display
     Display,                // The display itself
@@ -125,6 +127,45 @@ impl Radec {
 pub fn t_eq(star_t: f64, star_rad: f64, dist: f64, albedo: f64) -> f64 {
     // Following the formula
     star_t * (star_rad / (2.0 * dist)).sqrt() * (1.0 - albedo).sqrt()
+}
+
+/// # Object irradiance
+///
+/// Computes the irradiance at a certain distance from an object, using its luminosity.
+/// The `luminosity` is in Watts and the `distance` is in meters, result is in `W.m-2`.
+///
+/// ```rust
+/// # use scilib::constant;
+/// # use scilib::astronomy;
+/// // Computing the solar irradiance at the Earth
+/// let p_earth: f64 = astronomy::irradiance(constant::SUN_L, constant::AU);
+/// assert!((p_earth - 1361.0).abs() < 1.0);
+///
+/// // Computing the irradiance from the sun at Alpha-Centauri
+/// let p: f64 = astronomy::irradiance(constant::SUN_L, 4.3 * constant::LY);
+/// assert!((p - 1.84e-8).abs() < 0.1e-8);
+/// ```
+pub fn irradiance(luminosity: f64, distance: f64) -> f64 {
+    // Following the formula
+    luminosity / (4.0 * PI * distance.powi(2))
+}
+
+/// # Planetary luminosity
+///
+/// Computes the luminosity of a planet, based on the received irradiance and the albedo.
+pub fn planet_luminosity(albedo: f64, received: f64) -> f64 {
+    received * albedo
+}
+
+/// # Energy received by an object
+///
+/// Computes the received energy by an object of a given surface, at a known distance.
+/// Makes use of the `insolation` function to compute the surfacic power outputed by the object.
+/// This function can be used both for primary sources of power, or reflective ones; the albedo
+/// should be set to 1 for primary emitters.
+pub fn received_energy(luminosity: f64, distance: f64, surface: f64) -> f64 {
+    // Following the formula
+    irradiance(luminosity, distance) * surface
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
