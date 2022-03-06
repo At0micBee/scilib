@@ -464,7 +464,7 @@ impl<T: Into<Self>> Sub<T> for Complex {
     }
 }
 
-/// # Substraction to f64 (real): `f64 - c`
+/// # Subtraction to f64 (real): `f64 - c`
 /// 
 /// ```
 /// # use scilib::math::complex::Complex;
