@@ -7,9 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 use std::f64::consts::{     // Using std lib constants
-    FRAC_PI_2,              // Pi / 2
+    //FRAC_PI_2,              // Pi / 2
     FRAC_2_SQRT_PI,         // 2 / sqrt(Pi)
-    TAU                     // Tau constant
+    //TAU                     // Tau constant
 };
 
 use super::{                // Using parts from the crate
@@ -126,7 +126,7 @@ pub fn zeta<T, U>(s: T, a: U) -> Complex
 where T: Into<f64>, U: Into<Complex> {
 
     // Conversions
-    let mut a_c: Complex = a.into();
+    let a_c: Complex = a.into();
     let s_f: f64 = s.into();
 
     // If a is negative and even, we use Bernoulli

@@ -23,11 +23,12 @@
 //! - **Coordinate**: Provides support for coordinate systems, and their respective operations.
 //! - **Constant**: Contains many useful constants for physics
 //! - **Signal**: Convolution and fast Fourier transform functions
+//! - **Range**: Range generator to simplify vector creation
 //!
 //! ### Specific purpose
 //!
-//! - **Astronomy**: Astronomical positions (***wip***)
-//! - **Quantum**: Quantum mechanics functions (***wip***)
+//! - **Astronomy**: Astronomical toolbox (***wip***)
+//! - **Quantum**: Quantum mechanics toolbox (***wip***)
 //!
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

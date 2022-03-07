@@ -412,6 +412,7 @@ impl<T: Into<Self>> Add<T> for Complex {
 /// let res = 3.0 + c;
 /// 
 /// assert!(res.re == 10.0 && res.im == 2.0);
+/// ```
 impl Add<Complex> for f64 {
     type Output = Complex;
     fn add(self, rhs: Complex) -> Self::Output {
@@ -453,6 +454,7 @@ impl<T: Into<Self>> AddAssign<T> for Complex {
 /// 
 /// assert!(res.re == -2.9 && res.im == 2.5);
 /// assert!(res2.re == -2.9 && res2.im == 3.0);
+/// ```
 impl<T: Into<Self>> Sub<T> for Complex {
     type Output = Self;
     fn sub(self, rhs: T) -> Self::Output {
@@ -472,6 +474,7 @@ impl<T: Into<Self>> Sub<T> for Complex {
 /// let res = 3.0 - c;
 /// 
 /// assert!(res.re == -7.0 && res.im == -2.0);
+/// ```
 impl Sub<Complex> for f64 {
     type Output = Complex;
     fn sub(self, rhs: Complex) -> Self::Output {
@@ -493,6 +496,7 @@ impl Sub<Complex> for f64 {
 /// 
 /// assert!(c1.re == -2.9 && c1.im == 2.5);
 /// assert!(c2.re == -7.0 && c2.im == 0.5);
+/// ```
 impl<T: Into<Self>> SubAssign<T> for Complex {
     fn sub_assign(&mut self, rhs: T) {
         let rhs: Self = rhs.into();
@@ -512,6 +516,7 @@ impl<T: Into<Self>> SubAssign<T> for Complex {
 /// 
 /// assert!(res.re == 9.0 && res.im == 16.05);
 /// assert!(res2.re == 4.2 && res2.im == 6.0);
+/// ```
 impl<T: Into<Self>> Mul<T> for Complex {
     type Output = Self;
     fn mul(self, rhs: T) -> Self::Output {
@@ -531,6 +536,7 @@ impl<T: Into<Self>> Mul<T> for Complex {
 /// let res = 3.0 * c;
 /// 
 /// assert!(res.re == 15.0 && res.im == 6.0);
+/// ```
 impl Mul<Complex> for f64 {
     type Output = Complex;
     fn mul(self, rhs: Complex) -> Self::Output {
@@ -552,6 +558,7 @@ impl Mul<Complex> for f64 {
 /// 
 /// assert!(c1.re == 9.0 && c1.im == 16.05);
 /// assert!(c2.re == 10.0 && c2.im == 1.0);
+/// ```
 impl<T: Into<Self>> MulAssign<T> for Complex {
     fn mul_assign(&mut self, rhs: T) {
         let rhs: Self = rhs.into();
@@ -572,6 +579,7 @@ impl<T: Into<Self>> MulAssign<T> for Complex {
 /// 
 /// assert!((res.re - 0.47524752475).abs() < 1.0e-9 && (res.im - 0.5524752475).abs() < 1.0e-9);
 /// assert!(res2.re == 1.05 && res2.im == 1.5);
+/// ```
 impl<T: Into<Self>> Div<T> for Complex {
     type Output = Self;
     fn div(self, rhs: T) -> Self::Output {
@@ -592,6 +600,7 @@ impl<T: Into<Self>> Div<T> for Complex {
 /// let res = 2.0 / c;
 /// 
 /// assert!(res.re == 0.2 && res.im == -0.4);
+/// ```
 impl Div<Complex> for f64 {
     type Output = Complex;
     fn div(self, rhs: Complex) -> Self::Output {
@@ -615,6 +624,7 @@ impl Div<Complex> for f64 {
 /// 
 /// assert!((c1.re - 0.47524752475).abs() < 1.0e-9 && (c1.im - 0.5524752475).abs() < 1.0e-9);
 /// assert!(c2.re == 0.5 && c2.im == 0.05);
+/// ```
 impl<T: Into<Self>> DivAssign<T> for Complex {
     fn div_assign(&mut self, rhs: T) {
         let rhs: Self = rhs.into();
