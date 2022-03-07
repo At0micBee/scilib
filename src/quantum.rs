@@ -28,9 +28,9 @@ use crate::{                // Calling other modules
 /// let l = get_l(3);
 /// assert_eq!(l, vec![0, 1, 2]);
 /// ``` */
-#[allow(unused)]
-fn get_l(n: usize) -> Vec<usize> {
-    (0..n).collect()
+pub fn get_l<T>(n: T) -> Vec<usize>
+where T: Into<usize> {
+    (0..n.into()).collect()
 }
 
 /// # Computing legal magnetic quantum numbers m based on l
@@ -42,9 +42,9 @@ fn get_l(n: usize) -> Vec<usize> {
 /// let m = get_m(2);
 /// assert_eq!(m, vec![-2, -1, 0, 1, 2]);
 /// ``` */
-#[allow(unused)]
-fn get_m(l: usize) -> Vec<isize> {
-    let li: isize = l as isize;
+pub fn get_m<T>(l: T) -> Vec<isize>
+where T: Into<isize> {
+    let li: isize = l.into();
     (-li..=li).collect()
 }
 
@@ -52,25 +52,24 @@ fn get_m(l: usize) -> Vec<isize> {
 /// 
 /// They are quite costly to derive properly, due to the normalization process. Luckily, we can 
 /// compute them manually and implement them this way.
-#[allow(unused)]
-fn radial_wavefunction(n: usize, l: usize, r: f64) -> f64 {
+/// 
+/// This function is a simple sub-function selector that return the result of the appropriate
+/// radial function. The `match` allows great flexibility but incurs runtime penalty.
+/// 
+/// WARNING: Not all wavefunction have been implemented; max is n=2, l=1.
+pub fn radial_wavefunction(n: usize, l: usize, r: f64) -> f64 {
 
-    match (n, l) {
-        // n=1, l=0
-        (1, 0) => {
-            2.0 * (1.0 / cst::A_0).powf(3.0 / 2.0) * (-r / cst::A_0).exp()
-        },
-        // n=2, l=0
-        (2, 0) => {
-            2.0 * (0.5 / cst::A_0).powf(3.0 / 2.0) * (1.0 - r / (2.0 * cst::A_0)) * (-r / (2.0 * cst::A_0)).exp()
-        },
-        // n=2, l=1
-        (2, 1) => {
-            (1.0 / 3.0_f64.sqrt()) * (0.5 / cst::A_0).powf(3.0 / 2.0) * (r / cst::A_0) * (-r / (2.0 * cst::A_0)).exp()
-        }
-        // Either impossible case, or not computed
-        _ => 0.0
-    }
+    // Pre-computing
+    let factor: f64 = r / (n as f64 * cst::A_0);
+
+    // Computing the norm of the function
+    let mut norm: f64 = (2.0 / (n as f64 * cst::A_0)).powi(3);
+    norm *= basic::factorial(n - l - 1) as f64 / (2 * n * basic::factorial(n + l).pow(3)) as f64;
+
+    // Computing the term associated to the Laguerre polynomial
+    let poly = polynomial::Laguerre::new(n + 1, 2 * l as i32 + 1).compute(2.0 * factor);
+
+    -(norm.sqrt()).powi(l as i32) * poly * (-factor.exp())
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
