@@ -591,7 +591,7 @@ impl<T: Into<Self>> Div<T> for Complex {
 /// let c = Complex::from(2.0, 4.0);
 /// let res = 2.0 / c;
 /// 
-/// assert!(res.re == 0.2 && res.im == 0.4);
+/// assert!(res.re == 0.2 && res.im == -0.4);
 impl Div<Complex> for f64 {
     type Output = Complex;
     fn div(self, rhs: Complex) -> Self::Output {
