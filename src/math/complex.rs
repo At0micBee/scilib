@@ -404,6 +404,24 @@ impl<T: Into<Self>> Add<T> for Complex {
     }
 }
 
+/// # Addition to f64 (real): `f64 + c`
+/// 
+/// ```
+/// # use scilib::math::complex::Complex;
+/// let c = Complex::from(7, 2.0);
+/// let res = 3.0 + c;
+/// 
+/// assert!(res.re == 10.0 && res.im == 2.0);
+impl Add<Complex> for f64 {
+    type Output = Complex;
+    fn add(self, rhs: Complex) -> Self::Output {
+        Complex {
+            re: self + rhs.re,
+            im: rhs.im
+        }
+    }
+}
+
 /// # Assigning Addition
 /// 
 /// ```
@@ -446,6 +464,24 @@ impl<T: Into<Self>> Sub<T> for Complex {
     }
 }
 
+/// # Subtraction to f64 (real): `f64 - c`
+/// 
+/// ```
+/// # use scilib::math::complex::Complex;
+/// let c = Complex::from(10, 2.0);
+/// let res = 3.0 - c;
+/// 
+/// assert!(res.re == -7.0 && res.im == -2.0);
+impl Sub<Complex> for f64 {
+    type Output = Complex;
+    fn sub(self, rhs: Complex) -> Self::Output {
+        Complex {
+            re: self - rhs.re,
+            im: -rhs.im
+        }
+    }
+}
+
 /// # Assigning subtraction
 /// 
 /// ```
@@ -456,7 +492,7 @@ impl<T: Into<Self>> Sub<T> for Complex {
 /// c2 -= 12.0;
 /// 
 /// assert!(c1.re == -2.9 && c1.im == 2.5);
-/// assert!(c2.re == -7.0 && c2.im == 0.5)
+/// assert!(c2.re == -7.0 && c2.im == 0.5);
 impl<T: Into<Self>> SubAssign<T> for Complex {
     fn sub_assign(&mut self, rhs: T) {
         let rhs: Self = rhs.into();
@@ -544,6 +580,26 @@ impl<T: Into<Self>> Div<T> for Complex {
         Self {
             re: (self.re * rhs.re + self.im * rhs.im) / div,
             im: (self.im * rhs.re - self.re * rhs.im) / div
+        }
+    }
+}
+
+/// # Division to f64 (real): `f64 / c`
+/// 
+/// ```
+/// # use scilib::math::complex::Complex;
+/// let c = Complex::from(2.0, 4.0);
+/// let res = 2.0 / c;
+/// 
+/// assert!(res.re == 0.2 && res.im == -0.4);
+impl Div<Complex> for f64 {
+    type Output = Complex;
+    fn div(self, rhs: Complex) -> Self::Output {
+        // num / (a + ib) == a * num / (a² + b²) - i * b * num / (a² + b²)
+        let modulus_squared = rhs.re.powi(2) + rhs.im.powi(2);
+        Complex {
+            re: self * rhs.re / modulus_squared,
+            im: -self * rhs.im / modulus_squared
         }
     }
 }
