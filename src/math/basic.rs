@@ -121,7 +121,6 @@ pub fn stieltjes(n: usize, a: Complex) -> Complex {
 }
 
 /// # Hurwitz Zeta function
-#[allow(dead_code)]
 pub fn zeta<T, U>(s: T, a: U) -> Complex
 where T: Into<f64>, U: Into<Complex> {
 
@@ -158,88 +157,6 @@ where T: Into<f64>, U: Into<Complex> {
     }
 
     res
-
-    /* // Sum values
-    let mut n: Complex = Complex::unity();
-    let mut term: Complex = Complex::unity() / a_c.powf(s_f);
-    let mut res: Complex = term;
-
-    let mut counter: usize = 0;
-
-    'convergence: loop {
-
-        if term.modulus() < PRECISION || counter >= 100000 {
-            break 'convergence;
-        }
-        term = Complex::unity() / (a_c + n).powf(s_f);
-        res += term;
-        n += 1;
-        counter += 1;
-    }
-
-    res */
-
-    /* a_c.re = a_c.re.fract();
-
-    let mut res: Complex = Complex::new();
-    let mut n: usize = 0;
-
-    let mut sign: f64;
-    let mut term: Complex;
-    let mut binom: f64;
-
-    'convergence: loop {
-
-        if n >= 60 {
-            break 'convergence;
-        }
-
-        sign = -1.0;
-        term = Complex::new();
-
-        for k in 0..=n {
-            sign *= -1.0;
-            binom = binomial(n, k) as f64;
-            term += sign * binom * (a_c + k as f64).powf(1.0 - s_f);
-        }
-
-        res += term / (n + 1) as f64;
-        n += 1;
-    }
-
-    res / (s_f - 1.0) */
-
-    /* // For the case Re{s} < 0 and 0 < a <=1
-
-    let pre: f64 = 2.0 * gamma(1.0 - s_f) / (TAU).powf(1.0 - s_f);
-    let w_s: f64 = (FRAC_PI_2 * s_f).sin();
-    let w_c: f64 = (FRAC_PI_2 * s_f).cos();
-
-    let mut term_c: Complex = Complex::new();
-    let mut term_s: Complex = Complex::new();
-    let mut val: Complex;
-    let mut divisor: f64;
-
-    let mut n: usize = 1;
-
-    'convergence: loop {
-
-        if n >= 10 {
-            break 'convergence;
-        }
-
-        val = TAU * n as f64 * a_c;             // Pre-computing the value
-        divisor = (n as f64).powf(1.0 - s_f);   // Pre-computing the divisor
-        term_c += val.cos() / divisor;
-        term_s += val.sin() / divisor;
-
-        println!("{}", pre);
-
-        n += 1;
-    }
-
-    pre * (w_s * term_c + w_c * term_s) */
-
 }
 
 /// # Gamma function
