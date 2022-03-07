@@ -417,7 +417,7 @@ impl Add<Complex> for f64 {
     fn add(self, rhs: Complex) -> Self::Output {
         Complex {
             re: self + rhs.re,
-            im: self + rhs.im
+            im: self
         }
     }
 }
@@ -477,7 +477,7 @@ impl Sub<Complex> for f64 {
     fn sub(self, rhs: Complex) -> Self::Output {
         Complex {
             re: self - rhs.re,
-            im: self - rhs.im
+            im: self
         }
     }
 }
@@ -596,7 +596,7 @@ impl Div<Complex> for f64 {
     type Output = Complex;
     fn div(self, rhs: Complex) -> Self::Output {
         // num / (a + ib) == a * num / (a² + b²) - i * b * num / (a² + b²)
-        let modulus_squared = rhs.re * rhs.re + rhs.im * rhs.im;
+        let modulus_squared = rhs.re.powi(2) + rhs.im.powi(2);
         Complex {
             re: self * rhs.re / modulus_squared,
             im: -self * rhs.im / modulus_squared
