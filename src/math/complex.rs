@@ -492,7 +492,7 @@ impl Sub<Complex> for f64 {
 /// c2 -= 12.0;
 /// 
 /// assert!(c1.re == -2.9 && c1.im == 2.5);
-/// assert!(c2.re == -7.0 && c2.im == 0.5)
+/// assert!(c2.re == -7.0 && c2.im == 0.5);
 impl<T: Into<Self>> SubAssign<T> for Complex {
     fn sub_assign(&mut self, rhs: T) {
         let rhs: Self = rhs.into();
