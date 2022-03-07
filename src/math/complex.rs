@@ -417,7 +417,7 @@ impl Add<Complex> for f64 {
     fn add(self, rhs: Complex) -> Self::Output {
         Complex {
             re: self + rhs.re,
-            im: self
+            im: rhs.im
         }
     }
 }
@@ -471,13 +471,13 @@ impl<T: Into<Self>> Sub<T> for Complex {
 /// let c = Complex::from(10, 2.0);
 /// let res = 3.0 - c;
 /// 
-/// assert!(res.re == 7.0 && res.im == 2.0);
+/// assert!(res.re == -7.0 && res.im == -2.0);
 impl Sub<Complex> for f64 {
     type Output = Complex;
     fn sub(self, rhs: Complex) -> Self::Output {
         Complex {
             re: self - rhs.re,
-            im: self
+            im: -rhs.im
         }
     }
 }
