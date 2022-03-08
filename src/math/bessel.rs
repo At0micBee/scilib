@@ -447,3 +447,47 @@ where T: Into<Complex> + Copy, U: Into<f64> {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/// # Spherical Bessel function of the first kind : j
+pub fn sj_array<T, U>(x: T, n: U) -> Vec<Complex>
+where T: Into<Complex>, U: Into<usize> {
+    let z: Complex = x.into();
+    let order: usize = n.into();
+    let max_len = (order + 1) * 10; // ten times more to have the limit
+    let mut jn: Vec<Complex> = vec![Complex::from(0.0, 0.0); max_len];
+    jn[max_len - 1] = Complex::from(0.0, 0.0);
+    jn[max_len - 2] = Complex::from(1.0, 0.0);
+    for i in (1..=max_len - 2).rev() {
+        jn[i - 1] = ((2 * i + 1) as f64) / z * jn[i] - jn[i + 1];
+    }
+    jn.resize(order + 1, Complex::from(0.0, 0.0));
+    let coeff = z.sin() / (z * jn[0]);
+    for i in 0..jn.len() {
+        jn[i] *= coeff;
+    }
+    return jn;
+}
+
+/// # Spherical Bessel function of the second kind : y
+pub fn sy_array<T, U>(x: T, n: U) -> Vec<Complex>
+where T: Into<Complex>, U: Into<usize> {
+    let z: Complex = x.into();
+    let order: usize = n.into();
+    let y0 = -z.cos() / z;
+    if order == 0 {
+        return vec![y0];
+    }
+    let y1 = -z.cos() / (z * z) - z.sin() / z;
+    if order == 1 {
+        return vec![y0, y1];
+    }
+    let mut yn: Vec<Complex> = vec![Complex::from(0.0, 0.0); order + 1];
+    yn[0] = y0;
+    yn[1] = y1;
+    for i in 2..(order + 1) {
+        yn[i] = ((2 * i + 1) as f64) / z * yn[i - 1] - yn[i - 2];
+    }
+    return yn;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
