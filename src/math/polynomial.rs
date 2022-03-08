@@ -127,7 +127,7 @@ impl Legendre {
         }
     }
 
-    /// Computes the value of `x` for the given polynomial.
+    /// Computes the value of `x` for the given polynomial (x: real).
     /// 
     /// Returns: the result of the polynomial Plm(x)
     /// 
@@ -150,6 +150,14 @@ impl Legendre {
         // Iterates through the values of the factors and powers
         let pre: f64 = self.pre_f * (1.0 - x.powi(2)).powf(self.m as f64 / 2.0);
         pre * self.factor.iter().zip(&self.power).fold(0.0, |res, (f, p)| res + f * x.powi(*p))
+    }
+
+    /// Computes the value of `z` for the given polynomial (z: complex).
+    /// 
+    /// Returns: the result of the polynomial Plm(z)
+    pub fn compute_complex(&self, z: Complex) -> Complex {
+        // Iterates through the values of the factors and powers
+        self.factor.iter().zip(&self.power).fold(Complex::new(), |res, (f, p)| res + *f * z.powi(*p))
     }
 }
 
@@ -223,7 +231,7 @@ impl Laguerre {
         }
     }
 
-    /// Computes the value of `x` for the given polynomial.
+    /// Computes the value of `x` for the given polynomial (x: real).
     /// 
     /// Returns: the result of the polynomial Plm(x)
     /// 
@@ -242,6 +250,14 @@ impl Laguerre {
     pub fn compute(&self, x: f64) -> f64 {
         // Iterates through the values of the factors and powers
         self.factor.iter().zip(&self.power).fold(0.0, |res, (f, p)| res + f * x.powi(*p))
+    }
+
+    /// Computes the value of `z` for the given polynomial (z: complex).
+    /// 
+    /// Returns: the result of the polynomial Plm(z)
+    pub fn compute_complex(&self, z: Complex) -> Complex {
+        // Iterates through the values of the factors and powers
+        self.factor.iter().zip(&self.power).fold(Complex::new(), |res, (f, p)| res + *f * z.powi(*p))
     }
 }
 
@@ -343,7 +359,7 @@ impl Bernoulli {
         }
     }
 
-    /// Computes the value of `x` for the given polynomial.
+    /// Computes the value of `x` for the given polynomial (x: real).
     /// 
     /// Returns: the result of the polynomial Bn(x)
     /// 
@@ -509,6 +525,14 @@ impl Euler {
     pub fn compute(&self, x: f64) -> f64 {
         // Iterates through the values of the factors and powers
         self.factor.iter().zip(&self.power).fold(0.0, |res, (f, p)| res + f * x.powi(*p))
+    }
+
+    /// Computes the value of `z` for the given polynomial (z: complex).
+    /// 
+    /// Returns: the result of the polynomial En(x)
+    pub fn compute_complex(&self, z: Complex) -> Complex {
+        // Iterates through the values of the factors and powers
+        self.factor.iter().zip(&self.power).fold(Complex::new(), |res, (f, p)| res + *f * z.powi(*p))
     }
 }
 
