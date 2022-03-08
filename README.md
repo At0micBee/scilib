@@ -162,7 +162,10 @@ The spherical harmonics Ylm(theta, phi) function has been added to the quantum s
 use scilib::quantum::*;
 
 // Computing Ylm for l=3, m=1, theta = 0.2 and phi = -0.3
-let res = spherical_harmonics(3, 1, 0.2, -0.3);
+let sph = spherical_harmonics(3, 1, 0.2, -0.3);
+
+// Computing the Rnl for n=4, l=2
+let rad = radial_wavefunction(4, 2, 1.3e-12);
 ```
 
 ---

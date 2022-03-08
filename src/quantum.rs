@@ -23,11 +23,11 @@ use crate::{                // Calling other modules
 /// 
 /// This quantum number exists in the range [0, n-1].
 /// 
-/* /// ```
+/// ```
 /// # use scilib::quantum::get_l;
 /// let l = get_l(3);
 /// assert_eq!(l, vec![0, 1, 2]);
-/// ``` */
+/// ```
 pub fn get_l<T>(n: T) -> Vec<usize>
 where T: Into<usize> {
     (0..n.into()).collect()
@@ -37,11 +37,11 @@ where T: Into<usize> {
 /// 
 /// This quantum number exists in the range [-l, l].
 /// 
-/* /// ```
+/// ```
 /// # use scilib::quantum::get_m;
 /// let m = get_m(2);
 /// assert_eq!(m, vec![-2, -1, 0, 1, 2]);
-/// ``` */
+/// ```
 pub fn get_m<T>(l: T) -> Vec<isize>
 where T: Into<isize> {
     let li: isize = l.into();
@@ -56,7 +56,11 @@ where T: Into<isize> {
 /// This function is a simple sub-function selector that return the result of the appropriate
 /// radial function. The `match` allows great flexibility but incurs runtime penalty.
 /// 
-/// WARNING: Not all wavefunction have been implemented; max is n=2, l=1.
+/// ```
+/// # use scilib::quantum::radial_wavefunction;
+/// // Computing the Rnl for n=2, l=1
+/// let res = radial_wavefunction(2, 1, 1.3e-12);
+/// ```
 pub fn radial_wavefunction(n: usize, l: usize, r: f64) -> f64 {
 
     // Pre-computing
@@ -69,7 +73,7 @@ pub fn radial_wavefunction(n: usize, l: usize, r: f64) -> f64 {
     // Computing the term associated to the Laguerre polynomial
     let poly = polynomial::Laguerre::new(n + 1, 2 * l as i32 + 1).compute(2.0 * factor);
 
-    -(norm.sqrt()).powi(l as i32) * poly * (-factor.exp())
+    -(norm.sqrt()).powi(l as i32) * poly * (-factor).exp()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
