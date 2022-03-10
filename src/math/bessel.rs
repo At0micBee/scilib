@@ -448,10 +448,9 @@ where T: Into<Complex> + Copy, U: Into<f64> {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-fn sj_upward_reccurence<T, U>(z: T, n: U) -> Vec<Complex> 
-where T: Into<Complex>, U: Into<usize> {
-    let order: usize = n.into();
-    let count = order + 1;
+fn sj_upward_reccurence<T>(z: T, n: usize) -> Vec<Complex> 
+where T: Into<Complex> {
+    let count = n + 1;
     let x: Complex = z.into();
     let mut jn = vec![Complex::from(0.0, 0.0); count];
     jn[0] = x.sin() / x;
@@ -462,11 +461,9 @@ where T: Into<Complex>, U: Into<usize> {
     jn
 }
 
-fn sj_downward_reccurence<T, U>(z: T, nl: U, nu: U) -> Vec<Complex> 
-where T: Into<Complex>, U: Into<usize> {
-    let lower_order: usize = nl.into();
-    let upper_order: usize = nu.into();
-    let count = upper_order - lower_order + 1;
+fn sj_downward_reccurence<T>(z: T, nl: usize, nu: usize) -> Vec<Complex> 
+where T: Into<Complex> {
+    let count = nu - nl + 1;
     let x: Complex = z.into();
     let mut jn= vec![Complex::from(0.0, 0.0); count + 2];
     jn[count + 1] = Complex::from(0.0, 0.0);
@@ -478,26 +475,40 @@ where T: Into<Complex>, U: Into<usize> {
     jn
 }
 
-/// # Spherical Bessel function of the first kind : j
-pub fn sj_array<T, U>(z: T, n: U) -> Vec<Complex>
-where T: Into<Complex>, U: Into<usize> {
-    let order: usize = n.into();
+/// # First spherical Bessel function (array): j
+/// 
+/// Compute the first kind of spherical bessel functions by reccurency to get an array of function.
+/// * `z` - where the function is evaluated
+/// * `n` - maximum order evaluated, return a vector from 0 to the nth order included : `sj[0]` to `sj[n]`
+/// 
+/// ```
+/// let sj = func::sj_array(Complex::from(13, 5), 3);
+/// assert_eq!(sj[0], Complex::from(3.8248700377925635, 3.708547263317134));
+/// assert_eq!(sj[1], Complex::from(-3.357143112679857, 3.9747696875545517));
+/// assert_eq!(sj[2], Complex::from(-4.1924320794482135, -2.6499227040139104));
+/// let sj2 = func::sj_array(0.2, 25);
+/// assert_eq!(sj2[13], Complex::from(0.000000000000000000000003835110596379198, 0.0));
+/// assert_eq!(sj2[17], Complex::from(0.000000000000000000000000000000005910455642760406, 0.0));
+/// assert_eq!(sj2[25], Complex::from(0.000000000000000000000000000000000000000000000000001125476749298975, 0.0));
+/// ```
+pub fn sj_array<T>(z: T, n: usize) -> Vec<Complex>
+where T: Into<Complex> {
     let x: Complex = z.into();
-    if x.modulus() > order as f64 / 2.0 {
-        sj_upward_reccurence(x, order)
+    if x.modulus() > n as f64 / 2.0 {
+        sj_upward_reccurence(x, n)
     } else {
         const PACK: usize = 50;
-        let num_big_loop = order / PACK;
+        let num_big_loop = n / PACK;
         let mut jn_all = Vec::<Vec<Complex>>::new();
         for i in 0..num_big_loop {
             jn_all.push(sj_downward_reccurence(x, i * PACK, (i + 1) * PACK));
         }
-        let rest = order % PACK;
+        let rest = n % PACK;
         if rest != 0 {
-            jn_all.push(sj_downward_reccurence(x, order - rest, order));
+            jn_all.push(sj_downward_reccurence(x, n - rest, n));
         }
 
-        let mut jn = Vec::<Complex>::with_capacity(order);
+        let mut jn = Vec::<Complex>::with_capacity(n);
         let mut norm = x.sin() / x / jn_all[0][0];
         for i in 0..jn_all[0].len() {
             jn.push(jn_all[0][i] * norm);
@@ -512,24 +523,38 @@ where T: Into<Complex>, U: Into<usize> {
     }
 }
 
-/// # Spherical Bessel function of the second kind : y
-pub fn sy_array<T, U>(x: T, n: U) -> Vec<Complex>
-where T: Into<Complex>, U: Into<usize> {
-    let z: Complex = x.into();
-    let order: usize = n.into();
-    let y0 = -z.cos() / z;
-    if order == 0 {
+/// # Second spherical Bessel function (array): y
+/// 
+/// Compute the second kind of spherical bessel functions by reccurency to get an array of function.
+/// * `z` - where the function is evaluated
+/// * `n` - maximum order evaluated, return a vector from 0 to the nth order included : `sj[0]` to `sj[n]`
+/// 
+/// ```
+/// let sy = func::sy_array(Complex::from(13, 5), 3);
+/// assert_eq!(sy[0], Complex::from(-3.7090299518957797, 3.8248379131516654));
+/// assert_eq!(sy[1], Complex::from(-3.9748349852610523, -3.356650136356049));
+/// assert_eq!(sy[2], Complex::from(1.9446973361696478, -4.437267728778557));
+/// let sy2 = func::sy_array(0.2, 25);
+/// assert_eq!(sy2[13], Complex::from(-438040564762039800000000.0, 0.0));
+/// assert_eq!(sy2[17], Complex::from(-284225138610497950000000000000000.0, 0.0));
+/// assert_eq!(sy2[25], Complex::from(-1492587957151948600000000000000000000000000000000000.0, 0.0));
+/// ```
+pub fn sy_array<T>(z: T, n: usize) -> Vec<Complex>
+where T: Into<Complex> {
+    let x: Complex = z.into();
+    let y0 = -x.cos() / x;
+    if n == 0 {
         return vec![y0];
     }
-    let y1 = -z.cos() / (z * z) - z.sin() / z;
-    if order == 1 {
+    let y1 = -x.cos() / (x * x) - x.sin() / x;
+    if n == 1 {
         return vec![y0, y1];
     }
-    let mut yn: Vec<Complex> = vec![Complex::from(0.0, 0.0); order + 1];
+    let mut yn: Vec<Complex> = vec![Complex::from(0.0, 0.0); n + 1];
     yn[0] = y0;
     yn[1] = y1;
-    for i in 2..(order + 1) {
-        yn[i] = ((2 * i + 1) as f64) / z * yn[i - 1] - yn[i - 2];
+    for i in 2..(n + 1) {
+        yn[i] = ((2 * i + 1) as f64) / x * yn[i - 1] - yn[i - 2];
     }
     return yn;
 }
