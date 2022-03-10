@@ -25,7 +25,7 @@ use crate::{                // Calling other modules
 /// 
 /// ```
 /// # use scilib::quantum::get_l;
-/// let l = get_l(3);
+/// let l = get_l(3_usize);
 /// assert_eq!(l, vec![0, 1, 2]);
 /// ```
 pub fn get_l<T>(n: T) -> Vec<usize>
@@ -39,7 +39,7 @@ where T: Into<usize> {
 /// 
 /// ```
 /// # use scilib::quantum::get_m;
-/// let m = get_m(2);
+/// let m = get_m(2_isize);
 /// assert_eq!(m, vec![-2, -1, 0, 1, 2]);
 /// ```
 pub fn get_m<T>(l: T) -> Vec<isize>
@@ -71,9 +71,10 @@ pub fn radial_wavefunction(n: usize, l: usize, r: f64) -> f64 {
     norm *= basic::factorial(n - l - 1) as f64 / (2 * n * basic::factorial(n + l).pow(3)) as f64;
 
     // Computing the term associated to the Laguerre polynomial
-    let poly = polynomial::Laguerre::new(n + 1, 2 * l as i32 + 1).compute(2.0 * factor);
+    let mut poly = polynomial::Laguerre::new(n+1, 0);
+    poly.derive(2 * l as i32 + 1);
 
-    -(norm.sqrt()).powi(l as i32) * poly * (-factor).exp()
+    (2.0 * factor).powi(l as i32) * -(norm.sqrt()) * poly.compute(2.0 * factor) * (-factor).exp()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

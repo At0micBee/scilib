@@ -231,6 +231,35 @@ impl Laguerre {
         }
     }
 
+    pub fn derive(&mut self, m: i32) {
+
+        // Creating the marker to know if we need to delete the last element
+        // when the power reaches 0
+        let mut marker: bool;
+        
+        // Looping the derivation, m times
+        for _ in 1..=m {
+
+            // Resetting at false, and starting the computation of the new terms
+            marker = false;
+            for (f, p) in self.factor.iter_mut().zip(&mut self.power) {
+                match p {
+                    0 => marker = true,     // If p is zero, we do not touch anything
+                    _ => {                  // For anything else, we compute the derivative
+                        *f *= *p as f64;    // Changing th factor value
+                        *p -= 1;            // Changing the power value
+                    }
+                }
+            }
+
+            // If the marker is true, we remove the zero power, and the associated factor
+            if marker {
+                self.factor.pop();  // pop() method is fine, 0 can only exist once per derivative
+                self.power.pop();   // and if so, it will always be at the last position
+            }
+        }
+    }
+
     /// Computes the value of `x` for the given polynomial (x: real).
     /// 
     /// Returns: the result of the polynomial Plm(x)
@@ -248,8 +277,11 @@ impl Laguerre {
     /// assert_eq!(res, 2.42);
     /// ```
     pub fn compute(&self, x: f64) -> f64 {
+        println!("{}", self);
         // Iterates through the values of the factors and powers
-        self.factor.iter().zip(&self.power).fold(0.0, |res, (f, p)| res + f * x.powi(*p))
+        let res: f64 = self.factor.iter().zip(&self.power).fold(0.0, |res, (f, p)| res + f * x.powi(*p));
+        println!("res {}", res);
+        res
     }
 
     /// Computes the value of `z` for the given polynomial (z: complex).
