@@ -448,24 +448,68 @@ where T: Into<Complex> + Copy, U: Into<f64> {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/// # Spherical Bessel function of the first kind : j
-pub fn sj_array<T, U>(x: T, n: U) -> Vec<Complex>
+fn sj_upward_reccurence<T, U>(z: T, n: U) -> Vec<Complex> 
 where T: Into<Complex>, U: Into<usize> {
-    let z: Complex = x.into();
     let order: usize = n.into();
-    let max_len = (order + 1) * 10; // ten times more to have the limit
-    let mut jn: Vec<Complex> = vec![Complex::from(0.0, 0.0); max_len];
-    jn[max_len - 1] = Complex::from(0.0, 0.0);
-    jn[max_len - 2] = Complex::from(1.0, 0.0);
-    for i in (1..=max_len - 2).rev() {
-        jn[i - 1] = ((2 * i + 1) as f64) / z * jn[i] - jn[i + 1];
+    let count = order + 1;
+    let x: Complex = z.into();
+    let mut jn = vec![Complex::from(0.0, 0.0); count];
+    jn[0] = x.sin() / x;
+    jn[1] = x.sin() / x.powi(2) - x.cos() / x;
+    for i in 1..=count - 2 {
+        jn[i + 1] = (2 * i + 1) as f64 / x * jn[i] - jn[i - 1];
     }
-    jn.resize(order + 1, Complex::from(0.0, 0.0));
-    let coeff = z.sin() / (z * jn[0]);
-    for i in 0..jn.len() {
-        jn[i] *= coeff;
+    jn
+}
+
+fn sj_downward_reccurence<T, U>(z: T, nl: U, nu: U) -> Vec<Complex> 
+where T: Into<Complex>, U: Into<usize> {
+    let lower_order: usize = nl.into();
+    let upper_order: usize = nu.into();
+    let count = upper_order - lower_order + 1;
+    let x: Complex = z.into();
+    let mut jn= vec![Complex::from(0.0, 0.0); count + 2];
+    jn[count + 1] = Complex::from(0.0, 0.0);
+    jn[count] = Complex::from(1.0, 0.0);
+    for i in (1..=count).rev() {
+        jn[i - 1] = (2 * i + 1) as f64 / x * jn[i] - jn[i + 1];
     }
-    return jn;
+    jn.resize(count, Complex::from(0.0, 0.0));
+    jn
+}
+
+/// # Spherical Bessel function of the first kind : j
+pub fn sj_array<T, U>(z: T, n: U) -> Vec<Complex>
+where T: Into<Complex>, U: Into<usize> {
+    let order: usize = n.into();
+    let x: Complex = z.into();
+    if x.modulus() > order as f64 / 2.0 {
+        sj_upward_reccurence(x, order)
+    } else {
+        const PACK: usize = 50;
+        let num_big_loop = order / PACK;
+        let mut jn_all = Vec::<Vec<Complex>>::new();
+        for i in 0..num_big_loop {
+            jn_all.push(sj_downward_reccurence(x, i * PACK, (i + 1) * PACK));
+        }
+        let rest = order % PACK;
+        if rest != 0 {
+            jn_all.push(sj_downward_reccurence(x, order - rest, order));
+        }
+
+        let mut jn = Vec::<Complex>::with_capacity(order);
+        let mut norm = x.sin() / x / jn_all[0][0];
+        for i in 0..jn_all[0].len() {
+            jn.push(jn_all[0][i] * norm);
+        }
+        for i in 1..jn_all.len() {
+            norm = *jn.last().unwrap() / jn_all[i][0];
+            for k in 1..jn_all[i].len() {
+                jn.push(jn_all[i][k] * norm);
+            }
+        }
+        jn
+    }
 }
 
 /// # Spherical Bessel function of the second kind : y
