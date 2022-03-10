@@ -354,6 +354,25 @@ impl Complex {
         let (arg, norm): (f64, f64) = self.polar();
         Self::from_polar(arg * e, norm.powf(e))
     }
+
+    /// # Squared root
+    /// 
+    /// Return a tuple where the first value is the "negative" result and the second value is the "positive" result.
+    /// 
+    /// ```
+    /// let c = Complex::from(4.0, 2.0);
+    /// let sqrt_neg = c.sqrt().0;
+    /// let sqrt_pos = c.sqrt().1;
+    /// assert_eq!(sqrt_neg, Complex::from(-1.79890744, -1.111785941));
+    /// assert_eq!(sqrt_pos, Complex::from(1.79890744, 1.111785941));
+    /// ```
+    pub fn sqrt(&self) -> (Self, Self) {
+        let modulus = self.modulus();
+        let a = ((modulus + self.re) / 2.0).sqrt();
+        let b = ((modulus - self.re) / 2.0).sqrt();
+        let sign = self.im.signum();
+        (Self::from(-a, -b * sign), Self::from(a, b * sign))
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
