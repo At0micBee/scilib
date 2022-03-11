@@ -44,11 +44,10 @@ const STIELTJES_M: usize = 1_000_000;
 /// assert!((y - 0.776699238306) < 1.0e-12);
 /// ```
 pub fn sinc(x: f64) -> f64 {
-    let res = x.sin() / x;
-    if res.is_nan() {
+    if x == 0.0 {
         1.0
     } else {
-        res
+        x.sin() / x
     }
 }
 
@@ -234,6 +233,20 @@ where T: Into<f64> + Copy, U: Into<f64> + Copy {
     let b: f64 = gamma(x.into() + y.into());
     
     t1 * t2 / b
+}
+
+/// # Sigmoid function
+/// 
+/// Computes the value of the sigmoid function for a given value `x`.
+/// 
+/// ```
+/// # use scilib::math::basic::sigmoid;
+/// 
+/// assert!((sigmoid(-1.0) - 0.26894142136999).abs() < 1.0e-12);
+/// assert_eq!(sigmoid(0.0), 0.5);
+/// ```
+pub fn sigmoid(x: f64) -> f64 {
+    1.0 / (1.0 + (-x).exp())
 }
 
 /// # Error function

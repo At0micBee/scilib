@@ -155,7 +155,7 @@ let eul = Euler::new(5);        // n=5
 
 ## Quantum mechanics
 
-The spherical harmonics Ylm(theta, phi) function has been added to the quantum section, and is valid for acoustics as well.
+Both the radial wave function Rnl(r) and the spherical harmonics Ylm(theta, phi) have been added to the quantum section. The Ylm is also valid for acoustics as well.
 
 ```rust
 // Found in the quantum crate

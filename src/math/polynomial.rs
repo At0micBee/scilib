@@ -127,7 +127,7 @@ impl Legendre {
         }
     }
 
-    /// Computes the value of `x` for the given polynomial.
+    /// Computes the value of `x` for the given polynomial (x: real).
     /// 
     /// Returns: the result of the polynomial Plm(x)
     /// 
@@ -150,6 +150,14 @@ impl Legendre {
         // Iterates through the values of the factors and powers
         let pre: f64 = self.pre_f * (1.0 - x.powi(2)).powf(self.m as f64 / 2.0);
         pre * self.factor.iter().zip(&self.power).fold(0.0, |res, (f, p)| res + f * x.powi(*p))
+    }
+
+    /// Computes the value of `z` for the given polynomial (z: complex).
+    /// 
+    /// Returns: the result of the polynomial Plm(z)
+    pub fn compute_complex(&self, z: Complex) -> Complex {
+        // Iterates through the values of the factors and powers
+        self.factor.iter().zip(&self.power).fold(Complex::new(), |res, (f, p)| res + *f * z.powi(*p))
     }
 }
 
@@ -192,6 +200,8 @@ impl Laguerre {
     /// Produces the factors and powers for nth order polynomial, where
     /// `l`: the order of the Legendre polynomial and `m`: The derivative order.
     /// 
+    /// The factors of the polynomials are normalized.
+    /// 
     /// Returns: `Self`, the corresponding struct
     /// ```
     /// # use scilib::math::polynomial::Laguerre;
@@ -199,9 +209,6 @@ impl Laguerre {
     /// let p21 = Laguerre::new(2, 1);      // l=2, m=1
     /// ```
     pub fn new(l: usize, m: i32) -> Self {
-
-        // Checking that the range is good
-        assert!(m >= 0 && m <= l as i32);
 
         // Initializing the vectors
         let mut factor: Vec<f64> = Vec::new();
@@ -223,7 +230,36 @@ impl Laguerre {
         }
     }
 
-    /// Computes the value of `x` for the given polynomial.
+    pub fn derive(&mut self, m: i32) {
+
+        // Creating the marker to know if we need to delete the last element
+        // when the power reaches 0
+        let mut marker: bool;
+        
+        // Looping the derivation, m times
+        for _ in 1..=m {
+
+            // Resetting at false, and starting the computation of the new terms
+            marker = false;
+            for (f, p) in self.factor.iter_mut().zip(&mut self.power) {
+                match p {
+                    0 => marker = true,     // If p is zero, we do not touch anything
+                    _ => {                  // For anything else, we compute the derivative
+                        *f *= *p as f64;    // Changing th factor value
+                        *p -= 1;            // Changing the power value
+                    }
+                }
+            }
+
+            // If the marker is true, we remove the zero power, and the associated factor
+            if marker {
+                self.factor.pop();  // pop() method is fine, 0 can only exist once per derivative
+                self.power.pop();   // and if so, it will always be at the last position
+            }
+        }
+    }
+
+    /// Computes the value of `x` for the given polynomial (x: real).
     /// 
     /// Returns: the result of the polynomial Plm(x)
     /// 
@@ -240,8 +276,19 @@ impl Laguerre {
     /// assert_eq!(res, 2.42);
     /// ```
     pub fn compute(&self, x: f64) -> f64 {
+        println!("{}", self);
         // Iterates through the values of the factors and powers
-        self.factor.iter().zip(&self.power).fold(0.0, |res, (f, p)| res + f * x.powi(*p))
+        let res: f64 = self.factor.iter().zip(&self.power).fold(0.0, |res, (f, p)| res + f * x.powi(*p));
+        println!("res {}", res);
+        res
+    }
+
+    /// Computes the value of `z` for the given polynomial (z: complex).
+    /// 
+    /// Returns: the result of the polynomial Plm(z)
+    pub fn compute_complex(&self, z: Complex) -> Complex {
+        // Iterates through the values of the factors and powers
+        self.factor.iter().zip(&self.power).fold(Complex::new(), |res, (f, p)| res + *f * z.powi(*p))
     }
 }
 
@@ -343,7 +390,7 @@ impl Bernoulli {
         }
     }
 
-    /// Computes the value of `x` for the given polynomial.
+    /// Computes the value of `x` for the given polynomial (x: real).
     /// 
     /// Returns: the result of the polynomial Bn(x)
     /// 
@@ -509,6 +556,14 @@ impl Euler {
     pub fn compute(&self, x: f64) -> f64 {
         // Iterates through the values of the factors and powers
         self.factor.iter().zip(&self.power).fold(0.0, |res, (f, p)| res + f * x.powi(*p))
+    }
+
+    /// Computes the value of `z` for the given polynomial (z: complex).
+    /// 
+    /// Returns: the result of the polynomial En(x)
+    pub fn compute_complex(&self, z: Complex) -> Complex {
+        // Iterates through the values of the factors and powers
+        self.factor.iter().zip(&self.power).fold(Complex::new(), |res, (f, p)| res + *f * z.powi(*p))
     }
 }
 
