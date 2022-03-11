@@ -647,7 +647,7 @@ where T: Into<Complex> {
     sh_first
 }
 
-/// # First spherical Hankel function: h2
+/// # Second spherical Hankel function: h2
 /// 
 /// Compute the second kind of spherical hankel function.
 /// * `z` - where the function is evaluated
@@ -666,7 +666,7 @@ where T: Into<Complex> {
     sj(x, n) - Complex::i() * sy(x, n)
 }
 
-/// # Second spherical Hankel function (array): h1
+/// # Second spherical Hankel function (array): h2
 /// 
 /// Compute the second kind of spherical hankel function by reccurency to get an array of function.
 /// * `z` - where the function is evaluated
