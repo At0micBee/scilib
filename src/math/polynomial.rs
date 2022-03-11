@@ -200,6 +200,8 @@ impl Laguerre {
     /// Produces the factors and powers for nth order polynomial, where
     /// `l`: the order of the Legendre polynomial and `m`: The derivative order.
     /// 
+    /// The factors of the polynomials are normalized.
+    /// 
     /// Returns: `Self`, the corresponding struct
     /// ```
     /// # use scilib::math::polynomial::Laguerre;

@@ -50,11 +50,10 @@ where T: Into<isize> {
 
 /// # Radial wavefunctions
 /// 
-/// They are quite costly to derive properly, due to the normalization process. Luckily, we can 
-/// compute them manually and implement them this way.
-/// 
-/// This function is a simple sub-function selector that return the result of the appropriate
-/// radial function. The `match` allows great flexibility but incurs runtime penalty.
+/// This function derives the normalization factor and the associated Laguerre polynomial
+/// to compute any wave function. This operation is quite costly, but achieves any possible
+/// `n, l` combination. An array version will be implemented as well to avoid recomputing
+/// these factors for a single `n, l` pair.
 /// 
 /// ```
 /// # use scilib::quantum::radial_wavefunction;
@@ -71,8 +70,9 @@ pub fn radial_wavefunction(n: usize, l: usize, r: f64) -> f64 {
     norm *= basic::factorial(n - l - 1) as f64 / (2 * n * basic::factorial(n + l).pow(3)) as f64;
 
     // Computing the term associated to the Laguerre polynomial
-    let poly = polynomial::Laguerre::new(n - l - 1, 2 * l as i32).compute(2.0 * factor);
+    let poly: f64 = polynomial::Laguerre::new(n - l - 1, 2 * l as i32).compute(2.0 * factor);
 
+    // Finishing computation and returning
     (2.0 * factor).powi(l as i32) * norm.sqrt() * poly * (-factor).exp()
 }
 
