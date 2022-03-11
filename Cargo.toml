@@ -2,8 +2,8 @@
 name = "scilib"
 description = "A scientific library for the Rust programming language."
 documentation = "https://docs.rs/scilib/"
-author = "Hugo G. 'AtomicBee' Vivien [hugo.vivien@pm.me]"
-keywords = ["mathematics", "science", "physics", "bessel", "fft"]
+authors = ["Hugo G. 'AtomicBee' Vivien [hugo.vivien@pm.me]"]
+keywords = ["physics", "bessel", "fft", "coordinates", "constants"]
 categories = ["science", "mathematics"]
 repository = "https://github.com/At0micBee/scilib"
 license = "GPL-3.0"

@@ -9,7 +9,7 @@
 //! The Jn(x) function is the simplest solution to Bessel's equation. The most generalized case is for
 //! a real index `n` and a complex number `x`, which is possible with this crate. Additionally, two methods are
 //! provided for this equation, one for a integer order (named `j`) and one for a real order (named `jf`). The integer
-//! order one is limited but is faster than it's counterpart. The real order function is slower, but can compute any
+//! order one is limited but is faster than its counterpart. The real order function is slower, but can compute any
 //! order. Note that `jf` will attempt to fall back on `j` when it finds an integer order.
 //! 
 //! ```rust
