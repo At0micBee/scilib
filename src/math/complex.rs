@@ -360,9 +360,10 @@ impl Complex {
     /// Return the "positive" result from complex squared root.
     /// 
     /// ```
+    /// # use scilib::math::complex::Complex;
     /// let c = Complex::from(4.0, 2.0);
     /// let res = c.sqrt();
-    /// assert_eq!(sqrt_pos, Complex::from(1.79890744, 1.111785941));
+    /// assert_eq!(res, Complex::from(2.0581710272714924, 0.48586827175664576));
     /// ```
     pub fn sqrt(&self) -> Self {
         let modulus = self.modulus();

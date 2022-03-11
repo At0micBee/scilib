@@ -482,11 +482,14 @@ where T: Into<Complex> {
 /// * `n` - maximum order evaluated, return a vector from 0 to the nth order included : `sj[0]` to `sj[n]`
 /// 
 /// ```
-/// let sj = func::sj_array(Complex::from(13, 5), 3);
+/// # use scilib::math::complex::Complex;
+/// # use scilib::math::bessel::*;
+/// 
+/// let sj = sj_array(Complex::from(13, 5), 3);
 /// assert_eq!(sj[0], Complex::from(3.8248700377925635, 3.708547263317134));
 /// assert_eq!(sj[1], Complex::from(-3.357143112679857, 3.9747696875545517));
 /// assert_eq!(sj[2], Complex::from(-4.1924320794482135, -2.6499227040139104));
-/// let sj2 = func::sj_array(0.2, 25);
+/// let sj2 = sj_array(0.2, 25);
 /// assert_eq!(sj2[13], Complex::from(0.000000000000000000000003835110596379198, 0.0));
 /// assert_eq!(sj2[17], Complex::from(0.000000000000000000000000000000005910455642760406, 0.0));
 /// assert_eq!(sj2[25], Complex::from(0.000000000000000000000000000000000000000000000000001125476749298975, 0.0));
@@ -530,11 +533,14 @@ where T: Into<Complex> {
 /// * `n` - maximum order evaluated, return a vector from 0 to the nth order included : `sj[0]` to `sj[n]`
 /// 
 /// ```
-/// let sy = func::sy_array(Complex::from(13, 5), 3);
+/// # use scilib::math::complex::Complex;
+/// # use scilib::math::bessel::*;
+/// 
+/// let sy = sy_array(Complex::from(13, 5), 3);
 /// assert_eq!(sy[0], Complex::from(-3.7090299518957797, 3.8248379131516654));
 /// assert_eq!(sy[1], Complex::from(-3.9748349852610523, -3.356650136356049));
 /// assert_eq!(sy[2], Complex::from(1.9446973361696478, -4.437267728778557));
-/// let sy2 = func::sy_array(0.2, 25);
+/// let sy2 = sy_array(0.2, 25);
 /// assert_eq!(sy2[13], Complex::from(-438040564762039800000000.0, 0.0));
 /// assert_eq!(sy2[17], Complex::from(-284225138610497950000000000000000.0, 0.0));
 /// assert_eq!(sy2[25], Complex::from(-1492587957151948600000000000000000000000000000000000.0, 0.0));
