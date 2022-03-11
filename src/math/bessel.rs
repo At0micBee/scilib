@@ -448,6 +448,25 @@ where T: Into<Complex> + Copy, U: Into<f64> {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/// # First spherical Bessel function: j
+/// 
+/// Compute the first kind of spherical bessel function.
+/// * `z` - where the function is evaluated
+/// * `n` - order evaluated
+/// 
+/// ```
+/// # use scilib::math::complex::Complex;
+/// # use scilib::math::bessel::*;
+/// 
+/// let res = sj(Complex::from(13, 5), 3);
+/// assert_eq!(res, Complex::from(1.6109825049200244, -4.322382277910797));
+/// ```
+pub fn sj<T>(z: T, n: usize) -> Complex 
+where T: Into<Complex> {
+    let x: Complex  = z.into();
+    (std::f64::consts::PI / 2.0 / x).sqrt() * jf(x, n as f64 + 0.5)
+}
+
 fn sj_upward_reccurence<T>(z: T, n: usize) -> Vec<Complex> 
 where T: Into<Complex> {
     let count = n + 1;
@@ -477,7 +496,7 @@ where T: Into<Complex> {
 
 /// # First spherical Bessel function (array): j
 /// 
-/// Compute the first kind of spherical bessel functions by reccurency to get an array of function.
+/// Compute the first kind of spherical bessel function by reccurency to get an array of function.
 /// * `z` - where the function is evaluated
 /// * `n` - maximum order evaluated, return a vector from 0 to the nth order included : `sj[0]` to `sj[n]`
 /// 
@@ -485,14 +504,14 @@ where T: Into<Complex> {
 /// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::*;
 /// 
-/// let sj = sj_array(Complex::from(13, 5), 3);
-/// assert_eq!(sj[0], Complex::from(3.8248700377925635, 3.708547263317134));
-/// assert_eq!(sj[1], Complex::from(-3.357143112679857, 3.9747696875545517));
-/// assert_eq!(sj[2], Complex::from(-4.1924320794482135, -2.6499227040139104));
-/// let sj2 = sj_array(0.2, 25);
-/// assert_eq!(sj2[13], Complex::from(3.835110596379198e-24, 0.0));
-/// assert_eq!(sj2[17], Complex::from(5.910455642760406e-33, 0.0));
-/// assert_eq!(sj2[25], Complex::from(1.125476749298975e-51, 0.0));
+/// let res1 = sj_array(Complex::from(13, 5), 3);
+/// assert_eq!(res1[0], Complex::from(3.8248700377925635, 3.708547263317134));
+/// assert_eq!(res1[1], Complex::from(-3.357143112679857, 3.9747696875545517));
+/// assert_eq!(res1[2], Complex::from(-4.1924320794482135, -2.6499227040139104));
+/// let res2 = sj_array(0.2, 25);
+/// assert_eq!(res2[13], Complex::from(3.835110596379198e-24, 0.0));
+/// assert_eq!(res2[17], Complex::from(5.910455642760406e-33, 0.0));
+/// assert_eq!(res2[25], Complex::from(1.125476749298975e-51, 0.0));
 /// ```
 pub fn sj_array<T>(z: T, n: usize) -> Vec<Complex>
 where T: Into<Complex> {
@@ -526,24 +545,43 @@ where T: Into<Complex> {
     }
 }
 
-/// # Second spherical Bessel function (array): y
+/// # Second spherical Bessel function: y
 /// 
-/// Compute the second kind of spherical bessel functions by reccurency to get an array of function.
+/// Compute the second kind of spherical bessel function.
 /// * `z` - where the function is evaluated
-/// * `n` - maximum order evaluated, return a vector from 0 to the nth order included : `sj[0]` to `sj[n]`
+/// * `n` - order evaluated
 /// 
 /// ```
 /// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::*;
 /// 
-/// let sy = sy_array(Complex::from(13, 5), 3);
-/// assert_eq!(sy[0], Complex::from(-3.7090299518957797, 3.8248379131516654));
-/// assert_eq!(sy[1], Complex::from(-3.9748349852610523, -3.356650136356049));
-/// assert_eq!(sy[2], Complex::from(1.9446973361696478, -4.437267728778557));
-/// let sy2 = sy_array(0.2, 25);
-/// assert_eq!(sy2[13], Complex::from(-4380405647620398.0e8, 0.0));
-/// assert_eq!(sy2[17], Complex::from(-28422513861049795.0e16, 0.0));
-/// assert_eq!(sy2[25], Complex::from(-14925879571519486.0e35, 0.0));
+/// let res = sy(Complex::from(13, 5), 3);
+/// assert_eq!(res, Complex::from(4.322629120777188, 1.6104674841102558));
+/// ```
+pub fn sy<T>(z: T, n: usize) -> Complex 
+where T: Into<Complex> {
+    let x: Complex = z.into();
+    (std::f64::consts::PI / 2.0 / x).sqrt() * y(x, n as f64 + 0.5)
+}
+
+/// # Second spherical Bessel function (array): y
+/// 
+/// Compute the second kind of spherical bessel function by reccurency to get an array of function.
+/// * `z` - where the function is evaluated
+/// * `n` - maximum order evaluated, return a vector from 0 to the nth order included : `sy[0]` to `sy[n]`
+/// 
+/// ```
+/// # use scilib::math::complex::Complex;
+/// # use scilib::math::bessel::*;
+/// 
+/// let res1 = sy_array(Complex::from(13, 5), 3);
+/// assert_eq!(res1[0], Complex::from(-3.7090299518957797, 3.8248379131516654));
+/// assert_eq!(res1[1], Complex::from(-3.9748349852610523, -3.356650136356049));
+/// assert_eq!(res1[2], Complex::from(2.6504303824601, -4.1922958025278));
+/// let res2 = sy_array(0.2, 25);
+/// assert_eq!(res2[13], Complex::from(-4.82921204481494e22, 0.0));
+/// assert_eq!(res2[17], Complex::from(-2.417182573235861e31, 0.0));
+/// assert_eq!(res2[25], Complex::from(-8.711173815326792e49, 0.0));
 /// ```
 pub fn sy_array<T>(z: T, n: usize) -> Vec<Complex>
 where T: Into<Complex> {
@@ -559,10 +597,98 @@ where T: Into<Complex> {
     let mut yn: Vec<Complex> = vec![Complex::from(0.0, 0.0); n + 1];
     yn[0] = y0;
     yn[1] = y1;
-    for i in 2..(n + 1) {
-        yn[i] = ((2 * i + 1) as f64) / x * yn[i - 1] - yn[i - 2];
+    for i in 1..=n - 1 {
+        yn[i + 1] = ((2 * i + 1) as f64) / x * yn[i] - yn[i - 1];
     }
     return yn;
+}
+
+/// # First spherical Hankel function: h1
+/// 
+/// Compute the first kind of spherical hankel function.
+/// * `z` - where the function is evaluated
+/// * `n` - order evaluated
+/// 
+/// ```
+/// # use scilib::math::complex::Complex;
+/// # use scilib::math::bessel::*;
+/// 
+/// let res = sh_first(Complex::from(13, 5), 3);
+/// assert_eq!(res, Complex::from(5.150208097686182e-4, 2.4684286639153896e-4));
+/// ```
+pub fn sh_first<T>(z: T, n: usize) -> Complex 
+where T: Into<Complex> {
+    let x: Complex = z.into();
+    sj(x, n) + Complex::i() * sy(x, n)
+}
+
+/// # First spherical Hankel function (array): h1
+/// 
+/// Compute the first kind of spherical hankel function by reccurency to get an array of function.
+/// * `z` - where the function is evaluated
+/// * `n` - maximum order evaluated, return a vector from 0 to the nth order included : `sh_first[0]` to `sh_first[n]`
+/// 
+/// ```
+/// # use scilib::math::complex::Complex;
+/// # use scilib::math::bessel::*;
+/// 
+/// let res = sh_first_array(Complex::from(13, 5), 3);
+/// assert_eq!(res[3], Complex::from(5.127390110655217e-4, 2.5295761378174575e-4));
+/// ```
+pub fn sh_first_array<T>(z: T, n: usize) -> Vec<Complex> 
+where T: Into<Complex> {
+    let x: Complex = z.into();
+    let sj_res = sj_array(x, n);
+    let sy_res = sy_array(x, n);
+    let mut sh_first = Vec::<Complex>::with_capacity(n + 1);
+    for i in 0..sj_res.len() {
+        sh_first.push(sj_res[i] + Complex::i() * sy_res[i]);
+    }
+    sh_first
+}
+
+/// # First spherical Hankel function: h2
+/// 
+/// Compute the second kind of spherical hankel function.
+/// * `z` - where the function is evaluated
+/// * `n` - order evaluated
+/// 
+/// ```
+/// # use scilib::math::complex::Complex;
+/// # use scilib::math::bessel::*;
+/// 
+/// let res = sh_second(Complex::from(13, 5), 3);
+/// assert_eq!(res, Complex::from(3.22144998903028, -8.645011398687984));
+/// ```
+pub fn sh_second<T>(z: T, n: usize) -> Complex 
+where T: Into<Complex> {
+    let x: Complex = z.into();
+    sj(x, n) - Complex::i() * sy(x, n)
+}
+
+/// # Second spherical Hankel function (array): h1
+/// 
+/// Compute the second kind of spherical hankel function by reccurency to get an array of function.
+/// * `z` - where the function is evaluated
+/// * `n` - maximum order evaluated, return a vector from 0 to the nth order included : `sh_second[0]` to `sh_second[n]`
+/// 
+/// ```
+/// # use scilib::math::complex::Complex;
+/// # use scilib::math::bessel::*;
+/// 
+/// let res = sh_second_array(Complex::from(13, 5), 3);
+/// assert_eq!(res[3], Complex::from(3.2214420145498694, -8.644990000503286));
+/// ```
+pub fn sh_second_array<T>(z: T, n: usize) -> Vec<Complex> 
+where T: Into<Complex> {
+    let x: Complex = z.into();
+    let sj_res = sj_array(x, n);
+    let sy_res = sy_array(x, n);
+    let mut sh_second = Vec::<Complex>::with_capacity(n + 1);
+    for i in 0..sj_res.len() {
+        sh_second.push(sj_res[i] - Complex::i() * sy_res[i]);
+    }
+    sh_second
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
