@@ -71,10 +71,9 @@ pub fn radial_wavefunction(n: usize, l: usize, r: f64) -> f64 {
     norm *= basic::factorial(n - l - 1) as f64 / (2 * n * basic::factorial(n + l).pow(3)) as f64;
 
     // Computing the term associated to the Laguerre polynomial
-    let mut poly = polynomial::Laguerre::new(n+1, 0);
-    poly.derive(2 * l as i32 + 1);
+    let poly = polynomial::Laguerre::new(n - l - 1, 2 * l as i32).compute(2.0 * factor);
 
-    (2.0 * factor).powi(l as i32) * -(norm.sqrt()) * poly.compute(2.0 * factor) * (-factor).exp()
+    (2.0 * factor).powi(l as i32) * norm.sqrt() * poly * (-factor).exp()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
