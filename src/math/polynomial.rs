@@ -208,9 +208,6 @@ impl Laguerre {
     /// ```
     pub fn new(l: usize, m: i32) -> Self {
 
-        // Checking that the range is good
-        assert!(m >= 0 && m <= l as i32);
-
         // Initializing the vectors
         let mut factor: Vec<f64> = Vec::new();
         let mut power: Vec<i32> = Vec::new();
