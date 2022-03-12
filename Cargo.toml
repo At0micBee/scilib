@@ -1,18 +1,20 @@
 [package]
 name = "scilib"
 description = "A scientific library for the Rust programming language."
-documentation = "https://docs.rs/scilib/"
-authors = ["Hugo G. 'AtomicBee' Vivien [hugo.vivien@pm.me]"]
-keywords = ["physics", "bessel", "fft", "coordinates", "constants"]
+authors = ["Hugo G. 'AtomicBee' Vivien <hugo.vivien@pm.me>"]
 categories = ["science", "mathematics"]
-repository = "https://github.com/At0micBee/scilib"
-license = "GPL-3.0"
+keywords = ["physics", "bessel", "fft", "coordinates", "quantum"]
 version = "0.3.1"
+
+repository = "https://github.com/At0micBee/scilib"
+documentation = "https://docs.rs/scilib/"
+readme = "README.md"
+
+license = "GPL-3.0"
+
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
+##########
 
 [profile.test]
-opt-level = 3
+opt-level = 3   # Some functions are costly, might as well go faster

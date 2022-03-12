@@ -249,6 +249,25 @@ pub fn sigmoid(x: f64) -> f64 {
     1.0 / (1.0 + (-x).exp())
 }
 
+/// # Gaussian function
+/// 
+/// `a` is the amplitude of the gaussian.
+/// `b` is the center of the gaussian.
+/// `c` is the standard deviation.
+/// `x` is the value to evaluate.
+/// 
+/// Computes the value of the gaussian function with parameters a, b, c at x.
+/// 
+/// ```
+/// # use scilib::math::basic::gaussian;
+/// let res1: f64 = gaussian(1.0, 2.0, 3.0, 0.0);
+/// 
+/// assert_eq!(res1, 0.26359713811572677);
+/// ```
+pub fn gaussian(a: f64, b: f64, c: f64, x: f64) -> f64 {
+    a * (-(x - b).powi(2) / c).exp()
+}
+
 /// # Error function
 /// 
 /// We define the error function for complex number, as its counterpart erfi requires.
