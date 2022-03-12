@@ -32,7 +32,7 @@ const STIELTJES_M: usize = 1_000_000;
 ///
 /// `x`: the value at which to evaluate the function
 /// 
-/// Returns: the sinc value of x
+/// Returns the sinc value of x.
 /// 
 /// ```
 /// # use scilib::math::basic::sinc;
@@ -53,13 +53,15 @@ pub fn sinc(x: f64) -> f64 {
 
 /// # Newton binomial formula
 ///
-/// `n` is the number of "objects" and `k` is the selection
+/// `n` is the number of options.
+/// `k` is the selection.
 /// 
-/// Returns: `k` among `n`
+/// Returns `k` among `n`.
 /// 
 /// ```
 /// # use scilib::math::basic::binomial;
 /// let res: usize = binomial(4_usize, 2_usize);
+/// 
 /// assert_eq!(res, 6);
 /// ```
 /// 
@@ -91,13 +93,14 @@ pub fn binomial(n: usize, k: usize) -> usize {
 
 /// # Factorial function
 ///
-/// `n` is the integer at which to evaluate the factorial
+/// `n` is the integer at which to evaluate the factorial.
 /// 
-/// Returns: `n`!
+/// Returns `n!`.
 /// 
 /// ```
 /// # use scilib::math::basic::factorial;
 /// let res: usize = factorial(5_usize);
+/// 
 /// assert_eq!(res, 120);
 /// ```
 pub fn factorial<T>(n: T) -> usize
@@ -107,7 +110,18 @@ where T: Into<usize> {
 
 /// # Stieltjes Gamma function
 /// 
-/// Computes Gamma_n(a).
+/// `n` is the order of the Stieltjes function to use.
+/// `a` is the value at which to compute the function.
+/// 
+/// Returns the value of Gamma_n(a). At the moment, the results are only valid for the first few
+/// orders, as the computation is very expansive. To get the basic Stieltjes coefficient, set `a=1`.
+/// 
+/// ```
+/// # use scilib::math::basic::stieltjes;
+/// let res1 = stieltjes(0, 1.0.into());
+/// 
+/// assert!((res1.re - 0.577215664).abs() <= 1e-6);
+/// ```
 pub fn stieltjes(n: usize, a: Complex) -> Complex {
 
     let mut res: Complex = - (a + STIELTJES_M as f64).ln().powi(n as i32 + 1) / (n as f64 + 1.0);
@@ -120,6 +134,8 @@ pub fn stieltjes(n: usize, a: Complex) -> Complex {
 }
 
 /// # Hurwitz Zeta function
+/// 
+/// WARNING: still under development, results cannot be guarantee.
 pub fn zeta<T, U>(s: T, a: U) -> Complex
 where T: Into<f64>, U: Into<Complex> {
 
@@ -177,7 +193,8 @@ where T: Into<f64>, U: Into<Complex> {
 /// With the current computation scheme, we limit the precision of the computation in exchange for speed.
 /// Typical values are achieve within a `1.0e-5` margin of error. Changing the method to another one
 /// might grant some more speed and lower the error on the results.
-pub fn gamma<T: Into<f64>>(value: T) -> f64 {
+pub fn gamma<T>(value: T) -> f64
+where T: Into<f64> {
 
     let x: f64 = value.into();
 
@@ -216,6 +233,8 @@ pub fn gamma<T: Into<f64>>(value: T) -> f64 {
 
 /// # Euler Beta function
 /// 
+/// `x` `y` are the points at which to evaluate the function.
+/// 
 /// The computation of the result is based on results from the gamma function. It is also possible to define
 /// it with infinite series (or products), which could have some advantages, I'll investigate this possibility later.
 /// 
@@ -237,7 +256,9 @@ where T: Into<f64> + Copy, U: Into<f64> + Copy {
 
 /// # Sigmoid function
 /// 
-/// Computes the value of the sigmoid function for a given value `x`.
+/// `x` is the value at which to evaluate the function.
+/// 
+/// Returns the value of the sigmoid function.
 /// 
 /// ```
 /// # use scilib::math::basic::sigmoid;
@@ -270,7 +291,12 @@ pub fn gaussian(a: f64, b: f64, c: f64, x: f64) -> f64 {
 
 /// # Error function
 /// 
-/// We define the error function for complex number, as its counterpart erfi requires.
+/// `val` is the point at which to evaluate the function.
+/// 
+/// We define the error function for complex number.
+/// 
+/// WARNING: the erf function will soon become f64 only, moving the erf function for complex as a
+/// complex function directly.
 /// 
 /// ```
 /// # use scilib::math::complex::Complex;
@@ -319,6 +345,8 @@ where T: Into<Complex> {
 
 /// # Complementary error function
 /// 
+/// `val` is the point at which to evaluate the function.
+/// 
 /// This function simply returns the complement of the error function, that is `1 - erf(z)`.
 /// 
 /// ```
@@ -336,7 +364,9 @@ where T: Into<Complex> {
 
 /// # Imaginary error function
 /// 
-/// This function is defined as `-i * erf(i*z)`, which we take literally.
+/// `val` is the point at which to evaluate the function.
+/// 
+/// This function is defined as `-i * erf(i*z)`.
 /// 
 /// ```
 /// # use scilib::math::complex::Complex;
@@ -351,7 +381,11 @@ where T: Into<Complex> {
     -Complex::i() * erf(Complex::i() * val)
 }
 
-/// # Builds the demanded Pascal's triangle line
+/// # Builds Pascal's triangle line
+/// 
+/// `n` the index of the line in the triangle.
+/// 
+/// Returns the line of index `n`.
 /// 
 /// The first position of the triangle is number as line 0, the rest follows from there.
 /// 
