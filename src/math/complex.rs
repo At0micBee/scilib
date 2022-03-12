@@ -26,20 +26,24 @@ use std::fmt::{     // Formatter display
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/// # Complex structure
+/// # Complex number
+/// 
+/// We define a complex as follows: $a + ib$, where $a$, $b$ are real numbers, and $i$ is the 
+/// imaginary unit. Because the goal of the crate is to be used for scientific processes, we 
+/// use `f64` for both real and imaginary parts. 
 /// 
 /// The principle is simple, we create both parts in a struct and treat them accordingly.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct Complex {
-    /// The real part of the number
+    /// The real part of the number ($\Re(z)$)
     pub re: f64,
-    /// The imaginary part of the number
+    /// The imaginary part of the number ($\Im(z)$)
     pub im: f64
 }
 
 /// # Display
 /// 
-/// Returns the complex in the for a + bi, whe the sign of b is always showing.
+/// Returns the complex in the for $a + ib$, where the sign of $b$ is always showing.
 impl Display for Complex {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> DRes {
         write!(f, "{}", format!("{} {:+}i", self.re, self.im))?;
@@ -51,7 +55,7 @@ impl Display for Complex {
 impl Complex {
     /// # New Complex
     /// 
-    /// Simply returns 0 +0i.
+    /// Simply returns $0$.
     /// 
     /// ```
     /// # use scilib::math::complex::Complex;
@@ -68,7 +72,7 @@ impl Complex {
 
     /// # Pure complex unity
     /// 
-    /// Simply returns 0 +1i.
+    /// Simply returns $i$.
     /// 
     /// ```
     /// # use scilib::math::complex::Complex;
@@ -85,7 +89,7 @@ impl Complex {
 
     /// # Pure real unity
     /// 
-    /// Simply returns 1 + 0i.
+    /// Simply returns $1$.
     /// 
     /// ```
     /// # use scilib::math::complex::Complex;
@@ -123,8 +127,11 @@ impl Complex {
     }
 
     /// # From polar coordinates
-    /// 
-    /// Creates the complex number based on polar coordinates values
+    /// Creates the complex number based on polar coordinates values.
+    /// To do so, we follow the formula:
+    /// $$
+    /// z = r(\cos(\theta) + i\sin(\theta))
+    /// $$
     /// 
     /// ```
     /// # use std::f64::consts::PI;
@@ -136,12 +143,14 @@ impl Complex {
     /// ```
     pub fn from_polar<T, U>(arg: T, norm: U) -> Self
     where T: Into<f64> + Copy, U: Into<f64> + Copy {
-        Self::from(arg.into().cos() * norm.into(), arg.into().sin() * norm.into())
+        norm.into() * Self::from(arg.into().cos(), arg.into().sin())
     }
 
     /// # Exponential
-    /// 
-    /// Computes the exponential value of a complex number
+    /// Computes the exponential value of a complex number:
+    /// $$
+    /// \exp(z) = \exp(a)(\cos(b) + i\sin(b))
+    /// $$
     /// 
     /// ```
     /// # use scilib::math::complex::Complex;
@@ -160,8 +169,14 @@ impl Complex {
     }
 
     /// # Natural logarithm
-    /// 
-    /// Computes the `ln` of self.
+    /// Computes the `ln` of self. We pass via the polar coordinate to achieve this,
+    /// by using the property that:
+    /// $$
+    /// z = a + ib = (r, \theta)
+    /// $$
+    /// $$
+    /// \ln(z) = \ln(r) + i\theta
+    /// $$
     /// 
     /// ```
     /// # use scilib::math::complex::Complex;
@@ -180,9 +195,10 @@ impl Complex {
     }
 
     /// # Cosine function
-    /// 
-    /// Computes the cosine value of the given complex number.
-    /// Formula: `cos(a + ib) = cos(a)cosh(b) - i sin(a)sinh(b)`.
+    /// Computes the cosine value of the given complex number, using the formula:
+    /// $$
+    /// \cos(a + ib) = \cos(a)\cosh(b) - i\sin(a)\sinh(b)
+    /// $$
     /// 
     /// ```
     /// # use scilib::math::complex::Complex;
@@ -200,9 +216,10 @@ impl Complex {
     }
 
     /// # Sinus function
-    /// 
-    /// Computes the sinus value of the given complex number.
-    /// Formula: `sin(a + ib) = sin(a)cosh(b) + i cos(a)sinh(b)`
+    /// Computes the sinus value of the given complex number, using the formula:
+    /// $$
+    /// \sin(a + ib) = \sin(a)\cosh(b) + i\cos(a)\sinh(b)
+    /// $$
     /// 
     /// ```
     /// # use scilib::math::complex::Complex;
@@ -221,8 +238,10 @@ impl Complex {
 
     /// # Tangent function
     /// 
-    /// Computes the tangent value of the given complex number.
-    /// Formula: `tan(x) = sin(x) / cos(x)`.
+    /// Computes the tangent value of the given complex number, with:
+    /// $$
+    /// \tan(x) = \frac{\sin(x)}{\cos(x)}
+    /// $$
     /// 
     /// ```
     /// # use scilib::math::complex::Complex;
@@ -237,8 +256,10 @@ impl Complex {
     }
 
     /// # Complex conjugation
-    /// 
-    /// Conjugating a complex number changes the sign of the imaginary part.
+    /// Conjugating a complex number changes the sign of the imaginary part:
+    /// $$
+    /// \overline{z} = \overline{a + ib} = a - ib
+    /// $$
     /// 
     /// ```
     /// # use scilib::math::complex::Complex;
@@ -255,8 +276,10 @@ impl Complex {
     }
 
     /// # Argument for polar coordinates
-    /// 
-    /// Computes the argument in the polar plan.
+    /// Computes the argument in the polar plan, using the formula:
+    /// $$
+    /// \arg(z) = \arctan2(\Re(z), \Im(z))
+    /// $$
     /// 
     /// ```
     /// # use std::f64::consts::PI;
@@ -272,9 +295,11 @@ impl Complex {
     }
 
     /// # Modulus computation
-    /// 
     /// The modulus of a complex number is defined as the square root of the
-    /// sum of its squared part.
+    /// sum of its squared part (following the L2 norm):
+    /// $$
+    /// |z| = \sqrt{\Re(z)^2 + \Im(z)^2}
+    /// $$
     /// 
     /// ```
     /// # use scilib::math::complex::Complex;
@@ -289,7 +314,6 @@ impl Complex {
     }
 
     /// # The polar coordinates of the number
-    /// 
     /// Returns a tuple where the zeroth element is the argument and the first
     /// element is the modulus (or norm) of the number.
     /// 
@@ -341,6 +365,10 @@ impl Complex {
     }
 
     /// # Raising to a real power
+    /// The formula is defined as:
+    /// $$
+    /// z^{p} = p\arg(z) + |z|^p
+    /// $$
     ///
     /// ```
     /// # use scilib::math::complex::Complex;
