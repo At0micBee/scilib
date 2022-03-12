@@ -18,3 +18,7 @@ edition = "2021"
 
 [profile.test]
 opt-level = 3   # Some functions are costly, might as well go faster
+
+# Using latex in the docs to display formulas
+[package.metadata.docs.rs]
+rustdoc-args = [ "--html-in-header", "katex-header.html" ]

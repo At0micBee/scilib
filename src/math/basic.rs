@@ -9,7 +9,7 @@
 use std::f64::consts::{     // Using std lib constants
     //FRAC_PI_2,              // Pi / 2
     FRAC_2_SQRT_PI,         // 2 / sqrt(Pi)
-    //TAU                     // Tau constant
+    TAU                     // Tau constant
 };
 
 use super::{                // Using parts from the crate
@@ -29,10 +29,18 @@ const STIELTJES_M: usize = 1_000_000;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # Sinus cardinal
-///
-/// `x`: the value at which to evaluate the function
 /// 
-/// Returns the sinc value of x.
+/// The value of the [cardinal sinus](https://fr.wikipedia.org/wiki/Sinus_cardinal) is defined as:
+/// $$
+/// \mathrm{sinc}(x) = \frac{\sin(x)}{x}
+/// $$
+/// By convention, when $x = 0,~\mathrm{sinc}(x) = 1$.
+/// 
+/// ---
+///
+/// `x`: the value at which to evaluate the function ($x$).
+/// 
+/// Returns the sinc value of `x`.
 /// 
 /// ```
 /// # use scilib::math::basic::sinc;
@@ -51,10 +59,16 @@ pub fn sinc(x: f64) -> f64 {
     }
 }
 
-/// # Newton binomial formula
+/// # Binomial theorem
+/// 
+/// The [binomial theorem](https://en.wikipedia.org/wiki/Binomial_theorem) is defined as:
+/// $$
+/// \binom{n}{k} = \frac{n!}{k!(n - k)!}
+/// $$
+/// 
+/// ---
 ///
-/// `n` is the number of options.
-/// `k` is the selection.
+/// `n` is the number of options ($n$) and `k` is the selection ($k$).
 /// 
 /// Returns `k` among `n`.
 /// 
@@ -65,10 +79,12 @@ pub fn sinc(x: f64) -> f64 {
 /// assert_eq!(res, 6);
 /// ```
 /// 
+/// ---
+/// 
 /// The implementation used here relies on the recurrence relation:
-/// 
-/// (n, k) = (n-1, k) + (n-1, k-1)
-/// 
+/// $$
+/// \binom{n}{k} = \binom{n-1}{k} + \binom{n-1}{k-1}
+/// $$
 /// This pushes overflow back for a few more terms.
 pub fn binomial(n: usize, k: usize) -> usize {
 
@@ -92,10 +108,16 @@ pub fn binomial(n: usize, k: usize) -> usize {
 }
 
 /// # Factorial function
-///
-/// `n` is the integer at which to evaluate the factorial.
+/// The [factorial function](https://en.wikipedia.org/wiki/Factorial) is defined as:
+/// $$
+/// n! = \prod_{i=1}^{n}i
+/// $$
 /// 
-/// Returns `n!`.
+/// ---
+/// 
+/// `n` is the integer at which to evaluate the factorial ($n$).
+/// 
+/// Returns `n!`, the product of positive integers less or equal to `n`.
 /// 
 /// ```
 /// # use scilib::math::basic::factorial;
@@ -176,10 +198,19 @@ where T: Into<f64>, U: Into<Complex> {
 
 /// # Gamma function
 /// 
-/// `x` is the value to evaluate.
+/// The [gamma function](https://en.wikipedia.org/wiki/Gamma_function) is a generalization of the factorial, and is defined as:
+/// $$
+/// \Gamma(z) = \int_{0}^{\infty}x^{z-1}\exp(-x)dx
+/// $$
 /// 
-/// The gamma function is the generalization of the factorial function, and is
-/// used to provide value for non-integer numbers (except non-positive integers).
+/// This function provides result for any real number, and returns the same result for integer as a factorial:
+/// $$
+/// \Gamma(n) = (n-1)!
+/// $$
+/// 
+/// ---
+/// 
+/// `x` is the value to evaluate ($x$).
 /// 
 /// ```
 /// # use scilib::math::basic::gamma;
@@ -197,11 +228,6 @@ pub fn gamma<T>(value: T) -> f64
 where T: Into<f64> {
 
     let x: f64 = value.into();
-
-    // If the number is an integer, we can simple return the factorial
-    if x.fract() == 0.0 {
-        return factorial(x as usize) as f64;
-    }
 
     let mut n: f64 = 1.0;      // Order counter
 
@@ -232,8 +258,15 @@ where T: Into<f64> {
 }
 
 /// # Euler Beta function
+/// The [beta function](https://en.wikipedia.org/wiki/Beta_function) is an integral similar to the gamma function,
+/// and it is defined as:
+/// $$
+/// B(x,y) = B(y,x) = \int_{0}^{1}t^{x-1}(1-t)^{y-1}dt
+/// $$
 /// 
-/// `x` `y` are the points at which to evaluate the function.
+/// ---
+/// 
+/// `x` and `y` are the points at which to evaluate the function ($x$, $y$).
 /// 
 /// The computation of the result is based on results from the gamma function. It is also possible to define
 /// it with infinite series (or products), which could have some advantages, I'll investigate this possibility later.
@@ -241,9 +274,21 @@ where T: Into<f64> {
 /// ```
 /// # use scilib::math::basic::beta;
 /// let res: f64 = beta(1, 1.1);
+/// let comp1: f64 = beta(3, 2);
+/// let comp2: f64 = beta(2, 3);
 /// 
 /// assert!((res - 0.909090).abs() < 1.0e-5);
+/// assert_eq!(comp1, comp2);
 /// ```
+/// 
+/// ---
+/// 
+/// The current implementation relies on the relation:
+/// $$
+/// B(x,y) = \frac{\Gamma(x)\Gamma(y)}{\Gamma(x+y)}
+/// $$
+/// Which is easier to manage, but could be slower and slightly less precise.
+/// Future updates will improve this function.
 pub fn beta<T, U>(x: T, y: U) -> f64
 where T: Into<f64> + Copy, U: Into<f64> + Copy {
 
@@ -255,27 +300,41 @@ where T: Into<f64> + Copy, U: Into<f64> + Copy {
 }
 
 /// # Sigmoid function
+/// The [sigmoid function](https://en.wikipedia.org/wiki/Sigmoid_function) is defined as:
+/// $$
+/// \sigma(x) = \frac{1}{1 + \exp(-x)} = 1 - \sigma(-x)
+/// $$
 /// 
-/// `x` is the value at which to evaluate the function.
+/// ---
+/// 
+/// `x` is the value at which to evaluate the function ($x$).
 /// 
 /// Returns the value of the sigmoid function.
 /// 
 /// ```
 /// # use scilib::math::basic::sigmoid;
+/// let res1: f64 = sigmoid(-1.0);
+/// let res2: f64 = sigmoid(0.0);
+/// let res_comp: f64 = sigmoid(1.0);
 /// 
-/// assert!((sigmoid(-1.0) - 0.26894142136999).abs() < 1.0e-12);
-/// assert_eq!(sigmoid(0.0), 0.5);
+/// assert!((res1 - 0.26894142136999).abs() < 1.0e-12);
+/// assert_eq!(res2, 0.5);
+/// assert_eq!(res1, 1.0 - res_comp);
 /// ```
 pub fn sigmoid(x: f64) -> f64 {
     1.0 / (1.0 + (-x).exp())
 }
 
 /// # Gaussian function
+/// The [gaussian function](https://en.wikipedia.org/wiki/Gaussian_function) is defined as:
+/// $$
+/// g(x) = a\cdot\exp\left(-\frac{(b - x)^2}{2c^2}\right)
+/// $$
 /// 
-/// `a` is the amplitude of the gaussian.
-/// `b` is the center of the gaussian.
-/// `c` is the standard deviation.
-/// `x` is the value to evaluate.
+/// ---
+/// 
+/// `a` is the amplitude ($a$), `b` is the center ($b$), 
+/// `c` is the standard deviation ($c$),`x` is the value to evaluate ($x$).
 /// 
 /// Computes the value of the gaussian function with parameters a, b, c at x.
 /// 
@@ -283,15 +342,41 @@ pub fn sigmoid(x: f64) -> f64 {
 /// # use scilib::math::basic::gaussian;
 /// let res1: f64 = gaussian(1.0, 2.0, 3.0, 0.0);
 /// 
-/// assert_eq!(res1, 0.26359713811572677);
+/// assert_eq!(res1, 0.8007374029168081);
 /// ```
 pub fn gaussian(a: f64, b: f64, c: f64, x: f64) -> f64 {
-    a * (-(x - b).powi(2) / c).exp()
+    a * (-(x - b).powi(2) / (2.0 * c.powi(2))).exp()
+}
+
+/// # Normalized gaussian function
+/// The [normalized gaussian function](https://en.wikipedia.org/wiki/Gaussian_function) is defined as:
+/// $$
+/// g(x) = \frac{1}{\sigma\sqrt{2\pi}}\cdot\exp\left( -\frac{(x - \mu)^2}{2\sigma^2} \right)
+/// $$
+/// 
+/// ---
+/// 
+/// `lambda` is the expected value ($\mu$), `sigma` is the variance ($\sigma$).
+/// 
+/// ```
+/// # use scilib::math::basic::normed_gaussian;
+/// let res: f64 = normed_gaussian(1.0, 2.0, 3.0);
+/// 
+/// assert!((res - 0.120985362259).abs() < 1e-12);
+/// ```
+pub fn normed_gaussian(mu: f64, sigma: f64, x: f64) -> f64 {
+    (1.0 / (sigma * (TAU.sqrt()))) * (-(x - mu).powi(2) / (2.0 * sigma.powi(2))).exp()
 }
 
 /// # Error function
+/// The [error function](https://en.wikipedia.org/wiki/Error_function) is defined as:
+/// $$
+/// \mathrm{erf}(z) = \frac{2}{\sqrt{\pi}}\int_{0}^{z}\exp(-t^2)dt
+/// $$
 /// 
-/// `val` is the point at which to evaluate the function.
+/// ---
+/// 
+/// `val` is the point at which to evaluate the function ($z$).
 /// 
 /// We define the error function for complex number.
 /// 
@@ -344,8 +429,14 @@ where T: Into<Complex> {
 }
 
 /// # Complementary error function
+/// The [complementary error function](https://en.wikipedia.org/wiki/Error_function) is defined as:
+/// $$
+/// \mathrm{erfc}(z) = 1 - \mathrm{erf}(z)
+/// $$
 /// 
-/// `val` is the point at which to evaluate the function.
+/// ---
+/// 
+/// `val` is the point at which to evaluate the function ($z$).
 /// 
 /// This function simply returns the complement of the error function, that is `1 - erf(z)`.
 /// 
@@ -363,8 +454,14 @@ where T: Into<Complex> {
 }
 
 /// # Imaginary error function
+/// The [imaginary error function](https://en.wikipedia.org/wiki/Error_function) is defined as:
+/// $$
+/// \mathrm{erfi}(z) = -i\cdot\mathrm{erf}(iz)
+/// $$
 /// 
-/// `val` is the point at which to evaluate the function.
+/// ---
+/// 
+/// `val` is the point at which to evaluate the function ($z$).
 /// 
 /// This function is defined as `-i * erf(i*z)`.
 /// 
@@ -382,6 +479,14 @@ where T: Into<Complex> {
 }
 
 /// # Builds Pascal's triangle line
+/// We can obtain any given line of the [pascal triangle](https://en.wikipedia.org/wiki/Pascal%27s_triangle) by using
+/// the formula defined here:
+/// $$
+/// e_n^k = \binom{n}{k}
+/// $$
+/// Where $e_n^k$ is the element of the $n^{th}$ line and $i^{th}$ position.
+/// 
+/// ---
 /// 
 /// `n` the index of the line in the triangle.
 /// 
