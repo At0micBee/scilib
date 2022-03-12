@@ -28,6 +28,64 @@ const STIELTJES_M: usize = 1_000_000;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/// # ∑ operation
+/// 
+/// Implementation of the mathematical summation.
+/// * `type` - the type of the result
+/// * `var` - name of the variable used in the loop (ex: i, n, j, etc)
+/// * `start` - beginning of the summation (included)
+/// * `end` - ending of the summation (included)
+/// * `form` - the formula summed
+/// 
+/// ```
+/// # #[macro_use] extern crate scilib; 
+/// # fn main() {
+/// # use scilib::math::basic::*;
+/// let res = summation!(u32, n, 0, 10, n);
+/// assert_eq!(55, res);
+/// # }
+/// ```
+#[macro_export]
+macro_rules! summation {
+    ($type:ty, $var:pat, $start:expr, $end:expr, $form:expr) => {{
+        let mut result: $type = 0 as $type;
+        for $var in $start..=$end {
+            result += $form;
+        }
+        result
+    }};
+}
+
+/// # Π operation
+/// 
+/// Implementation of the mathematical product.
+/// * `type` - the type of the result
+/// * `var` - name of the variable used in the loop (ex: i, n, j, etc)
+/// * `start` - beginning of the product (included)
+/// * `end` - ending of the product (included)
+/// * `form` - the formula multiplied
+/// 
+/// ```
+/// # #[macro_use] extern crate scilib; 
+/// # fn main() {
+/// # use scilib::math::basic::*;
+/// let res = product!(u32, i, 1, 10, i); // = 10!
+/// assert_eq!(3628800, res);
+/// # }
+/// ```
+#[macro_export]
+macro_rules! product {
+    ($type:ty, $var:pat, $start:expr, $end:expr, $form:expr) => {{
+        let mut result: $type = 1 as $type;
+        for $var in $start..=$end {
+            result *= $form;
+        }
+        result
+    }};
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /// # Sinus cardinal
 ///
 /// `x`: the value at which to evaluate the function
