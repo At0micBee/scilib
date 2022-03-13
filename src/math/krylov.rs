@@ -7,6 +7,17 @@
 //!  - Newton-Krylov 
 //!  - Jacobian Free Newton-Krylov 
 
+// Test function for all run test
+pub fn test_func(v : &Vec<f64>) -> Vec<f64> {
+
+    let res_1 = v[0] - 3.0* v[1] + v[2] - 2.0;
+    let res_2 = 3.0* v[0] - 4.0 * v[1] + v[2]; 
+    let res_3 = 2.0* v[1] - v[2] - 1.0;
+
+    let res_vec = vec![res_1,res_2,res_3];
+    
+    res_vec
+}
 
 /// # L2 Norm 
 /// 
@@ -34,8 +45,14 @@ pub fn l2_norm(u : &Vec<f64>) -> f64 {
 ///  $$ \frac{F(U+\epsilon V) - F(U)}{\epsilon}$$
 /// 
 /// ```
+/// # use scilib::math::krylov::{jacobian_vec_estimate,test_func};
 /// 
-/// 
+/// let u = vec![1.0,1.0,1.0];
+/// let v = vec![1e-1,1e-1,1e-1];
+///
+/// let jv = jacobian_vec_estimate(&u, &v, test_func);
+///
+/// assert!((jv[0] + 1.0).abs() < 1e-4 && jv[1].abs() < 1e-4 && (jv[2] - 1.0).abs()<1e-4);
 /// 
 /// ```
 pub fn jacobian_vec_estimate(
