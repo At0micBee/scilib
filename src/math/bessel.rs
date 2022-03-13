@@ -459,7 +459,7 @@ where T: Into<Complex> + Copy, U: Into<f64> {
 /// # use scilib::math::bessel::*;
 /// 
 /// let res = sj(Complex::from(13, 5), 3);
-/// assert_eq!(res, Complex::from(1.6109825049200244, -4.322382277910797));
+/// assert!((res.re - 1.6109825049200244).abs() < 1e-8 && (res.im + 4.322382277910797).abs() < 1e-8);
 /// ```
 pub fn sj<T>(z: T, n: usize) -> Complex 
 where T: Into<Complex> {
@@ -556,7 +556,7 @@ where T: Into<Complex> {
 /// # use scilib::math::bessel::*;
 /// 
 /// let res = sy(Complex::from(13, 5), 3);
-/// assert_eq!(res, Complex::from(4.322629120777188, 1.6104674841102558));
+/// assert!((res.re - 4.322629120777188).abs() < 1e-8 && (res.im - 1.6104674841102558) < 1e-8);
 /// ```
 pub fn sy<T>(z: T, n: usize) -> Complex 
 where T: Into<Complex> {
@@ -614,7 +614,7 @@ where T: Into<Complex> {
 /// # use scilib::math::bessel::*;
 /// 
 /// let res = sh_first(Complex::from(13, 5), 3);
-/// assert_eq!(res, Complex::from(5.150208097686182e-4, 2.4684286639153896e-4));
+/// assert!((res.re - 5.150208097686182e-4).abs() < 1e-8 &&  (res.im - 2.4684286639153896e-4).abs() < 1e-8);
 /// ```
 pub fn sh_first<T>(z: T, n: usize) -> Complex 
 where T: Into<Complex> {
@@ -658,7 +658,7 @@ where T: Into<Complex> {
 /// # use scilib::math::bessel::*;
 /// 
 /// let res = sh_second(Complex::from(13, 5), 3);
-/// assert_eq!(res, Complex::from(3.22144998903028, -8.645011398687984));
+/// assert!((res.re - 3.22144998903028).abs() < 1e-8 && (res.im + 8.645011398687984).abs() < 1e-8);
 /// ```
 pub fn sh_second<T>(z: T, n: usize) -> Complex 
 where T: Into<Complex> {
