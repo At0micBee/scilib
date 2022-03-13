@@ -121,3 +121,61 @@ where T: Into<f64>, U: Into<f64>, V: Into<f64> {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/// # ∑ operation
+/// 
+/// Implementation of the mathematical summation.
+/// * `type` - the type of the result
+/// * `var` - name of the variable used in the loop (ex: i, n, j, etc)
+/// * `range` - range used for the loop
+/// * `form` - the formula summed
+/// 
+/// ```
+/// # #[macro_use] extern crate scilib; 
+/// # fn main() {
+/// # use scilib::math::basic::*;
+/// let res1 = summation!(u32, n, 0..=10, n);
+/// assert_eq!(55, res1);
+/// let res2 = summation!(f64, n, 0..=10, n as f64 * 0.5);
+/// assert_eq!(27.5, res2);
+/// # }
+/// ```
+#[macro_export]
+macro_rules! summation {
+    ($type:ty, $var:pat, $range:expr, $form:expr) => {{
+        let mut result: $type = 0 as $type;
+        for $var in $range {
+            result += $form;
+        }
+        result
+    }};
+}
+
+/// # Π operation
+/// 
+/// Implementation of the mathematical product.
+/// * `type` - the type of the result
+/// * `var` - name of the variable used in the loop (ex: i, n, j, etc)
+/// * `range` - range used for the loop
+/// * `form` - the formula multiplied
+/// 
+/// ```
+/// # #[macro_use] extern crate scilib; 
+/// # fn main() {
+/// # use scilib::math::basic::*;
+/// let res = product!(u32, i, 1..=10, i); // = 10!
+/// assert_eq!(3628800, res);
+/// # }
+/// ```
+#[macro_export]
+macro_rules! product {
+    ($type:ty, $var:pat, $range:expr, $form:expr) => {{
+        let mut result: $type = 1 as $type;
+        for $var in $range {
+            result *= $form;
+        }
+        result
+    }};
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
