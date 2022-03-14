@@ -130,15 +130,20 @@ where T: Into<f64>, U: Into<f64>, V: Into<f64> {
 /// * `range` - range used for the loop
 /// * `form` - the formula summed
 /// 
+/// Which effectively computes:
+/// $$
+/// y = \sum_{i=r_\mathrm{min}}^{r_\mathrm{max}}f(i)
+/// $$
+/// With $r_\mathrm{min}$ and $r_\mathrm{max}$ the bounding values of the range, $i$ the variable used and
+/// $f(i)$ the formula applied.
+/// 
 /// ```
-/// # #[macro_use] extern crate scilib; 
-/// # fn main() {
+/// # #[macro_use] extern crate scilib;
 /// # use scilib::math::basic::*;
 /// let res1 = summation!(u32, n, 0..=10, n);
 /// assert_eq!(55, res1);
 /// let res2 = summation!(f64, n, 0..=10, n as f64 * 0.5);
 /// assert_eq!(27.5, res2);
-/// # }
 /// ```
 #[macro_export]
 macro_rules! summation {
@@ -159,13 +164,19 @@ macro_rules! summation {
 /// * `range` - range used for the loop
 /// * `form` - the formula multiplied
 /// 
+/// Which effectively computes:
+/// $$
+/// y = \prod_{i=r_\mathrm{min}}^{r_\mathrm{max}}f(i)
+/// $$
+/// With $r_\mathrm{min}$ and $r_\mathrm{max}$ the bounding values of the range, $i$ the variable used and
+/// $f(i)$ the formula applied.
+/// 
 /// ```
-/// # #[macro_use] extern crate scilib; 
-/// # fn main() {
+/// # #[macro_use] extern crate scilib;
 /// # use scilib::math::basic::*;
-/// let res = product!(u32, i, 1..=10, i); // = 10!
+/// let res = product!(usize, i, 1..=10, i); // = 10!
 /// assert_eq!(3628800, res);
-/// # }
+/// assert_eq!(res, factorial(10_usize));
 /// ```
 #[macro_export]
 macro_rules! product {
