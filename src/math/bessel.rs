@@ -394,8 +394,6 @@ where T: Into<Complex> + Copy, U: Into<f64> {
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 /// # First Hankel function: H1
 /// 
 /// Computes the first kind of Hankel function, accepts complex input.
@@ -464,39 +462,47 @@ where T: Into<Complex> + Copy, U: Into<f64> {
 pub fn sj<T>(z: T, n: usize) -> Complex 
 where T: Into<Complex> {
     let x: Complex  = z.into();
-    (std::f64::consts::PI / 2.0 / x).sqrt() * jf(x, n as f64 + 0.5)
+    (FRAC_PI_2 / x).sqrt() * jf(x, n as f64 + 0.5)
 }
 
-fn sj_upward_reccurence<T>(z: T, n: usize) -> Vec<Complex> 
+fn sj_upward_recurrence<T>(z: T, n: usize) -> Vec<Complex> 
 where T: Into<Complex> {
+
     let count = n + 1;
     let x: Complex = z.into();
-    let mut jn = vec![Complex::from(0.0, 0.0); count];
+    let mut jn = vec![Complex::new(); count];
+
     jn[0] = x.sin() / x;
     jn[1] = x.sin() / x.powi(2) - x.cos() / x;
+
     for i in 1..=count - 2 {
         jn[i + 1] = (2 * i + 1) as f64 / x * jn[i] - jn[i - 1];
     }
+
     jn
 }
 
-fn sj_downward_reccurence<T>(z: T, nl: usize, nu: usize) -> Vec<Complex> 
+fn sj_downward_recurrence<T>(z: T, nl: usize, nu: usize) -> Vec<Complex> 
 where T: Into<Complex> {
+
     let count = nu - nl + 1;
     let x: Complex = z.into();
-    let mut jn= vec![Complex::from(0.0, 0.0); count + 2];
-    jn[count + 1] = Complex::from(0.0, 0.0);
-    jn[count] = Complex::from(1.0, 0.0);
+    let mut jn= vec![Complex::new(); count + 2];
+
+    jn[count + 1] = Complex::new();
+    jn[count] = Complex::unity();
+
     for i in (1..=count).rev() {
         jn[i - 1] = (2 * i + 1) as f64 / x * jn[i] - jn[i + 1];
     }
-    jn.resize(count, Complex::from(0.0, 0.0));
+    jn.resize(count, Complex::new());
+
     jn
 }
 
 /// # First spherical Bessel function (array): j
 /// 
-/// Compute the first kind of spherical bessel function by reccurency to get an array of function.
+/// Compute the first kind of spherical bessel function by recurrence to get an array of function.
 /// * `z` - where the function is evaluated
 /// * `n` - maximum order evaluated, return a vector from 0 to the nth order included : `sj[0]` to `sj[n]`
 /// 
@@ -515,34 +521,41 @@ where T: Into<Complex> {
 /// ```
 pub fn sj_array<T>(z: T, n: usize) -> Vec<Complex>
 where T: Into<Complex> {
-    let x: Complex = z.into();
-    if x.modulus() > n as f64 / 2.0 {
-        sj_upward_reccurence(x, n)
-    } else {
-        const PACK: usize = 50;
-        let num_big_loop = n / PACK;
-        let mut jn_all = Vec::<Vec<Complex>>::new();
-        for i in 0..num_big_loop {
-            jn_all.push(sj_downward_reccurence(x, i * PACK, (i + 1) * PACK));
-        }
-        let rest = n % PACK;
-        if rest != 0 {
-            jn_all.push(sj_downward_reccurence(x, n - rest, n));
-        }
 
-        let mut jn = Vec::<Complex>::with_capacity(n);
-        let mut norm = x.sin() / x / jn_all[0][0];
-        for i in 0..jn_all[0].len() {
-            jn.push(jn_all[0][i] * norm);
-        }
-        for i in 1..jn_all.len() {
-            norm = *jn.last().unwrap() / jn_all[i][0];
-            for k in 1..jn_all[i].len() {
-                jn.push(jn_all[i][k] * norm);
-            }
-        }
-        jn
+    let x: Complex = z.into();
+
+    if x.modulus() > n as f64 / 2.0 {
+        return sj_upward_recurrence(x, n);
     }
+
+    const PACK: usize = 50;
+    let num_big_loop = n / PACK;
+    let mut jn_all = Vec::<Vec<Complex>>::new();
+
+    for i in 0..num_big_loop {
+        jn_all.push(sj_downward_recurrence(x, i * PACK, (i + 1) * PACK));
+    }
+
+    let rest = n % PACK;
+    if rest != 0 {
+        jn_all.push(sj_downward_recurrence(x, n - rest, n));
+    }
+
+    let mut jn = Vec::<Complex>::with_capacity(n);
+    let mut norm = x.sin() / x / jn_all[0][0];
+
+    for i in 0..jn_all[0].len() {
+        jn.push(jn_all[0][i] * norm);
+    }
+
+    for i in 1..jn_all.len() {
+        norm = *jn.last().unwrap() / jn_all[i][0];
+        for k in 1..jn_all[i].len() {
+            jn.push(jn_all[i][k] * norm);
+        }
+    }
+    
+    jn
 }
 
 /// # Second spherical Bessel function: y
@@ -561,12 +574,12 @@ where T: Into<Complex> {
 pub fn sy<T>(z: T, n: usize) -> Complex 
 where T: Into<Complex> {
     let x: Complex = z.into();
-    (std::f64::consts::PI / 2.0 / x).sqrt() * y(x, n as f64 + 0.5)
+    (FRAC_PI_2 / x).sqrt() * y(x, n as f64 + 0.5)
 }
 
 /// # Second spherical Bessel function (array): y
 /// 
-/// Compute the second kind of spherical bessel function by reccurency to get an array of function.
+/// Compute the second kind of spherical bessel function by recurrence to get an array of function.
 /// * `z` - where the function is evaluated
 /// * `n` - maximum order evaluated, return a vector from 0 to the nth order included : `sy[0]` to `sy[n]`
 /// 
@@ -585,22 +598,29 @@ where T: Into<Complex> {
 /// ```
 pub fn sy_array<T>(z: T, n: usize) -> Vec<Complex>
 where T: Into<Complex> {
+
     let x: Complex = z.into();
     let y0 = -x.cos() / x;
+
     if n == 0 {
         return vec![y0];
     }
+
     let y1 = -x.cos() / (x * x) - x.sin() / x;
+
     if n == 1 {
         return vec![y0, y1];
     }
-    let mut yn: Vec<Complex> = vec![Complex::from(0.0, 0.0); n + 1];
+
+    let mut yn: Vec<Complex> = vec![Complex::new(); n + 1];
     yn[0] = y0;
     yn[1] = y1;
+
     for i in 1..=n - 1 {
         yn[i + 1] = ((2 * i + 1) as f64) / x * yn[i] - yn[i - 1];
     }
-    return yn;
+
+    yn
 }
 
 /// # First spherical Hankel function: h1
@@ -624,7 +644,7 @@ where T: Into<Complex> {
 
 /// # First spherical Hankel function (array): h1
 /// 
-/// Compute the first kind of spherical hankel function by reccurency to get an array of function.
+/// Compute the first kind of spherical hankel function by recurrence to get an array of function.
 /// * `z` - where the function is evaluated
 /// * `n` - maximum order evaluated, return a vector from 0 to the nth order included : `sh_first[0]` to `sh_first[n]`
 /// 
@@ -637,13 +657,16 @@ where T: Into<Complex> {
 /// ```
 pub fn sh_first_array<T>(z: T, n: usize) -> Vec<Complex> 
 where T: Into<Complex> {
+
     let x: Complex = z.into();
     let sj_res = sj_array(x, n);
     let sy_res = sy_array(x, n);
     let mut sh_first = Vec::<Complex>::with_capacity(n + 1);
+
     for i in 0..sj_res.len() {
         sh_first.push(sj_res[i] + Complex::i() * sy_res[i]);
     }
+
     sh_first
 }
 
@@ -668,7 +691,7 @@ where T: Into<Complex> {
 
 /// # Second spherical Hankel function (array): h2
 /// 
-/// Compute the second kind of spherical hankel function by reccurency to get an array of function.
+/// Compute the second kind of spherical hankel function by recurrence to get an array of function.
 /// * `z` - where the function is evaluated
 /// * `n` - maximum order evaluated, return a vector from 0 to the nth order included : `sh_second[0]` to `sh_second[n]`
 /// 
@@ -681,13 +704,16 @@ where T: Into<Complex> {
 /// ```
 pub fn sh_second_array<T>(z: T, n: usize) -> Vec<Complex> 
 where T: Into<Complex> {
+
     let x: Complex = z.into();
     let sj_res = sj_array(x, n);
     let sy_res = sy_array(x, n);
     let mut sh_second = Vec::<Complex>::with_capacity(n + 1);
+
     for i in 0..sj_res.len() {
         sh_second.push(sj_res[i] - Complex::i() * sy_res[i]);
     }
+    
     sh_second
 }
 
