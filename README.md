@@ -153,8 +153,8 @@ Useful polynomials will be implemented to facilitate their uses to everyone; as 
 use scilib::math::polynomial::*;
 
 // Legendre and Laguerre support derivative (and negative m)
-let leg = Legendre::new(2, 1);  // l=2, m=1
-let lag = Laguerre::new(3, -2); // l=3, m=-2
+let leg = Legendre::new(2, -1); // l=2, m=-1
+let lag = Laguerre::new(3, 2);  // l=3, m=2
 
 // Standard support for Bernoulli and Euler (numbers and polynomials)
 let ber = Bernoulli::new(3);    // n=3
