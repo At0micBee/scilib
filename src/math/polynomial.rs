@@ -12,7 +12,7 @@ use super::{            // Using parts from the crate
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # Legendre polynomials
-/// These polynomials are used as solution to the Legendre differential equations, which can be written as:
+/// The [Legendre polynomials](https://en.wikipedia.org/wiki/Legendre_polynomials) are used as solution to the Legendre differential equations, which can be written as:
 /// $$
 /// (1-x^2)\frac{d^2P_n(x)}{dx^2} - 2x\frac{dP_n(x)}{dx} + n(n+1)P_n(x) = 0
 /// $$
@@ -68,7 +68,7 @@ impl Legendre {
     /// let p21 = Legendre::new(2, 1);      // l=2, m=1
     /// ```
     /// 
-    /// In the previous example, we have generated second order:
+    /// In the previous example, we have generated the second order:
     /// $$
     /// P_2(x) = \frac{3x^2}{2} - \frac{1}{2}
     /// $$
@@ -118,7 +118,7 @@ impl Legendre {
 
     /// Computes the m derivative of the polynomial
     ///
-    /// This is used to produce the Pnm(x) version of the polynomial.
+    /// This is used to produce the $P_n^m(x)$ version of the polynomial.
     fn derive(&mut self, m: i32) {
 
         // Creating the marker to know if we need to delete the last element
@@ -150,7 +150,7 @@ impl Legendre {
 
     /// Computes the value of `x` for the given polynomial (`x`: real).
     /// 
-    /// Returns: the result of the polynomial Plm(x)
+    /// Returns: the result of the polynomial $P_l^m(x)$.
     /// 
     /// ```
     /// # use scilib::math::polynomial::Legendre;
@@ -175,7 +175,7 @@ impl Legendre {
 
     /// Computes the value of `z` for the given polynomial (`z`: complex).
     /// 
-    /// Returns: the result of the polynomial Plm(z)
+    /// Returns: the result of the polynomial $P_l^m(z)$.
     /// 
     /// ```
     /// # use scilib::math::complex::Complex;
@@ -200,7 +200,7 @@ impl Legendre {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # Laguerre polynomials
-/// These polynomials are the solution to the Laguerre differential equation:
+/// The [Laguerre polynomials](https://en.wikipedia.org/wiki/Laguerre_polynomials) are the solution to the Laguerre differential equation:
 /// $$
 /// x\frac{d^2L_n}{dx^2} + (1-x)\frac{dL_n}{dx} + mL_n = 0
 /// $$
@@ -256,6 +256,15 @@ impl Laguerre {
     /// let p20 = Laguerre::new(2, 0);      // l=2, m=0
     /// let p21 = Laguerre::new(2, 1);      // l=2, m=1
     /// ```
+    /// 
+    /// In the previous example, we have generated the second order:
+    /// $$
+    /// L_2(x) = \frac{x^2}{2} - 2x + 1
+    /// $$
+    /// And the associated generalized form $L_2^1(x)$:
+    /// $$
+    /// L_2^1(x) = \frac{x^2}{2} - 3x + 3
+    /// $$
     pub fn new(l: usize, m: i32) -> Self {
 
         // Initializing the vectors
@@ -278,38 +287,9 @@ impl Laguerre {
         }
     }
 
-    pub fn derive(&mut self, m: i32) {
-
-        // Creating the marker to know if we need to delete the last element
-        // when the power reaches 0
-        let mut marker: bool;
-        
-        // Looping the derivation, m times
-        for _ in 1..=m {
-
-            // Resetting at false, and starting the computation of the new terms
-            marker = false;
-            for (f, p) in self.factor.iter_mut().zip(&mut self.power) {
-                match p {
-                    0 => marker = true,     // If p is zero, we do not touch anything
-                    _ => {                  // For anything else, we compute the derivative
-                        *f *= *p as f64;    // Changing th factor value
-                        *p -= 1;            // Changing the power value
-                    }
-                }
-            }
-
-            // If the marker is true, we remove the zero power, and the associated factor
-            if marker {
-                self.factor.pop();  // pop() method is fine, 0 can only exist once per derivative
-                self.power.pop();   // and if so, it will always be at the last position
-            }
-        }
-    }
-
     /// Computes the value of `x` for the given polynomial (x: real).
     /// 
-    /// Returns: the result of the polynomial Plm(x)
+    /// Returns: the result of the polynomial $P_l^m(x)$.
     /// 
     /// ```
     /// # use scilib::math::polynomial::Laguerre;
@@ -333,7 +313,22 @@ impl Laguerre {
 
     /// Computes the value of `z` for the given polynomial (z: complex).
     /// 
-    /// Returns: the result of the polynomial Plm(z)
+    /// Returns: the result of the polynomial $P_l^m(z)$.
+    /// 
+    /// ```
+    /// # use scilib::math::complex::Complex;
+    /// # use scilib::math::polynomial::Laguerre;
+    /// let z = Complex::from(1.2, -0.4);   // Example value
+    /// 
+    /// let p = Laguerre::new(2, 1);        // l=2, m=1
+    /// 
+    /// // Computing the results for the polynomial
+    /// let res = p.compute_complex(z);
+    ///
+    /// // Comparing to tabulated values
+    /// assert!((res.re - 0.04).abs() < 1.0e-12);
+    /// assert!((res.im - 0.72).abs() < 1.0e-12);
+    /// ```
     pub fn compute_complex(&self, z: Complex) -> Complex {
         // Iterates through the values of the factors and powers
         self.factor.iter().zip(&self.power).fold(Complex::new(), |res, (f, p)| res + *f * z.powi(*p))
@@ -343,6 +338,17 @@ impl Laguerre {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # Bernoulli polynomials
+/// The [Bernoulli polynomial](https://en.wikipedia.org/wiki/Bernoulli_polynomials) are present in a great variety
+/// of particular functions, and are closely related to the Euler polynomial (also in this crate).
+/// They are defined by the generating function:
+/// $$
+/// \frac{t\exp(xt)}{\exp(t) - 1} = \sum_{n=0}^{\infty}B_n(x)\frac{t^n}{n!}
+/// $$
+/// To generate the polynomials, we use the explicit formula:
+/// $$
+/// B_n(x) = \sum_{k=0}^{n}\binom{n}{k}B_{n-k}x^{k}
+/// $$
+/// Where $B_{n-k}$ correspond to the $(n-k)^\mathrm{th}$ [Bernoulli number](https://en.wikipedia.org/wiki/Bernoulli_number).
 #[derive(Debug, Default)]
 pub struct Bernoulli {
     /// The order of the polynomial
@@ -375,9 +381,13 @@ impl std::fmt::Display for Bernoulli {
 /// Implementing the required methods
 impl Bernoulli {
 
-    /// Bernoulli number generator
+    /// # Bernoulli number generator
     /// 
-    /// Following the Bm- convention.
+    /// Following the $B_m^{-}$ convention, we use the formula:
+    /// $$
+    /// B_m^{-} = \sum_{k=0}^{m}\sum_{v=0}^{k}(-1)^v \binom{k}{v}\frac{v^m}{k+1}
+    /// $$
+    /// 
     /// ```
     /// # use scilib::math::polynomial::Bernoulli;
     /// let num_0: f64 = Bernoulli::gen_number(0);
@@ -438,9 +448,9 @@ impl Bernoulli {
         }
     }
 
-    /// Computes the value of `x` for the given polynomial (x: real).
+    /// Computes the value of `x` for the given polynomial (`x`: real).
     /// 
-    /// Returns: the result of the polynomial Bn(x)
+    /// Returns: the result of the polynomial $B_n(x)$.
     /// 
     /// ```
     /// # use scilib::math::polynomial::Bernoulli;
@@ -459,9 +469,24 @@ impl Bernoulli {
         self.factor.iter().zip(&self.power).fold(0.0, |res, (f, p)| res + f * x.powi(*p))
     }
 
-    /// Computes the value of `z` for the given polynomial (z: complex).
+    /// Computes the value of `z` for the given polynomial (`z`: complex).
     /// 
-    /// Returns: the result of the polynomial Bn(z)
+    /// Returns: the result of the polynomial $B_n(z)$.
+    /// 
+    /// ```
+    /// # use scilib::math::complex::Complex;
+    /// # use scilib::math::polynomial::Bernoulli;
+    /// let z = Complex::from(-2.1, 1.1);   // Example value
+    /// 
+    /// let p = Bernoulli::new(4);          // n=4
+    /// 
+    /// // Computing the results for the polynomial
+    /// let res = p.compute_complex(z);
+    ///
+    /// // Comparing to tabulated values
+    /// assert!((res.re - -4.6617333333).abs() < 1.0e-8);
+    /// assert!((res.im - -60.632).abs() < 1.0e-8);
+    /// ```
     pub fn compute_complex(&self, z: Complex) -> Complex {
         // Iterates through the values of the factors and powers
         self.factor.iter().zip(&self.power).fold(Complex::new(), |res, (f, p)| res + *f * z.powi(*p))
@@ -471,6 +496,17 @@ impl Bernoulli {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # Bernoulli polynomials
+/// The [Euler polynomial](https://en.wikipedia.org/wiki/Bernoulli_polynomials) are present in a great variety
+/// of particular functions, and are closely related to the Euler polynomial (also in this crate).
+/// They are defined by the generating function:
+/// $$
+/// \frac{2\exp(xt)}{\exp(t) + 1} = \sum_{n=0}^{\infty}E_n(x)\frac{t^n}{n!}
+/// $$
+/// To generate the polynomials, we use the explicit formula:
+/// $$
+/// E_n(x) = \sum_{k=0}^{n}\binom{n}{k} \frac{E_k}{2^k}\left( x - \frac{1}{2} \right)^{n-k}
+/// $$
+/// Where $E_{k}$ correspond to the $k^\mathrm{th}$ [Euler number](https://en.wikipedia.org/wiki/Euler_numbers).
 #[derive(Debug, Default)]
 pub struct Euler {
     /// The order of the polynomial
@@ -500,8 +536,15 @@ impl std::fmt::Display for Euler {
     }
 }
 
+/// Implementing the required methods
 impl Euler {
-    /// Euler number generator
+    /// # Euler number generator
+    /// 
+    /// We use the formula:
+    /// $$
+    /// E_k = \sum_{i=1}^{k}(-1)^{i}\frac{1}{2^i}\sum_{l=0}^{2i}(-1)^l\binom{2i}{l}(i-l)^{k}
+    /// $$
+    /// For every even $k$; else the result is 0.
     /// 
     /// ```
     /// # use scilib::math::polynomial::Euler;
@@ -585,9 +628,9 @@ impl Euler {
         }
     }
 
-    /// Computes the value of `x` for the given polynomial (x: real).
+    /// Computes the value of `x` for the given polynomial (`x`: real).
     /// 
-    /// Returns: the result of the polynomial En(x)
+    /// Returns: the result of the polynomial $E_n(x)$
     /// 
     /// ```
     /// # use scilib::math::polynomial::Euler;
@@ -606,9 +649,24 @@ impl Euler {
         self.factor.iter().zip(&self.power).fold(0.0, |res, (f, p)| res + f * x.powi(*p))
     }
 
-    /// Computes the value of `z` for the given polynomial (z: complex).
+    /// Computes the value of `z` for the given polynomial (`z`: complex).
     /// 
-    /// Returns: the result of the polynomial En(x)
+    /// Returns: the result of the polynomial $E_n(z)$
+    /// 
+    /// ```
+    /// # use scilib::math::complex::Complex;
+    /// # use scilib::math::polynomial::Euler;
+    /// let z = Complex::from(1, -2.5); // Example value
+    /// 
+    /// let p = Euler::new(6);          // n=6
+    /// 
+    /// // Computing the results for the polynomial
+    /// let res = p.compute_complex(z);
+    ///
+    /// // Comparing to tabulated values
+    /// assert!((res.re - -244.141).abs() <= 1.0e-3);
+    /// assert!((res.im - -378.594).abs() <= 1.0e-3);
+    /// ```
     pub fn compute_complex(&self, z: Complex) -> Complex {
         // Iterates through the values of the factors and powers
         self.factor.iter().zip(&self.power).fold(Complex::new(), |res, (f, p)| res + *f * z.powi(*p))
