@@ -12,6 +12,16 @@ use super::{            // Using parts from the crate
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # Legendre polynomials
+/// These polynomials are used as solution to the Legendre differential equations, which can be written as:
+/// $$
+/// (1-x^2)\frac{d^2P_n(x)}{dx^2} - 2x\frac{dP_n(x)}{dx} + n(n+1)P_n(x) = 0
+/// $$
+/// 
+/// The generating formula used in the program is as follows:
+/// $$
+/// P_n(x) = \frac{1}{2^n}\sum_k^{\left\lfloor\frac{n}{2}\right\rfloor}(-1)^k\binom{n}{k}\binom{2n-2k}{n}x^{n-2k}
+/// $$
+///
 #[derive(Debug, Default)]
 pub struct Legendre {
     /// The order of the polynomial
@@ -20,7 +30,7 @@ pub struct Legendre {
     pub m: i32,
     /// The factor of each term
     factor: Vec<f64>,
-    /// The power at each term
+    /// The power of each term
     power: Vec<i32>,
     /// The pre-factor associated to m
     pre_f: f64
@@ -57,6 +67,17 @@ impl Legendre {
     /// let p20 = Legendre::new(2, 0);      // l=2, m=0
     /// let p21 = Legendre::new(2, 1);      // l=2, m=1
     /// ```
+    /// 
+    /// In the previous example, we have generated second order:
+    /// $$
+    /// P_2(x) = \frac{3x^2}{2} - \frac{1}{2}
+    /// $$
+    /// and its first derivative:
+    /// $$
+    /// P_2^1(x) = -3x
+    /// $$
+    /// Note the presence of the negative is due to the Ccondon-Shortley phase. In future version of the
+    /// crate, the phase will likely be removed and computed in the sub-functions which need it.
     pub fn new(l: usize, m: i32) -> Self {
 
         // Checking that the range is good
@@ -127,7 +148,7 @@ impl Legendre {
         }
     }
 
-    /// Computes the value of `x` for the given polynomial (x: real).
+    /// Computes the value of `x` for the given polynomial (`x`: real).
     /// 
     /// Returns: the result of the polynomial Plm(x)
     /// 
@@ -152,9 +173,24 @@ impl Legendre {
         pre * self.factor.iter().zip(&self.power).fold(0.0, |res, (f, p)| res + f * x.powi(*p))
     }
 
-    /// Computes the value of `z` for the given polynomial (z: complex).
+    /// Computes the value of `z` for the given polynomial (`z`: complex).
     /// 
     /// Returns: the result of the polynomial Plm(z)
+    /// 
+    /// ```
+    /// # use scilib::math::complex::Complex;
+    /// # use scilib::math::polynomial::Legendre;
+    /// let z = Complex::from(0.2, 3.1);    // Example value
+    /// 
+    /// let p30 = Legendre::new(2, 0);      // l=3, m=0
+    /// 
+    /// // Computing the results for each polynomial
+    /// let res30 = p30.compute_complex(z);
+    ///
+    /// // Comparing to tabulated values
+    /// assert!((res30.re - -14.855).abs() < 1.0e-12);
+    /// assert!((res30.im - 1.86).abs() < 1.0e-12);
+    /// ```
     pub fn compute_complex(&self, z: Complex) -> Complex {
         // Iterates through the values of the factors and powers
         self.factor.iter().zip(&self.power).fold(Complex::new(), |res, (f, p)| res + *f * z.powi(*p))
@@ -164,6 +200,18 @@ impl Legendre {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # Laguerre polynomials
+/// These polynomials are the solution to the Laguerre differential equation:
+/// $$
+/// x\frac{d^2L_n}{dx^2} + (1-x)\frac{dL_n}{dx} + mL_n = 0
+/// $$
+/// 
+/// In this crate, we use the generalized form of the Laguerre polynomial $L_n^m$, using:
+/// $$
+/// L_n^m(x) = \sum_{i=0}^{n} (-1)^i\binom{n+m}{n+i}\frac{x^i}{i!}
+/// $$
+/// 
+/// Which yields the standard Laguerre polynomial for $m=0$, but lets the polynomial be used
+/// to solve a wider variety of equations (such as radial wave function in quantum mechanics).
 #[derive(Debug, Default)]
 pub struct Laguerre {
     /// The order of the polynomial
