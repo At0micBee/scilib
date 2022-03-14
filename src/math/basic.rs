@@ -359,8 +359,8 @@ pub fn gaussian(a: f64, b: f64, c: f64, x: f64) -> f64 {
 /// `lambda` is the expected value ($\mu$), `sigma` is the variance ($\sigma$).
 /// 
 /// ```
-/// # use scilib::math::basic::normed_gaussian;
-/// let res: f64 = normed_gaussian(1.0, 2.0, 3.0);
+/// # use scilib::math::basic::gaussian_normed;
+/// let res: f64 = gaussian_normed(1.0, 2.0, 3.0);
 /// 
 /// assert!((res - 0.120985362259).abs() < 1e-12);
 /// ```
