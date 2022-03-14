@@ -95,6 +95,10 @@ All functions are implemented:
 - **K**: Modified second kind
 - **H1**: Hankel first kind
 - **H2**: Hankel second kind
+- **j**: Spherical first kind
+- **y**: Spherical second kind
+- **h1**: Spherical hankel first kind
+- **h2**: Spherical hankel second kind
 
 ```rust
 // Found in the math crate
@@ -104,12 +108,18 @@ use scilib::math::bessel;
 let res_j = bessel::jf(-1.2, -2.3);             // J function; works for any input and order
 let res_y = bessel::y(3.5, 1);                  // Y function; computes the limit for integer order
 let res_i = bessel::i(7.2, 2.25);               // I function; similar to J
-let res_k = bessel::k(-1.1, 0.5)                // K function; computes the limit for integer order
-let res_1 = bessel::hankel_first(2, -2)         // Hankel first kind
-let res_2 = bessel::hankel_second(1, -1.32)     // Hankel first kind
+let res_k = bessel::k(-1.1, 0.5);               // K function; computes the limit for integer order
+let res_1 = bessel::hankel_first(2, -2);        // Hankel first kind
+let res_2 = bessel::hankel_second(1, -1.32);    // Hankel first kind
+let res_sj = bessel::sj(4.4, 2);                // Spherical first kind
+let res_sy = bessel::sy(-1.54, 3);              // Spherical second kind
+let res_sj = bessel::sh_first(2.11, 4);         // Spherical hankel first kind
+let res_sj = bessel::sh_second(0.253, 0);       // Spherical hankel second kind
 ```
 
 Values are compared to known results (thanks, [WolframAlpha](https://www.wolframalpha.com/)), and the results are within small margins of error.
+
+Thanks to [Neven](https://github.com/Gentil-N) for adding the Spherical versions.
 
 ---
 
