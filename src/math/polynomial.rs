@@ -304,11 +304,8 @@ impl Laguerre {
     /// assert_eq!(res, 2.42);
     /// ```
     pub fn compute(&self, x: f64) -> f64 {
-        println!("{}", self);
         // Iterates through the values of the factors and powers
-        let res: f64 = self.factor.iter().zip(&self.power).fold(0.0, |res, (f, p)| res + f * x.powi(*p));
-        println!("res {}", res);
-        res
+        self.factor.iter().zip(&self.power).fold(0.0, |res, (f, p)| res + f * x.powi(*p))
     }
 
     /// Computes the value of `z` for the given polynomial (z: complex).
