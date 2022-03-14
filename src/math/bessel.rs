@@ -1,8 +1,13 @@
 //!
 //! # Bessel functions
 //! 
-//! The Bessel functions are the solution to the [Bessel differential equation](https://en.wikipedia.org/wiki/Bessel_function#Spherical_Bessel_functions).
+//! The [Bessel functions](https://en.wikipedia.org/wiki/Bessel_function) are the solution to the Bessel differential equation.
 //! There are multiple variants of these solutions, and this sub-module provides functions for all of them.
+//! 
+//! They are used to solve Bessel's differential equation:
+//! $$
+//! x^2\frac{d^2y}{dx^2} + x\frac{dy}{dx} + (x^2 - \alpha^2)y = 0
+//! $$
 //! 
 //! ## First kind: J
 //! 
@@ -70,6 +75,8 @@
 //! let res_2 = hankel_second(c, -2.3);
 //! ```
 //! 
+//! # Spherical Bessel functions
+//! 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -93,11 +100,15 @@ const DISTANCE_Y_LIM: f64 = 0.001;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/// # J Bessel function, integer index
+/// # $J$ Bessel function, integer index
 ///
 /// `x` is the value to evaluate, and `n` the order of the function.
 /// 
-/// The J Bessel represent the first kind of Bessel function, and are solution to Bessel differential equation.
+/// The $J$ Bessel represent the first kind of Bessel function, and are solution to Bessel differential equation,
+/// and is defined as follows:
+/// $$
+/// J_\alpha(x) = \sum_{m=0}^{\infty}\frac{(-1)^m}{m!\Gamma(m+\alpha+1)}\left( \frac{x}{2} \right)^{2p+\alpha}
+/// $$
 /// 
 /// The bessel function depend on an infinite sum of terms; which we can't have.
 /// The criterion chosen here is check each new term impacts the results significantly enough.
@@ -177,9 +188,13 @@ pub fn j<T: Into<Complex>>(x: T, n: i32) -> Complex {
     }
 }
 
-/// # J Bessel function, real index
+/// # $J$ Bessel function, real index
 ///
 /// `x` is the value to evaluate, and `n` the order of the function.
+/// 
+/// $$
+/// J_\alpha(x) = \sum_{m=0}^{\infty}\frac{(-1)^m}{m!\Gamma(m+\alpha+1)}\left( \frac{x}{2} \right)^{2p+\alpha}
+/// $$
 /// 
 /// Similar to the other J Bessel method, but this one allows the use of a real (float) index, rather
 /// than an integer. This method is more costly to use than the other, and thus isn't recommended for
@@ -258,8 +273,11 @@ pub fn jf<T, U>(x: T, order: U) -> Complex
 
 /// # Y Bessel function, real index
 /// 
-/// The Y Bessel represent the second kind of Bessel function, and are solution to Bessel differential equation,
-/// in the case of a singularity at the origin.
+/// The $Y$ Bessel represent the second kind of Bessel function, and are solution to Bessel differential equation,
+/// in the case of a singularity at the origin. It is defined as:
+/// $$
+/// Y_\alpha(x) = \frac{J_\alpha(x)\cos(\alpha\pi) - J_\alpha(x)}{\sin(\alpha\pi)}
+/// $$
 /// 
 /// `x` is the value to evaluate, and `n` the order of the function.
 /// 
@@ -306,24 +324,34 @@ where T: Into<Complex> + Copy, U: Into<f64> {
     }
 }
 
-/// # I modified Bessel function
+/// # $I$ modified Bessel function
 /// 
-/// The I modified First Bessel function represent another kind of solution to the Bessel differential equation.
+/// The $I$ modified First Bessel function represent another kind of solution to the Bessel differential equation.
 /// 
 /// `x` is the value to evaluate, and `n` the order of the function.
 /// 
-/// We use a definition of I based on an infinite series (similar to J). This way, we ensure good precision in
-/// the computation.
+/// We use a definition of I based on an infinite series (similar to $J$). This way, we ensure good precision in
+/// the computation, by following the definition:
+/// $$
+/// I_\alpha = i^{-\alpha}J_\alpha(ix)=\sum_{m=0}^{\infty}\frac{1}{m!\Gamma(m+\alpha+1)}\left( \frac{x}{2} \right)^{2m+\alpha}
+/// $$
 /// 
 /// ```
 /// # use scilib::math::complex::Complex;
-/// # use scilib::math::bessel::i;
+/// # use scilib::math::bessel::{i, jf};
 /// let res = i(1.2, 0);
 /// assert!((res.re - 1.39373).abs() < 1.0e-4 && res.im == 0.0);
 /// 
 /// let c = Complex::from(-1.2, 0.5);
 /// let r2 = i(c, -1.6);
 /// assert!((r2.re - 0.549831).abs() < 1.0e-5 && (r2.im - -0.123202).abs() < 1.0e-5);
+/// 
+/// // We can check that the values are coherent
+/// let val = Complex::from(3.2, -1.1);
+/// let resi = i(val, 1.2);
+/// let conf = jf(Complex::i() * val, 1.2) * Complex::i().powf(-1.2);
+/// assert!((resi.re - conf.re).abs() < 1.0e-14);
+/// assert!((resi.im - conf.im).abs() < 1.0e-14);
 /// ```
 pub fn i<T, U>(x: T, order: U) -> Complex
 where T: Into<Complex>, U: Into<f64> + Copy {
@@ -361,13 +389,16 @@ where T: Into<Complex>, U: Into<f64> + Copy {
     res
 }
 
-/// # K modified Bessel function
+/// # $K$ modified Bessel function
 /// 
-/// The K modified Second Bessel function represent another kind of solution to the Bessel differential equation.
+/// The $K$ modified Second Bessel function represent another kind of solution to the Bessel differential equation.
 /// 
 /// `x` is the value to evaluate, and `n` the order of the function.
 /// 
-/// The definition of K is similar to Y, but is based on I and not J.
+/// The definition of $K$ is similar to $Y$, but is based on $I$ and not $J$:
+/// $$
+/// K_\alpha(x) = \frac{\pi}{2}\frac{I_{-\alpha}(x) - I_\alpha(x)}{\sin(\alpha\pi)}
+/// $$
 /// 
 /// ```
 /// # use scilib::math::complex::Complex;
@@ -396,7 +427,10 @@ where T: Into<Complex> + Copy, U: Into<f64> {
 
 /// # First Hankel function: H1
 /// 
-/// Computes the first kind of Hankel function, accepts complex input.
+/// Computes the first kind of Hankel function, which is defined as:
+/// $$
+/// H_\alpha^{(1)}(x) = J_\alpha(x) + iY_\alpha(x)
+/// $$
 /// 
 /// ```
 /// # use scilib::math::complex::Complex;
@@ -421,8 +455,10 @@ where T: Into<Complex> + Copy, U: Into<f64> {
 
 /// # Second Hankel function: H2
 /// 
-/// Computes the second kind of Hankel function, accepts complex input.
-/// We simplify the computation by simply conjugating the first kind
+/// Computes the first kind of Hankel function, which is defined as:
+/// $$
+/// H_\alpha^{(2)}(x) = J_\alpha(x) - iY_\alpha(x)
+/// $$
 /// 
 /// ```
 /// # use scilib::math::complex::Complex;
@@ -446,7 +482,12 @@ where T: Into<Complex> + Copy, U: Into<f64> {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/// # First spherical Bessel function: j
+/// # First spherical Bessel function: $j$
+/// 
+/// We follow the definition based on the $J$ Bessel functions:
+/// $$
+/// j_n(x) = \sqrt{\frac{\pi}{2x}}J_{n+\frac{1}{2}}(x)
+/// $$
 /// 
 /// Compute the first kind of spherical bessel function.
 /// * `z` - where the function is evaluated
@@ -455,7 +496,6 @@ where T: Into<Complex> + Copy, U: Into<f64> {
 /// ```
 /// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::*;
-/// 
 /// let res = sj(Complex::from(13, 5), 3);
 /// assert!((res.re - 1.6109825049200244).abs() < 1e-8 && (res.im + 4.322382277910797).abs() < 1e-8);
 /// ```
@@ -502,22 +542,29 @@ where T: Into<Complex> {
 
 /// # First spherical Bessel function (array): j
 /// 
-/// Compute the first kind of spherical bessel function by recurrence to get an array of function.
+/// Computes the first kind of spherical bessel function by recurrence to get an array of function.
 /// * `z` - where the function is evaluated
 /// * `n` - maximum order evaluated, return a vector from 0 to the nth order included : `sj[0]` to `sj[n]`
 /// 
 /// ```
 /// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::*;
-/// 
 /// let res1 = sj_array(Complex::from(13, 5), 3);
 /// assert_eq!(res1[0], Complex::from(3.8248700377925635, 3.708547263317134));
 /// assert_eq!(res1[1], Complex::from(-3.357143112679857, 3.9747696875545517));
 /// assert_eq!(res1[2], Complex::from(-4.1924320794482135, -2.6499227040139104));
+/// 
 /// let res2 = sj_array(0.2, 25);
 /// assert_eq!(res2[13], Complex::from(3.835110596379198e-24, 0.0));
 /// assert_eq!(res2[17], Complex::from(5.910455642760406e-33, 0.0));
 /// assert_eq!(res2[25], Complex::from(1.125476749298975e-51, 0.0));
+/// 
+/// // We can also confirm the coherence of the results:
+/// let val = Complex::from(3.2, -1.1);
+/// let resj = sj(val, 3);
+/// let resa = sj_array(val, 3);
+/// assert!((resj.re - resa[3].re).abs() < 1.0e-6);
+/// assert!((resj.im - resa[3].im).abs() < 1.0e-6);
 /// ```
 pub fn sj_array<T>(z: T, n: usize) -> Vec<Complex>
 where T: Into<Complex> {
@@ -558,7 +605,12 @@ where T: Into<Complex> {
     jn
 }
 
-/// # Second spherical Bessel function: y
+/// # Second spherical Bessel function: $y$
+/// 
+/// We follow the definition based on the $Y$ Bessel functions:
+/// $$
+/// y_n(x) = \sqrt{\frac{\pi}{2x}}Y_{n+\frac{1}{2}}(x)
+/// $$
 /// 
 /// Compute the second kind of spherical bessel function.
 /// * `z` - where the function is evaluated
@@ -567,7 +619,6 @@ where T: Into<Complex> {
 /// ```
 /// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::*;
-/// 
 /// let res = sy(Complex::from(13, 5), 3);
 /// assert!((res.re - 4.322629120777188).abs() < 1e-8 && (res.im - 1.6104674841102558) < 1e-8);
 /// ```
@@ -579,22 +630,29 @@ where T: Into<Complex> {
 
 /// # Second spherical Bessel function (array): y
 /// 
-/// Compute the second kind of spherical bessel function by recurrence to get an array of function.
+/// Computes the second kind of spherical bessel function by recurrence to get an array of function.
 /// * `z` - where the function is evaluated
 /// * `n` - maximum order evaluated, return a vector from 0 to the nth order included : `sy[0]` to `sy[n]`
 /// 
 /// ```
 /// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::*;
-/// 
 /// let res1 = sy_array(Complex::from(13, 5), 3);
 /// assert_eq!(res1[0], Complex::from(-3.7090299518957797, 3.8248379131516654));
 /// assert_eq!(res1[1], Complex::from(-3.9748349852610523, -3.356650136356049));
 /// assert_eq!(res1[2], Complex::from(2.6504303824601, -4.1922958025278));
 /// let res2 = sy_array(0.2, 25);
+/// 
 /// assert_eq!(res2[13], Complex::from(-4.82921204481494e22, 0.0));
 /// assert_eq!(res2[17], Complex::from(-2.417182573235861e31, 0.0));
 /// assert_eq!(res2[25], Complex::from(-8.711173815326792e49, 0.0));
+/// 
+/// // We can also confirm the coherence of the results:
+/// let val = Complex::from(3.2, -1.1);
+/// let resj = sy(val, 3);
+/// let resa = sy_array(val, 3);
+/// assert!((resj.re - resa[3].re).abs() < 1.0e-6);
+/// assert!((resj.im - resa[3].im).abs() < 1.0e-6);
 /// ```
 pub fn sy_array<T>(z: T, n: usize) -> Vec<Complex>
 where T: Into<Complex> {
@@ -625,6 +683,11 @@ where T: Into<Complex> {
 
 /// # First spherical Hankel function: h1
 /// 
+/// The first spherical hankel function is defined as:
+/// $$
+/// h_n^{(1)}(x) = j_n(x) + iy_n(x)
+/// $$
+/// 
 /// Compute the first kind of spherical hankel function.
 /// * `z` - where the function is evaluated
 /// * `n` - order evaluated
@@ -632,9 +695,8 @@ where T: Into<Complex> {
 /// ```
 /// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::*;
-/// 
 /// let res = sh_first(Complex::from(13, 5), 3);
-/// assert!((res.re - 5.150208097686182e-4).abs() < 1e-8 &&  (res.im - 2.4684286639153896e-4).abs() < 1e-8);
+/// assert!((res.re - 5.150208097686182e-4).abs() < 1e-8 && (res.im - 2.4684286639153896e-4).abs() < 1e-8);
 /// ```
 pub fn sh_first<T>(z: T, n: usize) -> Complex 
 where T: Into<Complex> {
@@ -651,9 +713,15 @@ where T: Into<Complex> {
 /// ```
 /// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::*;
-/// 
 /// let res = sh_first_array(Complex::from(13, 5), 3);
 /// assert_eq!(res[3], Complex::from(5.127390110655217e-4, 2.5295761378174575e-4));
+/// 
+/// // We can also confirm the coherence of the results:
+/// let val = Complex::from(3.2, -1.1);
+/// let resj = sh_first(val, 3);
+/// let resa = sh_first_array(val, 3);
+/// assert!((resj.re - resa[3].re).abs() <= 1.0e-5);
+/// assert!((resj.im - resa[3].im).abs() <= 1.0e-6);
 /// ```
 pub fn sh_first_array<T>(z: T, n: usize) -> Vec<Complex> 
 where T: Into<Complex> {
@@ -672,6 +740,11 @@ where T: Into<Complex> {
 
 /// # Second spherical Hankel function: h2
 /// 
+/// The second spherical hankel function is defined as:
+/// $$
+/// h_n^{(2)}(x) = j_n(x) - iy_n(x)
+/// $$
+/// 
 /// Compute the second kind of spherical hankel function.
 /// * `z` - where the function is evaluated
 /// * `n` - order evaluated
@@ -679,7 +752,6 @@ where T: Into<Complex> {
 /// ```
 /// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::*;
-/// 
 /// let res = sh_second(Complex::from(13, 5), 3);
 /// assert!((res.re - 3.22144998903028).abs() < 1e-8 && (res.im + 8.645011398687984).abs() < 1e-8);
 /// ```
@@ -698,9 +770,15 @@ where T: Into<Complex> {
 /// ```
 /// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::*;
-/// 
 /// let res = sh_second_array(Complex::from(13, 5), 3);
 /// assert_eq!(res[3], Complex::from(3.2214420145498694, -8.644990000503286));
+/// 
+/// // We can also confirm the coherence of the results:
+/// let val = Complex::from(3.2, -1.1);
+/// let resj = sh_second(val, 3);
+/// let resa = sh_second_array(val, 3);
+/// assert!((resj.re - resa[3].re).abs() < 1.0e-6);
+/// assert!((resj.im - resa[3].im).abs() < 1.0e-6);
 /// ```
 pub fn sh_second_array<T>(z: T, n: usize) -> Vec<Complex> 
 where T: Into<Complex> {
