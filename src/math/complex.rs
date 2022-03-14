@@ -383,9 +383,14 @@ impl Complex {
         Self::from_polar(arg * e, norm.powf(e))
     }
 
-    /// # Squared root
+    /// # Square root
     /// 
-    /// Return the "positive" result from complex squared root.
+    /// The result has two roots:
+    /// $$
+    /// \sqrt{z} = \sqrt{a + ib} = \sqrt{\frac{\sqrt{a^2 + b^2} + a}{2}} \pm i\sqrt{\frac{\sqrt{a^2 + b^2} - a}{2}}
+    /// $$
+    /// We choose to return the positive root as a convention, to access the other one, simply use the
+    /// complex conjugate function.
     /// 
     /// ```
     /// # use scilib::math::complex::Complex;
