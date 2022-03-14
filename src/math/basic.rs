@@ -364,7 +364,7 @@ pub fn gaussian(a: f64, b: f64, c: f64, x: f64) -> f64 {
 /// 
 /// assert!((res - 0.120985362259).abs() < 1e-12);
 /// ```
-pub fn normed_gaussian(mu: f64, sigma: f64, x: f64) -> f64 {
+pub fn gaussian_normed(mu: f64, sigma: f64, x: f64) -> f64 {
     (1.0 / (sigma * (TAU.sqrt()))) * (-(x - mu).powi(2) / (2.0 * sigma.powi(2))).exp()
 }
 
