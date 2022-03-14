@@ -382,6 +382,24 @@ impl Complex {
         let (arg, norm): (f64, f64) = self.polar();
         Self::from_polar(arg * e, norm.powf(e))
     }
+
+    /// # Squared root
+    /// 
+    /// Return the "positive" result from complex squared root.
+    /// 
+    /// ```
+    /// # use scilib::math::complex::Complex;
+    /// let c = Complex::from(4.0, 2.0);
+    /// let res = c.sqrt();
+    /// assert_eq!(res, Complex::from(2.0581710272714924, 0.48586827175664576));
+    /// ```
+    pub fn sqrt(&self) -> Self {
+        let modulus = self.modulus();
+        let a = ((modulus + self.re) / 2.0).sqrt();
+        let b = ((modulus - self.re) / 2.0).sqrt();
+        let sign = self.im.signum();
+        Self::from(a, b * sign)
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
