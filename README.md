@@ -146,13 +146,13 @@ let res3 = convolve(&r, &s);
 
 ## Typical polynomials
 
-Useful polynomials will be implemented to facilitate their uses to everyone; as it stands, both the Legendre (Plm(x)) and Laguerre (Llm(x)) polynomials have been implemented, where -l <= m <= l.
+Useful polynomials will be implemented to facilitate their uses to everyone; currently the [Legendre](https://docs.rs/scilib/0.4.0/scilib/math/polynomial/struct.Legendre.html), [Laguerre](https://docs.rs/scilib/0.4.0/scilib/math/polynomial/struct.Laguerre.html), [Bernoulli](https://docs.rs/scilib/0.4.0/scilib/math/polynomial/struct.Bernoulli.html) and [Euler](https://docs.rs/scilib/0.4.0/scilib/math/polynomial/struct.Euler.html) polynomials have been implemented.
 
 ```rust
 // They are found in the polynomial crate
 use scilib::math::polynomial::*;
 
-// Legendre and Laguerre support derivative (and negative m)
+// Legendre and Laguerre have their generalized versions
 let leg = Legendre::new(2, -1); // l=2, m=-1
 let lag = Laguerre::new(3, 2);  // l=3, m=2
 

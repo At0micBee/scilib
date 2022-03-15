@@ -60,6 +60,8 @@ impl Legendre {
     /// Produces the factors and powers for nth order polynomial, where
     /// `l` is the order of the Legendre polynomial and `m` is the derivative order.
     /// 
+    /// By definition, we have that $l\ge0$ and $-l\le m\le l$.
+    /// 
     /// Returns: `Self`, the corresponding struct
     ///
     /// ```
@@ -76,7 +78,7 @@ impl Legendre {
     /// $$
     /// P_2^1(x) = -3x
     /// $$
-    /// Note the presence of the negative is due to the Ccondon-Shortley phase. In future version of the
+    /// Note the presence of the negative is due to the Condon-Shortley phase. In future version of the
     /// crate, the phase will likely be removed and computed in the sub-functions which need it.
     pub fn new(l: usize, m: i32) -> Self {
 
@@ -250,6 +252,8 @@ impl Laguerre {
     /// 
     /// The factors of the polynomials are normalized.
     /// 
+    /// By definition, we have that $l\ge0$ and $m\ge0$.
+    /// 
     /// Returns: `Self`, the corresponding struct
     /// ```
     /// # use scilib::math::polynomial::Laguerre;
@@ -419,7 +423,10 @@ impl Bernoulli {
 
     /// Produces the factors and powers for nth order polynomial.
     /// 
+    /// By definition, we have that $n\ge0$.
+    /// 
     /// Returns: `Self`, the corresponding struct
+    /// 
     /// ```
     /// # use scilib::math::polynomial::Bernoulli;
     /// let p2 = Bernoulli::new(2);         // n=2
@@ -492,7 +499,7 @@ impl Bernoulli {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/// # Bernoulli polynomials
+/// # Euler polynomials
 /// The [Euler polynomial](https://en.wikipedia.org/wiki/Bernoulli_polynomials) are present in a great variety
 /// of particular functions, and are closely related to the Euler polynomial (also in this crate).
 /// They are defined by the generating function:
@@ -592,7 +599,10 @@ impl Euler {
 
     /// Produces the factors and powers for nth order polynomial.
     /// 
+    /// By definition, we have that $n\ge0$.
+    /// 
     /// Returns: `Self`, the corresponding struct
+    /// 
     /// ```
     /// # use scilib::math::polynomial::Euler;
     /// let p3 = Euler::new(3);             // n=3
