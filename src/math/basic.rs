@@ -196,6 +196,37 @@ where T: Into<f64>, U: Into<Complex> {
     res
 }
 
+/// # Polylogarithm
+pub fn li(s: f64, z: Complex) -> Complex {
+
+    let mut n: usize = 1;
+    let mut res_z: Complex = z;
+    let mut div: Complex = (1.0_f64).powf(s).into();
+
+    let mut term: Complex = res_z / div;
+
+    if term.modulus() <= 1.0e-8 {
+        return term;
+    }
+
+    let mut res: Complex = Complex::new();
+
+    'convergence: loop {
+        res += term;
+
+        if (term / res).modulus().abs() <= 1.0e-8 {
+            break 'convergence;
+        }
+
+        n += 1;
+        res_z *= z;
+        div = (n as f64).powf(s).into();
+        term = res_z / div;
+    }
+
+    res
+}
+
 /// # Gamma function
 /// 
 /// The [gamma function](https://en.wikipedia.org/wiki/Gamma_function) is a generalization of the factorial, and is defined as:
