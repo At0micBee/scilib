@@ -22,6 +22,10 @@ use super::{            // Using parts from the crate
 /// P_n(x) = \frac{1}{2^n}\sum_k^{\left\lfloor\frac{n}{2}\right\rfloor}(-1)^k\binom{n}{k}\binom{2n-2k}{n}x^{n-2k}
 /// $$
 ///
+/// For negative $n$, we follow the convention:
+/// $$
+/// P_n^{-m}(x) = (-1)^m\frac{(n-m)!}{(n+m)!}P_n^m(x)
+/// $$
 #[derive(Debug, Default)]
 pub struct Legendre {
     /// The order of the polynomial

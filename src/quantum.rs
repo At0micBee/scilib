@@ -1,6 +1,23 @@
 //!
 //! # Methods for quantum mechanics
 //! 
+//! This crate is dedicated to providing practical methods to solve quantum mechanics problems. In addition to
+//! simple tools such as computing the $n,~l,~m$ numbers, we also provide the requirements to solve the 
+//! wave-function:
+//! $$
+//! \Psi_{n,l,m}(r, \theta, \phi) = R_n^l(r)Y_l^m(\theta, \phi)
+//! $$
+//! 
+//! Where $R_n^l(r)$ is the radial wave-function and $Y_l^m(\theta, \phi)$ is the angular wave-function (or spherical harmonics function).
+//! Which have the respective forms:
+//! $$
+//! R_n^l(r) = \sqrt{\left( \frac{2}{na_B} \right)^3 \frac{(n-l-1)!}{2n\cdot(n+l)!}} \cdot \left( \frac{2r}{na_B} \right)^l
+//! L_{n-l-1}^{2l+1}\left( \frac{2r}{na_B} \right) \exp\left( -\frac{r}{na_B} \right)
+//! $$
+//! $$
+//! Y_l^m(\theta, \phi) = (-1)^m \sqrt{\frac{(2l+1)}{4\pi}\frac{(l-m)!}{(l+m)!}} P_l^m(\cos(\theta)) \exp(im\phi)
+//! $$
+//! With $L_n^m$ the Laguerre polynomials and $P_n^m$ the Legendre polynomials.
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -67,10 +84,10 @@ pub fn radial_wavefunction(n: usize, l: usize, r: f64) -> f64 {
 
     // Computing the norm of the function
     let mut norm: f64 = (2.0 / (n as f64 * cst::A_0)).powi(3);
-    norm *= basic::factorial(n - l - 1) as f64 / (2 * n * basic::factorial(n + l).pow(3)) as f64;
+    norm *= basic::factorial(n - l - 1) as f64 / (2 * n * basic::factorial(n + l)) as f64;
 
     // Computing the term associated to the Laguerre polynomial
-    let poly: f64 = polynomial::Laguerre::new(n - l - 1, 2 * l as i32).compute(2.0 * factor);
+    let poly: f64 = polynomial::Laguerre::new(n - l - 1, 2 * l as i32 + 1).compute(2.0 * factor);
 
     // Finishing computation and returning
     (2.0 * factor).powi(l as i32) * norm.sqrt() * poly * (-factor).exp()
