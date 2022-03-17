@@ -339,29 +339,15 @@ impl Complex {
     /// let res1 = c.powi(4);
     /// let res2 = c.powi(-1);
     /// 
-    /// assert!(res1.re == 28.0 && res1.im == 96.0);
-    /// assert!(res2.re == 0.3 && res2.im == -0.1);
+    /// assert!((res1.re - 28.0).abs() < 1.0e-12);
+    /// assert!((res1.im - 96.0).abs() < 1.0e-12);
+    /// assert_eq!(res2.re, 0.3);
+    /// assert_eq!(res2.im, -0.1);
     /// ```
     pub fn powi(self, e: i32) -> Self {
-
-        // x^0 = 1, technically not correct for 0^0 but we have to do something
-        if e == 0 {
-            return 1.0.into();
-        }
-
-        let mut res: Self = self;
-
-        // When e > 0
-        for _ in 1..e {
-            res *= self;
-        }
-
-        // When e < 0
-        for _ in e..=0 {
-            res /= self;
-        }
-
-        res
+        // Using polar coordinates
+        let (arg, norm): (f64, f64) = self.polar();
+        Self::from_polar(arg * e as f64, norm.powi(e))
     }
 
     /// # Raising to a real power
@@ -378,7 +364,7 @@ impl Complex {
     /// assert!((res.re - 2.2697926495).abs() < 1.0e-8 && (res.im - -5.9215705908).abs() < 1.0e-8);
     /// ```
     pub fn powf(&self, e: f64) -> Self {
-        // Cheating via polar
+        // Using polar coordinates
         let (arg, norm): (f64, f64) = self.polar();
         Self::from_polar(arg * e, norm.powf(e))
     }
@@ -400,10 +386,10 @@ impl Complex {
     /// ```
     pub fn sqrt(&self) -> Self {
         let modulus = self.modulus();
-        let a = ((modulus + self.re) / 2.0).sqrt();
-        let b = ((modulus - self.re) / 2.0).sqrt();
-        let sign = self.im.signum();
-        Self::from(a, b * sign)
+        Self {
+            re: ((modulus + self.re) / 2.0).sqrt(),
+            im: ((modulus - self.re) / 2.0).sqrt()
+        }
     }
 }
 
