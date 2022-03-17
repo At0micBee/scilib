@@ -170,7 +170,7 @@ pub fn j<T: Into<Complex>>(x: T, n: i32) -> Complex {
         res += term;
 
         // If the changed compared to the final value is small we break
-        if (term / res).modulus().abs() < PRECISION_CONVERGENCE {
+        if (term / res).modulus() < PRECISION_CONVERGENCE {
             break 'convergence;
         }
 
@@ -246,7 +246,7 @@ pub fn jf<T, U>(x: T, order: U) -> Complex
     let mut res: Complex = Complex::default();  // The result of the operation
     
     // If the first term is already too small we exit directly
-    if term.modulus().abs() < PRECISION_CONVERGENCE {
+    if term.modulus() < PRECISION_CONVERGENCE {
         return res;
     }
 
@@ -255,7 +255,7 @@ pub fn jf<T, U>(x: T, order: U) -> Complex
         res += term;
 
         // If the changed compared to the final value is small we break
-        if (term / res).modulus().abs() < PRECISION_CONVERGENCE {
+        if (term / res).modulus() < PRECISION_CONVERGENCE {
             break 'convergence;
         }
 
@@ -367,7 +367,7 @@ where T: Into<Complex>, U: Into<f64> + Copy {
     let mut res: Complex = Complex::default();  // The result of the operation
     
     // If the first term is already too small we exit directly
-    if term.modulus().abs() < PRECISION_CONVERGENCE {
+    if term.modulus() < PRECISION_CONVERGENCE {
         return res;
     }
 
@@ -376,7 +376,7 @@ where T: Into<Complex>, U: Into<f64> + Copy {
         res += term;
 
         // If the changed compared to the final value is small we break
-        if (term / res).modulus().abs() < PRECISION_CONVERGENCE {
+        if (term / res).modulus() < PRECISION_CONVERGENCE {
             break 'convergence;
         }
 

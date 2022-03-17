@@ -214,7 +214,7 @@ pub fn li(s: f64, z: Complex) -> Complex {
     'convergence: loop {
         res += term;
 
-        if (term / res).modulus().abs() <= 1.0e-8 {
+        if (term / res).modulus() <= 1.0e-8 {
             break 'convergence;
         }
 
@@ -437,7 +437,7 @@ where T: Into<Complex> {
     let mut res: Complex = 0.0.into();  // Result
 
     // If the term is too small we exit
-    if term.modulus().abs() < PRECISION {
+    if term.modulus() < PRECISION {
         return res;
     }
 
@@ -445,7 +445,7 @@ where T: Into<Complex> {
         res += term;
 
         // We exit when convergence reaches the precision
-        if (term / res).modulus().abs() < PRECISION {
+        if (term / res).modulus() < PRECISION {
             break 'convergence;
         }
 

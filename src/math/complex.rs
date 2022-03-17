@@ -236,11 +236,47 @@ impl Complex {
         }
     }
 
+    /// # Sinus cardinal function
+    /// Computes the cardinal sinus value of the given complex number, using the formula:
+    /// $$
+    /// \sinc(z) = \frac{\sin(z)}{z}
+    /// $$
+    /// 
+    /// ```
+    /// # use scilib::math::basic;
+    /// # use scilib::math::complex::Complex;
+    /// let zero = Complex::from(0, 0);
+    /// let res_zero = zero.sinc();
+    /// assert_eq!(res_zero, Complex::unity());
+    /// 
+    /// let real = Complex::from(2.1, 0.0);
+    /// let res_real = real.sinc();
+    /// assert_eq!(res_real, Complex::from(basic::sinc(2.1), 0.0));
+    /// 
+    /// let comp = Complex::from(0.0, -1.2);
+    /// let res_comp = comp.sinc();
+    /// assert_eq!(res_comp, Complex::from(1.257884462843477, 0.0));
+    /// 
+    /// let full = Complex::from(-1.2, 0.25);
+    /// let res_full = full.sinc();
+    /// assert_eq!(res_full, Complex::from(0.7830048555125434, 0.08684598500531493))
+    pub fn sinc(&self) -> Self {
+
+        if self.re == 0.0 && self.im == 0.0 {
+            Self {
+                re: 1.0,
+                im: 0.0
+            }
+        } else {
+            self.sin() / *self
+        }
+    }
+
     /// # Tangent function
     /// 
     /// Computes the tangent value of the given complex number, with:
     /// $$
-    /// \tan(x) = \frac{\sin(x)}{\cos(x)}
+    /// \tan(z) = \frac{\sin(z)}{\cos(z)} = \frac{\sin(2a) + i\sinh(2b)}{\cos(2a) + \cosh(2b)}
     /// $$
     /// 
     /// ```
@@ -252,7 +288,13 @@ impl Complex {
     /// assert!((res.im - 0.97157848523977).abs() < 1.0e-10);
     /// ```
     pub fn tan(&self) -> Self {
-        self.sin() / self.cos()
+
+        let pre: f64 = 1.0 / ((2.0 * self.re).cos() + (2.0 * self.im).cosh());
+        
+        pre * Self {
+            re: (2.0 * self.re).sin(),
+            im: (2.0 * self.im).sinh()
+        }
     }
 
     /// # Complex conjugation
@@ -388,7 +430,7 @@ impl Complex {
         let modulus = self.modulus();
         Self {
             re: ((modulus + self.re) / 2.0).sqrt(),
-            im: ((modulus - self.re) / 2.0).sqrt()
+            im: self.im.signum() * ((modulus - self.re) / 2.0).sqrt()
         }
     }
 }
