@@ -80,8 +80,7 @@ pub fn radial_wavefunction(n: usize, l: usize, r: f64) -> f64 {
 
 /// # Spherical harmonics
 /// 
-/// Provides the solution for the Ylm spherical harmonics in quantum mechanics. Note the the Condon-Shortley
-/// phase is computed withing the Legendre polynomial, this solution is also therefore viable for any acoustics.
+/// Provides the solution for the Ylm spherical harmonics in quantum mechanics.
 /// 
 /// ```
 /// # use scilib::quantum::spherical_harmonics;
@@ -102,7 +101,8 @@ pub fn spherical_harmonics(l: usize, m: i32, theta: f64, phi: f64) -> Complex {
     let bot: f64 = basic::factorial(l + mp as usize) as f64;
 
     // Computation with Legendre polynomial
-    let res: Complex = cpx * (norm * top / bot).sqrt() * poly.compute(theta.cos());
+    // (-1.0_f64).powi(m) term for the Condon-Shortley phase
+    let res: Complex = (-1.0_f64).powi(m) * cpx * (norm * top / bot).sqrt() * poly.compute(theta.cos());
 
     // Modifying the result depending on the sign of m
     if m.is_negative() {

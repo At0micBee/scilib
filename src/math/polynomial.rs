@@ -78,8 +78,6 @@ impl Legendre {
     /// $$
     /// P_2^1(x) = -3x
     /// $$
-    /// Note the presence of the negative is due to the Condon-Shortley phase. In future version of the
-    /// crate, the phase will likely be removed and computed in the sub-functions which need it.
     pub fn new(l: usize, m: i32) -> Self {
 
         // Checking that the range is good
@@ -97,7 +95,7 @@ impl Legendre {
         }
 
         // Computing the pre-factor associated to m
-        let mut pre_f: f64 = (-1.0_f64).powi(m);    // Condon–Shortley phase
+        let mut pre_f: f64 = 1.0;
         if m < 0 {
             pre_f *= (-1_f64).powi(m) * (basic::factorial((l as i32 - m) as usize) / basic::factorial((l as i32 + m) as usize)) as f64;
         }
@@ -167,7 +165,7 @@ impl Legendre {
     ///
     /// // Comparing to tabulated values
     /// assert_eq!(res20, -0.40625);
-    /// assert_eq!(res21, 0.7261843774138907);
+    /// assert_eq!(res21, -0.7261843774138907);
     /// ```
     pub fn compute(&self, x: f64) -> f64 {
         // Iterates through the values of the factors and powers
