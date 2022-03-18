@@ -36,43 +36,53 @@ use crate::{                // Calling other modules
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/// # Computing legal angular momentum numbers l based on n
-/// 
-/// This quantum number exists in the range [0, n-1].
+/// # Azimuthal quantum number $l$
+/// The [azimuthal quantum number](https://en.wikipedia.org/wiki/Azimuthal_quantum_number) is
+/// computed based on the value of the principal quantum number $n$.
+/// It takes the integer values:
+/// $$
+/// 0 \le l \le n-1
+/// $$
 /// 
 /// ```
 /// # use scilib::quantum::get_l;
 /// let l = get_l(3_usize);
 /// assert_eq!(l, vec![0, 1, 2]);
 /// ```
-pub fn get_l<T>(n: T) -> Vec<usize>
-where T: Into<usize> {
-    (0..n.into()).collect()
+pub fn get_l(n: usize) -> Vec<usize> {
+    (0..n).collect()
 }
 
-/// # Computing legal magnetic quantum numbers m based on l
-/// 
-/// This quantum number exists in the range [-l, l].
+/// # Magnetic quantum number $m$
+/// The [magnetic quantum number](https://en.wikipedia.org/wiki/Magnetic_quantum_number) is
+/// computed based on the value of the azimuthal quantum number $l$.
+/// It takes the integer values:
+/// $$
+/// -l \le m \le l
+/// $$
 /// 
 /// ```
 /// # use scilib::quantum::get_m;
-/// let m = get_m(2_isize);
+/// let m = get_m(2);
 /// assert_eq!(m, vec![-2, -1, 0, 1, 2]);
 /// ```
-pub fn get_m<T>(l: T) -> Vec<isize>
-where T: Into<isize> {
-    let li: isize = l.into();
-    (-li..=li).collect()
+pub fn get_m(l: i32) -> Vec<i32>{
+    (-l..=l).collect()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # Radial wave-function
+/// Computes the result of the radial wave-function, as defined by:
+/// $$
+/// R_n^l(r) = \sqrt{\left( \frac{2}{na_B} \right)^3 \frac{(n-l-1)!}{2n\cdot(n+l)!}} \cdot \left( \frac{2r}{na_B} \right)^l
+/// L_{n-l-1}^{2l+1}\left( \frac{2r}{na_B} \right) \exp\left( -\frac{r}{na_B} \right)
+/// $$
+/// With $L_n^m$ the Laguerre polynomials.
 /// 
 /// This function derives the normalization factor and the associated Laguerre polynomial
-/// to compute any wave function. This operation is quite costly, but achieves any possible
-/// `n, l` combination. An array version will be implemented as well to avoid recomputing
-/// these factors for a single `n, l` pair.
+/// to compute any wave function. We provide the principal quantum number `n` ($n$) and the
+/// azimuthal quantum number `l` ($l$), as well as the radius at which to compute the solution.
 /// 
 /// ```
 /// # use scilib::quantum::radial_wavefunction;
@@ -98,7 +108,7 @@ pub fn radial_wavefunction(n: usize, l: usize, r: f64) -> f64 {
 /// # Radial wave-function for vectors
 /// 
 /// Similar to `radial_wavefunction`, but computes the resulting values for a vector.
-/// This has the advantages to speed things up a lot when a lot of values are required,
+/// This has the advantages to speed things up when a lot of values are required,
 /// as the norm doesn't have to be computed at each pass, as well as the polynomial.
 /// 
 /// ```
@@ -133,8 +143,14 @@ pub fn radial_vec(n: usize, l: usize, r: &[f64]) -> Vec<f64> {
 }
 
 /// # Spherical harmonics
+/// Provides the solution to the angular $Y_l^m(\theta, \phi)$ wave-function:
+/// $$
+/// Y_l^m(\theta, \phi) = (-1)^m \sqrt{\frac{(2l+1)}{4\pi}\frac{(l-m)!}{(l+m)!}} P_l^m(\cos(\theta)) \exp(im\phi)
+/// $$
+/// With $P_n^m$ the Legendre polynomials.
 /// 
-/// Provides the solution for the Ylm spherical harmonics in quantum mechanics.
+/// For any `l` ($l$) the azimuthal quantum number and `m` ($m$) the magnetic quantum number. The equation
+/// produces the solution for a given set of angles $\theta$ and $\phi$.
 /// 
 /// ```
 /// # use scilib::quantum::spherical_harmonics;
