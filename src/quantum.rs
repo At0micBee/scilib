@@ -65,7 +65,9 @@ where T: Into<isize> {
     (-li..=li).collect()
 }
 
-/// # Radial wavefunctions
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/// # Radial wave-function
 /// 
 /// This function derives the normalization factor and the associated Laguerre polynomial
 /// to compute any wave function. This operation is quite costly, but achieves any possible
@@ -93,7 +95,42 @@ pub fn radial_wavefunction(n: usize, l: usize, r: f64) -> f64 {
     (2.0 * factor).powi(l as i32) * norm.sqrt() * poly * (-factor).exp()
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// # Radial wave-function for vectors
+/// 
+/// Similar to `radial_wavefunction`, but computes the resulting values for a vector.
+/// This has the advantages to speed things up a lot when a lot of values are required,
+/// as the norm doesn't have to be computed at each pass, as well as the polynomial.
+/// 
+/// ```
+/// # use scilib::range;
+/// # use scilib::quantum::radial_vec;
+/// // Computing the Rnl for n=2, l=1
+/// let x: Vec<f64> = range::linear(0, 1e-9, 500);
+/// let res = radial_vec(2, 1, &x);
+/// ```
+pub fn radial_vec(n: usize, l: usize, r: &[f64]) -> Vec<f64> {
+
+    // Preparing the poly
+    let poly = polynomial::Laguerre::new(n - l - 1, 2 * l as i32 + 1);
+
+    // Computing the norm of the function
+    let mut norm: f64 = (2.0 / (n as f64 * cst::A_0)).powi(3);
+    norm *= basic::factorial(n - l - 1) as f64 / (2 * n * basic::factorial(n + l)) as f64;
+    norm = norm.sqrt();
+
+    // Div part of the factor
+    let div: f64 = 1.0 / (n as f64 * cst::A_0);
+
+    // We initialize the values of the result with the polynomial
+    let mut res: Vec<f64> = r.iter().map(|rad| poly.compute(2.0 * rad * div)).collect();
+
+    // Computing the other parts of the function
+    for (elem, rad) in res.iter_mut().zip(r) {
+        *elem *= (2.0 * rad * div).powi(l as i32) * norm * (-rad * div).exp();
+    }
+    
+    res
+}
 
 /// # Spherical harmonics
 /// 
