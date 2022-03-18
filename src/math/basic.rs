@@ -132,6 +132,12 @@ where T: Into<usize> {
 
 /// # Stieltjes Gamma function
 /// 
+/// Based on the Stieltjes coefficients, the [Stieltjes gamma function](https://en.wikipedia.org/wiki/Stieltjes_constants)
+/// computes associated values, based on the formula:
+/// $$
+/// \gamma_n(x) = \lim_{m \to \infty} \sum_{k=0}^m \left( \frac{\ln(k+x)^n}{k+x} - \frac{\ln(m+x)^{n+1}}{n+1} \right)
+/// $$
+/// 
 /// `n` is the order of the Stieltjes function to use.
 /// `a` is the value at which to compute the function.
 /// 
@@ -141,7 +147,6 @@ where T: Into<usize> {
 /// ```
 /// # use scilib::math::basic::stieltjes;
 /// let res1 = stieltjes(0, 1.0.into());
-/// 
 /// assert!((res1.re - 0.577215664).abs() <= 1e-6);
 /// ```
 pub fn stieltjes(n: usize, a: Complex) -> Complex {
@@ -197,6 +202,23 @@ where T: Into<f64>, U: Into<Complex> {
 }
 
 /// # Polylogarithm
+/// 
+/// The [polylogarithm](https://en.wikipedia.org/wiki/Polylogarithm) is defined by an infinite series:
+/// $$
+/// Li_s(z) = \sum_{k=1}^\infty \frac{z^k}{k^s}
+/// $$
+/// Because of these properties, the polylogarithm can be computed only for $|z|<= 1$.
+/// 
+/// `s` is the power of the divisor ($s$) and `z` is the computed value ($s$).
+/// 
+/// ```
+/// # use scilib::math::complex::Complex;
+/// # use scilib::math::basic::li;
+/// let val: Complex = Complex::from(0.52, -0.55);
+/// let res = li(1.35, val);
+/// assert!((res.re - 0.38167313).abs() <= 1.0e-8);
+/// assert!((res.im - -0.794472094).abs() <= 1.0e-8);
+/// ```
 pub fn li(s: f64, z: Complex) -> Complex {
 
     let mut n: usize = 1;
