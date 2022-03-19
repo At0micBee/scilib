@@ -1,10 +1,9 @@
-# Scilib
+
+![](./branding/Scilib.png)
 
 ![](https://img.shields.io/docsrs/scilib?label=Tests&style=flat-square)
 ![](https://img.shields.io/crates/v/scilib?style=flat-square)
 ![](https://img.shields.io/crates/l/scilib?style=flat-square)
-
-> A Rust crate for scientific processes
 
 ---
 
