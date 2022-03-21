@@ -65,6 +65,12 @@ pub fn frequency_vec(temperature: f64, nu: &Vec<f64>) -> Vec<f64> {
 /// 
 /// The function uses `temperature` ($T$) the temperature of the body, `lambda` ($\lambda$) the wavelength to evaluate,
 /// and returns the corresponding irradiance.
+/// 
+/// ```
+/// # use scilib::planck;
+/// let res = planck::wavelength(5700.0, 0.4e-6);
+/// assert!((res - 2.118e13).abs() <= 1.0e10);
+/// ```
 pub fn wavelength(temperature: f64, lambda: f64) -> f64 {
 
     let factor: f64 = 2.0 * cst::H * cst::C.powi(2) / lambda.powi(5);
@@ -81,6 +87,15 @@ pub fn wavelength(temperature: f64, lambda: f64) -> f64 {
 /// 
 /// The function uses `temperature` ($T$) the temperature of the body, `lambda` ($\lambda$) the wavelengths to evaluate,
 /// and returns the corresponding irradiances.
+/// 
+/// ```
+/// # use scilib::range;
+/// # use scilib::planck;
+/// let wave = range::linear(0.0, 5e-6, 15);
+/// let temp: f64 = 5700.0;
+/// let res = planck::wavelength_vec(temp, &wave);
+/// assert!((res[8] - 4.408e11).abs() < 1.0e8);
+/// ```
 pub fn wavelength_vec(temperature: f64, lambda: &Vec<f64>) -> Vec<f64> {
 
     let factor: f64 = 2.0 * cst::H * cst::C.powi(2);
