@@ -2,7 +2,7 @@ fn chunk_quad(a: f64, offset: f64) -> f64 {
     a * offset
 }
 
-fn chunk_trapez(a: f64, b: f64, offset: f64) -> f64 {
+fn chunk_trapz(a: f64, b: f64, offset: f64) -> f64 {
     (a + b) / 2.0 * offset
 }
 
@@ -37,15 +37,14 @@ pub fn quad_fn(
 ) -> f64 {
     assert!(div >= 1);
     let mut area = 0.0;
-    let offset = upper_bound - lower_bound;
-    let step = offset / div as f64;
+    let step = (upper_bound - lower_bound) / div as f64;
     for i in 0..div {
-        area += chunk_quad(function(step * (i as f64 + 1.0)), step);
+        area += chunk_quad(function(step * (i as f64 + 1.0) + lower_bound), step);
     }
     area
 }
 
-pub fn trapez_fn(
+pub fn trapz_fn(
     function: impl Fn(f64) -> f64,
     lower_bound: f64,
     upper_bound: f64,
@@ -53,12 +52,11 @@ pub fn trapez_fn(
 ) -> f64 {
     assert!(div >= 1);
     let mut area = 0.0;
-    let offset = upper_bound - lower_bound;
-    let step = offset / div as f64;
+    let step = (upper_bound - lower_bound) / div as f64;
     let mut a = function(lower_bound);
     for i in 0..div {
-        let b = function(step * (i as f64 + 1.0));
-        area += chunk_trapez(a, b, step);
+        let b = function(step * (i as f64 + 1.0) + lower_bound);
+        area += chunk_trapz(a, b, step);
         a = b;
     }
     area
@@ -72,8 +70,7 @@ pub fn simp_fn(
 ) -> f64 {
     assert!(div >= 2);
     let mut area = 0.0;
-    let offset = upper_bound - lower_bound;
-    let step = offset / div as f64;
+    let step = (upper_bound - lower_bound) / div as f64;
     let mut p0 = (lower_bound, function(lower_bound));
     let mut current_pos = lower_bound + step;
     let mut p1 = (current_pos, function(current_pos));
@@ -96,10 +93,10 @@ pub fn quad_dt_tup(data: &[(f64, f64)]) -> f64 {
     area
 }
 
-pub fn trapez_dt_tup(data: &[(f64, f64)]) -> f64 {
+pub fn trapz_dt_tup(data: &[(f64, f64)]) -> f64 {
     let mut area = 0.0;
     for i in 0..data.len() - 1 {
-        area += chunk_trapez(data[i].1, data[i + 1].1, data[i + 1].0 - data[i].0);
+        area += chunk_trapz(data[i].1, data[i + 1].1, data[i + 1].0 - data[i].0);
     }
     area
 }
@@ -122,11 +119,11 @@ pub fn quad_dt_sep(x: &[f64], y: &[f64]) -> f64 {
     area
 }
 
-pub fn trapez_dt_sep(x: &[f64], y: &[f64]) -> f64 {
+pub fn trapz_dt_sep(x: &[f64], y: &[f64]) -> f64 {
     assert!(x.len() == y.len());
     let mut area = 0.0;
     for i in 0..x.len() - 1 {
-        area += chunk_trapez(y[i], y[i + 1], x[i + 1] - x[i]);
+        area += chunk_trapz(y[i], y[i + 1], x[i + 1] - x[i]);
     }
     area
 }
