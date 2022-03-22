@@ -68,17 +68,16 @@ pub fn simp_fn(
     upper_bound: f64,
     div: usize,
 ) -> f64 {
-    assert!(div >= 2);
+    assert!(div >= 2 && div % 2 == 0);
     let mut area = 0.0;
     let step = (upper_bound - lower_bound) / div as f64;
     let mut p0 = (lower_bound, function(lower_bound));
-    let mut current_pos = lower_bound + step;
-    let mut p1 = (current_pos, function(current_pos));
-    current_pos += step;
-    for i in 1..div {
-        let p2 = (current_pos, function(current_pos));
+    let mut curr_pos = lower_bound + step;
+    let mut p1 = (curr_pos, function(curr_pos));
+    for i in (1..div).step_by(2) {
+        curr_pos = lower_bound + (i + 2) as f64 * step;
+        let p2 = (curr_pos, function(curr_pos));
         area += chunk_simp(p0, p1, p2);
-        current_pos += step;
         p0 = p1;
         p1 = p2;
     }
@@ -102,9 +101,9 @@ pub fn trapz_dt_tup(data: &[(f64, f64)]) -> f64 {
 }
 
 pub fn simp_dt_tup(data: &[(f64, f64)]) -> f64 {
-    assert!(data.len() >= 3);
+    assert!(data.len() >= 3 && data.len() % 2 == 1);
     let mut area = 0.0;
-    for i in 0..data.len() - 2 {
+    for i in (0..data.len() - 2).step_by(2) {
         area += chunk_simp(data[i], data[i + 1], data[i + 2]);
     }
     area
@@ -129,9 +128,9 @@ pub fn trapz_dt_sep(x: &[f64], y: &[f64]) -> f64 {
 }
 
 pub fn simp_dt_sep(x: &[f64], y: &[f64]) -> f64 {
-    assert!(x.len() == y.len() && x.len() >= 3);
+    assert!(x.len() == y.len() && x.len() >= 3 && x.len() % 2 == 1);
     let mut area = 0.0;
-    for i in 0..x.len() - 2 {
+    for i in (0..x.len() - 2).step_by(2) {
         area += chunk_simp((x[i], y[i]), (x[i + 1], y[i + 1]), (x[i + 2], y[i + 2]));
     }
     area
