@@ -99,9 +99,7 @@ pub fn wavelength(temperature: f64, lambda: f64) -> f64 {
 pub fn wavelength_vec(temperature: f64, lambda: &Vec<f64>) -> Vec<f64> {
 
     let factor: f64 = 2.0 * cst::H * cst::C.powi(2);
-    println!("{}", factor);
     let pre: f64 = cst::H * cst::C / (cst::K_B * temperature);
-    println!("{}", pre);
 
     lambda.iter().map(|val| factor / (val.powi(5) * ( (pre / val).exp() - 1.0 )) ).collect()
 }

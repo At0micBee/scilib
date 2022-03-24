@@ -12,11 +12,9 @@
 /// ```
 /// # use scilib::range::by_increment;
 /// let res = by_increment(2.0, -1.0, -0.5);
-/// 
 /// assert_eq!(res[0], 2.0);
 /// assert_eq!(res.last().unwrap(), &-1.0);
 /// assert_eq!(res.len(), 7);
-/// 
 /// ```
 pub fn by_increment<T, U, V>(start: T, stop: U, step: V) -> Vec<f64>
 where T: Into<f64>, U: Into<f64>, V: Into<f64> {
@@ -52,7 +50,6 @@ where T: Into<f64>, U: Into<f64>, V: Into<f64> {
 /// ```
 /// # use scilib::range::linear;
 /// let r = linear(0.0, -10.0, 15);
-/// 
 /// assert_eq!(r[0], 0.0);
 /// assert_eq!(r.last().unwrap(), &-10.0);
 /// assert_eq!(r.len(), 15);
@@ -85,7 +82,6 @@ where T: Into<f64>, U: Into<f64> {
 /// ```
 /// # use scilib::range::logarithmic;
 /// let r = logarithmic(0.1, 10.0, 15, 10.0);
-/// 
 /// assert!((r[0] - 0.1).abs() < 1.0e-15);  // Start is correct
 /// assert!((r[7] - 1.0).abs() < 1.0e-15);  // Distribution is correct
 /// assert_eq!(r.last().unwrap(), &10.0);   // End is correct

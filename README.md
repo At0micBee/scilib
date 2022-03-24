@@ -9,9 +9,7 @@
 
 # Overview
 
-This crate is designed to help any mathematical or scientific processes for the Rust community. It compiles many useful concepts and items that are key in scientific applications, such as Bessel functions, statistical analysis, physical constants, etc...
-
-The aim is to provide classical functions in pure Rust, for ease of operability.
+This crate is designed to help any mathematical or scientific processes for the Rust community. It compiles many useful concepts and items that are key in many scientific domains. The aim of the crate is to provide these functions in pure Rust, to avoid any dependencies.
 
 ---
 
@@ -20,8 +18,8 @@ The aim is to provide classical functions in pure Rust, for ease of operability.
 As of the creation of this readme, I am working on this project alone which means a few things:
 
 1. The progression will be linked to my schedule
-2. I will work firsts on concept with which I am familiar with
-3. I am a self-taught developer, some solutions could be sub-optimal and thus improved
+2. I will work firsts on concept I am familiar with
+3. I am a self-taught developer, some solutions could be sub-optimal and thus improved, any help is welcome!
 
 The schedule of the development of the crate is not clear, as I am for now writing this as a side project. I plan on adding many useful functions from a physics point of view, but will expand as I go. For now, my long term objectives are: Astrophysics, Thermodynamics, Quantum mechanics, Electromagnetism.
 
