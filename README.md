@@ -1,5 +1,5 @@
 
-![](./branding/Scilib.png)
+![](https://raw.githubusercontent.com/At0micBee/scilib/master/branding/Scilib.png)
 
 ![](https://img.shields.io/docsrs/scilib?label=Tests&style=flat-square)
 ![](https://img.shields.io/crates/v/scilib?style=flat-square)
