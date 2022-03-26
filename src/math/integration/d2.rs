@@ -1,4 +1,9 @@
-pub fn quad_fn(
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/// # (d2) Rectangle rule
+/// Integrate two-dimensional function through the rectangle rule.
+pub fn rect(
     function: impl Fn(f64, f64) -> f64,
     x_lower_bound: f64,
     x_upper_bound: f64,
@@ -23,7 +28,7 @@ pub fn quad_fn(
     step_x * area
 }
 
-fn trapz_fn_sub_y(
+fn trapz_sub_y(
     function: impl Fn(f64, f64) -> f64,
     curr_x: f64,
     y_lower_bound: impl Fn(f64) -> f64 + Copy,
@@ -42,7 +47,9 @@ fn trapz_fn_sub_y(
     step * area / 2.0
 }
 
-pub fn trapz_fn(
+/// # (d2) Trapezoidal rule
+/// Integrate two-dimensional function through the trapezoidal rule.
+pub fn trapz(
     function: impl Fn(f64, f64) -> f64 + Copy,
     x_lower_bound: f64,
     x_upper_bound: f64,
@@ -55,11 +62,11 @@ pub fn trapz_fn(
 
     let step = (x_upper_bound - x_lower_bound) / div_x as f64;
     let mut save_previous =
-        trapz_fn_sub_y(function, x_lower_bound, y_lower_bound, y_upper_bound, div_y);
+        trapz_sub_y(function, x_lower_bound, y_lower_bound, y_upper_bound, div_y);
     let mut area = 0.0;
 
     for i in 0..div_x {
-        let next_value = trapz_fn_sub_y(
+        let next_value = trapz_sub_y(
             function,
             x_lower_bound + (i + 1) as f64 * step,
             y_lower_bound,
@@ -70,4 +77,21 @@ pub fn trapz_fn(
         save_previous = next_value;
     }
     step * area / 2.0
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#[test]
+fn test_d1() {
+    use std::f64::consts::PI;
+    {
+        println!(
+            "value : {}",
+            rect(|x, y| x * y, -4.0, 7.0, |x| x / 2.0, |x| 2.0* x, 10000, 10000)
+        );
+        println!(
+            "value : {}",
+            trapz(|x, y| x * y, -4.0, 7.0, |x| x / 2.0, |x| 2.0* x, 10000, 100)
+        );
+    }
 }

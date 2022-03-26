@@ -1,4 +1,7 @@
-fn chunk_quad(a: f64, offset: f64) -> f64 {
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+fn chunk_rect(a: f64, offset: f64) -> f64 {
     a * offset
 }
 
@@ -14,7 +17,11 @@ fn chunk_simp(
     (p2.0 - p0.0) / 6.0 * (p0.1 + 4.0 * p1 + p2.1)
 }
 
-pub fn quad_fn(
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/// # (d1) Rectangle rule - Function
+/// Integrate one-dimensional function through the rectangle rule.
+pub fn rect_fn(
     function: impl Fn(f64) -> f64,
     lower_bound: f64,
     upper_bound: f64,
@@ -24,7 +31,7 @@ pub fn quad_fn(
     let mut area = 0.0;
     let step = (upper_bound - lower_bound) / div as f64;
     for i in 0..div {
-        area += chunk_quad(function(step * (i as f64) + lower_bound), step);
+        area += chunk_rect(function(step * (i as f64) + lower_bound), step);
     }
     area
 }
@@ -33,25 +40,25 @@ pub fn quad_fn(
 fn test_d1() {
     use std::f64::consts::PI;
     {
-        let count = 10_001; //odd number required for simp method
+        let count = 1_000_001; //odd number required for simp method
         let mut data = vec![(0.0, 0.0); count];
-        let lower_bound = -2.0;
-        let upper_bound = 10.0;
+        let lower_bound = -2000.0;
+        let upper_bound = 1000.0;
         let step = (upper_bound - lower_bound) / (count - 1) as f64;
         for i in 0..count {
             let x = lower_bound + i as f64 * step;
-            data[i] = (x, x.exp());
+            data[i] = (x, x.cos());
         }
-        println!("dt value : {}", quad_dt_tup(&data));
+        println!("dt value : {}", rect_dt_tup(&data));
         println!("dt value : {}", trapz_dt_tup(&data));
         println!("dt value : {}", simp_dt_tup(&data));
     }
     {
         println!(
             "fn value : {}",
-            quad_fn(|x| x.cos(), PI * 2.0, PI * 2.0 + PI / 2.0, 1000)
+            rect_fn(|x| x.cos(), PI * 2.0, PI * 2.0 + PI / 2.0, 1000)
         );
-        println!("fn value : {}", quad_fn(|x| x.exp(), -2.0, 10.0, 100_000_000));
+        println!("fn value : {}", rect_fn(|x| x.exp(), -2.0, 10.0, 100_000_000));
         println!(
             "fn value : {}",
             trapz_fn(|x| x.cos(), PI * 2.0, PI * 2.0 + PI / 2.0, 100)
@@ -65,6 +72,8 @@ fn test_d1() {
     }
 }
 
+/// # (d1) Trapezoidal rule - Function
+/// Integrate one-dimensional function through the trapezoidal rule.
 pub fn trapz_fn(
     function: impl Fn(f64) -> f64,
     lower_bound: f64,
@@ -83,6 +92,8 @@ pub fn trapz_fn(
     area
 }
 
+/// # (d1) Simpson rule - Function
+/// Integrate one-dimensional function through the simpson rule.
 pub fn simp_fn(
     function: impl Fn(f64) -> f64,
     lower_bound: f64,
@@ -102,14 +113,20 @@ pub fn simp_fn(
     area
 }
 
-pub fn quad_dt_tup(data: &[(f64, f64)]) -> f64 {
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/// # (d1) Rectangle rule - Data by tuples
+/// Integrate one-dimensional function represented by data enclosed in tuples through the rectangle rule.
+pub fn rect_dt_tup(data: &[(f64, f64)]) -> f64 {
     let mut area = 0.0;
     for i in 0..data.len() - 1 {
-        area += chunk_quad(data[i].1, data[i + 1].0 - data[i].0);
+        area += chunk_rect(data[i].1, data[i + 1].0 - data[i].0);
     }
     area
 }
 
+/// # (d1) Trapezoidal rule - Data by tuples
+/// Integrate one-dimensional function represented by data enclosed in tuples through the trapezoidal rule.
 pub fn trapz_dt_tup(data: &[(f64, f64)]) -> f64 {
     let mut area = 0.0;
     for i in 0..data.len() - 1 {
@@ -118,7 +135,7 @@ pub fn trapz_dt_tup(data: &[(f64, f64)]) -> f64 {
     area
 }
 
-/// # /!\ UNSTABLE IF (RANGE / DIV) >= 100_000
+/// # /!\ UNSTABLE IF DIV >= 100_000
 fn chunk_simp_dt(
     p0: (f64 /*a0*/, f64 /*b0*/),
     p1: (f64 /*a1*/, f64 /*b1*/),
@@ -142,6 +159,8 @@ fn chunk_simp_dt(
     l2 - l0
 }
 
+/// # (d1) Simpson rule - Data by tuples
+/// Integrate one-dimensional function represented by data enclosed in tuples through the trapezoidal rule.
 pub fn simp_dt_tup(data: &[(f64, f64)]) -> f64 {
     assert!(data.len() >= 3 && data.len() % 2 == 1);
     let mut area = 0.0;
@@ -151,15 +170,21 @@ pub fn simp_dt_tup(data: &[(f64, f64)]) -> f64 {
     area
 }
 
-pub fn quad_dt_sep(x: &[f64], y: &[f64]) -> f64 {
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/// # (d1) Rectangle rule - Data by slices
+/// Integrate one-dimensional function represented by data enclosed in slices through the rectangle rule.
+pub fn rect_dt_sep(x: &[f64], y: &[f64]) -> f64 {
     assert!(x.len() == y.len());
     let mut area = 0.0;
     for i in 0..x.len() - 1 {
-        area += chunk_quad(y[i], x[i + 1] - x[i]);
+        area += chunk_rect(y[i], x[i + 1] - x[i]);
     }
     area
 }
 
+/// # (d1) Trapezoidal rule - Data by slices
+/// Integrate one-dimensional function represented by data enclosed in slices through the trapezoidal rule.
 pub fn trapz_dt_sep(x: &[f64], y: &[f64]) -> f64 {
     assert!(x.len() == y.len());
     let mut area = 0.0;
@@ -169,6 +194,8 @@ pub fn trapz_dt_sep(x: &[f64], y: &[f64]) -> f64 {
     area
 }
 
+/// # (d1) Simpson rule - Data by slices
+/// Integrate one-dimensional function represented by data enclosed in slices through the simpson rule.
 pub fn simp_dt_sep(x: &[f64], y: &[f64]) -> f64 {
     assert!(x.len() == y.len() && x.len() >= 3 && x.len() % 2 == 1);
     let mut area = 0.0;
@@ -177,3 +204,5 @@ pub fn simp_dt_sep(x: &[f64], y: &[f64]) -> f64 {
     }
     area
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
