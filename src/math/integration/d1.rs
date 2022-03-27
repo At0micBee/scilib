@@ -20,7 +20,11 @@ fn chunk_simp(
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # (d1) Rectangle rule - Function
-/// Integrate one-dimensional function through the rectangle rule.
+/// Integrate one-dimensional function through the rectangle rule:
+/// * `function` - Closure or function pointer matching `f(x) = y`
+/// * `lower_bound` - First limit of the integral (Fixed value)
+/// * `upper_bound` - Second limit of the integral (Fixed value)
+/// * `div` - Number of chunk evaluated: _big_ = high precision & low performances, _small_ = high performances & low precision
 pub fn rect_fn(
     function: impl Fn(f64) -> f64,
     lower_bound: f64,
@@ -42,12 +46,12 @@ fn test_d1() {
     {
         let count = 1_000_001; //odd number required for simp method
         let mut data = vec![(0.0, 0.0); count];
-        let lower_bound = -2000.0;
-        let upper_bound = 1000.0;
+        let lower_bound = -10.0;
+        let upper_bound = 10.0;
         let step = (upper_bound - lower_bound) / (count - 1) as f64;
         for i in 0..count {
             let x = lower_bound + i as f64 * step;
-            data[i] = (x, x.cos());
+            data[i] = (x, x);
         }
         println!("dt value : {}", rect_dt_tup(&data));
         println!("dt value : {}", trapz_dt_tup(&data));
@@ -73,7 +77,11 @@ fn test_d1() {
 }
 
 /// # (d1) Trapezoidal rule - Function
-/// Integrate one-dimensional function through the trapezoidal rule.
+/// Integrate one-dimensional function through the trapezoidal rule:
+/// * `function` - Closure or function pointer matching `f(x) = y`
+/// * `lower_bound` - First limit of the integral (Fixed value)
+/// * `upper_bound` - Second limit of the integral (Fixed value)
+/// * `div` - Number of chunk evaluated: _big_ = high precision & low performances, _small_ = high performances & low precision
 pub fn trapz_fn(
     function: impl Fn(f64) -> f64,
     lower_bound: f64,
@@ -92,8 +100,12 @@ pub fn trapz_fn(
     area
 }
 
-/// # (d1) Simpson rule - Function
-/// Integrate one-dimensional function through the simpson rule.
+/// # (d1) Simpson's rule - Function
+/// Integrate one-dimensional function through the simpson rule:
+/// * `function` - Closure or function pointer matching `f(x) = y`
+/// * `lower_bound` - First limit of the integral (Fixed value)
+/// * `upper_bound` - Second limit of the integral (Fixed value)
+/// * `div` - Number of chunk evaluated: _big_ = high precision & low performances, _small_ = high performances & low precision
 pub fn simp_fn(
     function: impl Fn(f64) -> f64,
     lower_bound: f64,
@@ -116,7 +128,8 @@ pub fn simp_fn(
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # (d1) Rectangle rule - Data by tuples
-/// Integrate one-dimensional function represented by data enclosed in tuples through the rectangle rule.
+/// Integrate one-dimensional function represented by data enclosed in tuples through the rectangle rule:
+/// * `data` - array of tuples corresponding to `x` and `y` rescpectively
 pub fn rect_dt_tup(data: &[(f64, f64)]) -> f64 {
     let mut area = 0.0;
     for i in 0..data.len() - 1 {
@@ -126,7 +139,8 @@ pub fn rect_dt_tup(data: &[(f64, f64)]) -> f64 {
 }
 
 /// # (d1) Trapezoidal rule - Data by tuples
-/// Integrate one-dimensional function represented by data enclosed in tuples through the trapezoidal rule.
+/// Integrate one-dimensional function represented by data enclosed in tuples through the trapezoidal rule:
+/// * `data` - array of tuples corresponding to `x` and `y` rescpectively
 pub fn trapz_dt_tup(data: &[(f64, f64)]) -> f64 {
     let mut area = 0.0;
     for i in 0..data.len() - 1 {
@@ -135,32 +149,21 @@ pub fn trapz_dt_tup(data: &[(f64, f64)]) -> f64 {
     area
 }
 
-/// # /!\ UNSTABLE IF DIV >= 100_000
 fn chunk_simp_dt(
     p0: (f64 /*a0*/, f64 /*b0*/),
     p1: (f64 /*a1*/, f64 /*b1*/),
     p2: (f64 /*a2*/, f64 /*b2*/),
 ) -> f64 {
-    let coeff0 = p0.1 / ((p0.0 - p1.0) * (p0.0 - p2.0));
-    let coeff1 = p1.1 / ((p1.0 - p0.0) * (p1.0 - p2.0));
-    let coeff2 = p2.1 / ((p2.0 - p0.0) * (p2.0 - p1.0));
-    let a1_a2 = p1.0 + p2.0;
-    let a0_a2 = p0.0 + p2.0;
-    let a0_a1 = p0.0 + p1.0;
-    let a1a2 = p1.0 * p2.0;
-    let a0a2 = p0.0 * p2.0;
-    let a0a1 = p0.0 * p1.0;
-    let l0 = coeff0 * (p0.0.powi(3) / 3.0 - p0.0.powi(2) / 2.0 * a1_a2 + p0.0 * a1a2)
-        + coeff1 * (p0.0.powi(3) / 3.0 - p0.0.powi(2) / 2.0 * a0_a2 + p0.0 * a0a2)
-        + coeff2 * (p0.0.powi(3) / 3.0 - p0.0.powi(2) / 2.0 * a0_a1 + p0.0 * a0a1);
-    let l2 = coeff0 * (p2.0.powi(3) / 3.0 - p2.0.powi(2) / 2.0 * a1_a2 + p2.0 * a1a2)
-        + coeff1 * (p2.0.powi(3) / 3.0 - p2.0.powi(2) / 2.0 * a0_a2 + p2.0 * a0a2)
-        + coeff2 * (p2.0.powi(3) / 3.0 - p2.0.powi(2) / 2.0 * a0_a1 + p2.0 * a0a1);
-    l2 - l0
+    let h0 = p1.0 - p0.0;
+    let h1 = p2.0 - p1.0;
+    (h0 + h1) / 6.0 * ((2.0 - h1 / h0) * p0.1 + (h0 + h1).powi(2) / (h0 * h1) * p1.1 + (2.0 - h0 / h1) * p2.1)
 }
 
-/// # (d1) Simpson rule - Data by tuples
-/// Integrate one-dimensional function represented by data enclosed in tuples through the trapezoidal rule.
+/// # (d1) Simpson's rule - Data by tuples
+/// Integrate one-dimensional function represented by data enclosed in tuples through the trapezoidal rule:
+/// * `data` - array of tuples corresponding to `x` and `y` rescpectively
+/// 
+/// **CAUTION**: `data.len()` must be an uneven number greater than 3
 pub fn simp_dt_tup(data: &[(f64, f64)]) -> f64 {
     assert!(data.len() >= 3 && data.len() % 2 == 1);
     let mut area = 0.0;
@@ -173,7 +176,9 @@ pub fn simp_dt_tup(data: &[(f64, f64)]) -> f64 {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # (d1) Rectangle rule - Data by slices
-/// Integrate one-dimensional function represented by data enclosed in slices through the rectangle rule.
+/// Integrate one-dimensional function represented by data enclosed in slices through the rectangle rule:
+/// * `x` - array of x-coordinates
+/// * `y` - array of y-coordinates
 pub fn rect_dt_sep(x: &[f64], y: &[f64]) -> f64 {
     assert!(x.len() == y.len());
     let mut area = 0.0;
@@ -184,7 +189,9 @@ pub fn rect_dt_sep(x: &[f64], y: &[f64]) -> f64 {
 }
 
 /// # (d1) Trapezoidal rule - Data by slices
-/// Integrate one-dimensional function represented by data enclosed in slices through the trapezoidal rule.
+/// Integrate one-dimensional function represented by data enclosed in slices through the trapezoidal rule:
+/// * `x` - array of x-coordinates
+/// * `y` - array of y-coordinates
 pub fn trapz_dt_sep(x: &[f64], y: &[f64]) -> f64 {
     assert!(x.len() == y.len());
     let mut area = 0.0;
@@ -194,8 +201,10 @@ pub fn trapz_dt_sep(x: &[f64], y: &[f64]) -> f64 {
     area
 }
 
-/// # (d1) Simpson rule - Data by slices
-/// Integrate one-dimensional function represented by data enclosed in slices through the simpson rule.
+/// # (d1) Simpson's rule - Data by slices
+/// Integrate one-dimensional function represented by data enclosed in slices through the simpson rule:
+/// * `x` - array of x-coordinates
+/// * `y` - array of y-coordinates
 pub fn simp_dt_sep(x: &[f64], y: &[f64]) -> f64 {
     assert!(x.len() == y.len() && x.len() >= 3 && x.len() % 2 == 1);
     let mut area = 0.0;
