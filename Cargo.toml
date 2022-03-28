@@ -4,7 +4,7 @@ description = "A scientific library for the Rust programming language."
 authors = ["Hugo G. 'AtomicBee' Vivien <hugo.vivien@pm.me>"]
 categories = ["science", "mathematics"]
 keywords = ["physics", "bessel", "fft", "coordinates", "quantum"]
-version = "0.4.1"
+version = "0.4.2"
 
 repository = "https://github.com/At0micBee/scilib"
 documentation = "https://docs.rs/scilib/"
