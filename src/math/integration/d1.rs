@@ -30,7 +30,6 @@ fn chunk_simp(
 /// # use scilib::math::integration::d1::*;
 /// # use std::f64::consts::PI;
 /// let res = rect_fn(|x| x.cos(), PI * 2.0, PI * 2.0 + PI / 2.0, 1000);
-/// println!("{}", res);
 /// assert!((res - 1.0).abs() < 1.0e-3);
 /// ```
 pub fn rect_fn(
@@ -48,42 +47,6 @@ pub fn rect_fn(
     area
 }
 
-#[test]
-fn test_d1() {
-    use std::f64::consts::PI;
-    /*{
-        let count = 1_000_001; //odd number required for simp method
-        let mut data = vec![(0.0, 0.0); count];
-        let lower_bound = -10.0;
-        let upper_bound = 10.0;
-        let step = (upper_bound - lower_bound) / (count - 1) as f64;
-        for i in 0..count {
-            let x = lower_bound + i as f64 * step;
-            data[i] = (x, x);
-        }
-        println!("dt value : {}", rect_dt_tup(&data));
-        println!("dt value : {}", trapz_dt_tup(&data));
-        println!("dt value : {}", simp_dt_tup(&data));
-    }
-    {
-        println!(
-            "fn value : {}",
-            rect_fn(|x| x.cos(), PI * 2.0, PI * 2.0 + PI / 2.0, 1000)
-        );
-        println!("fn value : {}", rect_fn(|x| x.exp(), -2.0, 10.0, 100_000_000));
-        println!(
-            "fn value : {}",
-            trapz_fn(|x| x.cos(), PI * 2.0, PI * 2.0 + PI / 2.0, 100)
-        );
-        println!("fn value : {}", trapz_fn(|x| x.exp(), -2.0, 10.0, 10_000));
-        println!(
-            "fn value : {}",
-            simp_fn(|x| x.cos(), PI * 2.0, PI * 2.0 + PI / 2.0, 100)
-        );
-        println!("fn value : {}", simp_fn(|x| x.exp(), -2.0, 10.0, 500));
-    }*/
-}
-
 /// # (d1) Trapezoidal rule - Function
 /// Integrate one-dimensional function through the trapezoidal rule:
 /// * `function` - Closure or function pointer matching `f(x) = y`
@@ -94,7 +57,6 @@ fn test_d1() {
 /// ```
 /// # use scilib::math::integration::d1::*;
 /// let res = trapz_fn(|x| x.exp(), -2.0, 10.0, 10_000);
-/// println!("{}", res);
 /// assert!((res - 22026.3304).abs() < 1.0e-2);
 /// ```
 pub fn trapz_fn(
@@ -125,7 +87,6 @@ pub fn trapz_fn(
 /// ```
 /// # use scilib::math::integration::d1::*;
 /// let res = simp_fn(|x| x.exp(), -2.0, 10.0, 1000);
-/// println!("{}", res);
 /// assert!((res - 22026.330459).abs() < 1.0e-4);
 /// ```
 pub fn simp_fn(
@@ -165,7 +126,6 @@ pub fn simp_fn(
 ///     data[i] = (x, x.sin());
 /// }
 /// let res = rect_dt_tup(&data);
-/// println!("{}", res);
 /// assert!(res.abs() < 1.0e-1);
 /// ```
 pub fn rect_dt_tup(data: &[(f64, f64)]) -> f64 {
@@ -262,7 +222,6 @@ pub fn simp_dt_tup(data: &[(f64, f64)]) -> f64 {
 ///     y[i] = pos.sin();
 /// }
 /// let res = rect_dt_sli(&x, &y);
-/// println!("{}", res);
 /// assert!(res.abs() < 1.0e-1);
 /// ```
 pub fn rect_dt_sli(x: &[f64], y: &[f64]) -> f64 {
