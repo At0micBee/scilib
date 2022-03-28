@@ -70,6 +70,29 @@ pub fn get_m(l: i32) -> Vec<i32>{
     (-l..=l).collect()
 }
 
+/// # Spin angular momentum
+/// The spin angular momentum $S$ is the quantized energy:
+/// $$
+/// S = \hbar \sqrt{s(s+1)} = \frac{\hbar}{2}\sqrt{n(n+2)}
+/// $$
+/// 
+/// Where $\hbar$ is the reduced planck constant and $s$ is the quantum number spin,
+/// given by the formula:
+/// $$
+/// s = \frac{n}{2}
+/// $$
+/// for $n\in\mathbb{N}$.
+/// 
+/// ```
+/// # use scilib::quantum::spin_ang_mom;
+/// # use scilib::constant as cst;
+/// let half = spin_ang_mom(1);
+/// assert!((half - 9.13285984e-35).abs() < 1.0e-43);
+/// ```
+pub fn spin_ang_mom(n: usize) -> f64 {
+    cst::H_BAR * ((n * (n + 2)) as f64).sqrt() / 2.0
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # Radial wave-function

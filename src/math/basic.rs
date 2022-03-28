@@ -563,4 +563,32 @@ pub fn pascal_triangle(n: usize) -> Vec<usize> {
     res
 }
 
+/// # Levi-Civita symbol
+/// Computes the result of the $n$ dimensional Levi-Civita symbol. Returns 1 if the indexes are an even permutation
+/// and -1 if odd permutation. If there is any repetition it returns 0.
+/// 
+/// The function does not perform a check to ensure that all numbers are account for.
+/// 
+/// ```
+/// # use scilib::math::basic::levi_civita;
+/// let pos = levi_civita(vec![2, 3, 4, 5, 1]);
+/// let neg = levi_civita(vec![3, 2, 1]);
+/// let z = levi_civita(vec![1, 1, 2, 3, 4, 5, 6]);
+/// assert_eq!(pos, 1);
+/// assert_eq!(neg, -1);
+/// assert_eq!(z, 0);
+/// ```
+pub fn levi_civita(val: Vec<isize>) -> isize {
+
+    let mut res: isize = 1;
+
+    for idx1 in 0..val.len() {
+        for idx2 in (idx1+1)..val.len() {
+            res *= (val[idx2] - val[idx1]).signum();
+        }
+    }
+    
+    res
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
