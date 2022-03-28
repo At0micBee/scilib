@@ -83,7 +83,7 @@ pub fn trapz(
 
 #[test]
 fn test_d2() {
-    use std::f64::consts::PI;
+    /*use std::f64::consts::PI;
     {
         println!(
             "value : {}",
@@ -93,5 +93,5 @@ fn test_d2() {
             "value : {}",
             trapz(|x, y| x * y, -4.0, 7.0, |x| x / 2.0, |x| 2.0* x, 10000, 100)
         );
-    }
+    }*/
 }

@@ -100,7 +100,7 @@ pub fn trapz(
 
 #[test]
 fn test_d3() {
-    use std::f64::consts::PI;
+    /*use std::f64::consts::PI;
     {
         println!(
             "value : {}",
@@ -110,5 +110,5 @@ fn test_d3() {
             "value : {}",
             rect(|x, y, z| x * y * z, -3.0, 5.0, |x| x, |x| 2.0 * x, |x, y| y, |x, y| 2.0 * y, 10000, 1000, 1000)
         );
-    }
+    }*/
 }
