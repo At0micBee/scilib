@@ -7,6 +7,8 @@
 //!  - Newton-Krylov 
 //!  - Jacobian Free Newton-Krylov 
 
+use std::ops::{Add, Mul, Deref};
+
 // Test function for all run test
 pub fn test_func(v : &Vec<f64>) -> Vec<f64> {
 
@@ -40,6 +42,30 @@ pub fn l2_norm(u : &Vec<f64>) -> f64 {
     norm
 }
 
+
+/// # Matrix Vector multiplication 
+/// 
+/// Compute a matrix vector product
+/// 
+
+pub fn mat_vec_product<T>(mat : &Vec<Vec<T>> ,  vector : &Vec<T> )
+where T : Add + Mul {
+    
+    assert_eq!(mat.len(),vector.len(),"Matrix and vector must have the same length")
+
+    mat.iter().zip(vector.iter()).map(||)
+    
+}
+
+pub fn dot_product<T>(vec1 : &Vec<T>, vec2 : &Vec<T>) -> T
+where T : Mul<T> + std::iter::Sum<<T as std::ops::Mul>::Output>{
+
+    assert_eq!(vec1.len(),vec2.len()," Both vectors must have the same dimensions");
+
+    vec1.iter().zip(vec2).map(|(v1,v2)| *v1 * *v2).sum()
+}
+
+/// # Jacobian Vector dot product estimate 
 /// Estimation of the dot product J.v of the equation system
 /// J.v is estimated at point U as:
 ///  $$ \frac{F(U+\epsilon V) - F(U)}{\epsilon}$$
@@ -90,7 +116,7 @@ pub fn jacobian_vec_estimate(
     jac_vec
 }
 
- 
+///  # Back Substitution Algorithm 
 ///  Function that solve the system 
 ///  $$ Ux = b $$  
 ///  where U is a upper triangular matrix (N,N), and b is a vector N. 
@@ -123,13 +149,62 @@ pub fn back_substitution(u: &Vec<Vec<f64>>,b:&Vec<f64>) -> Vec<f64> {
 
 }
 
-
+/// # GMRES Given 
+/// Given rotation GMRES version, it include the computation of the Arnoldi basis and 
+/// the reduction of the Vk vector basis matrix. It return the du minimizing the 
+/// residual (||func(u) - Jdu||₂) for a system of dimension N. Where func(u) is
+/// the system we want to solve by JFNK, J is the jacobian of the system and du is  
+/// the newton step we are looking for. For more information on the method :
+/// Knoll et al 2009 and  Saad et al 1986.
 pub fn gmres_given(
-    func : fn(&Vec<f64>) -> Vec<f64>, // function to minimize 
-    u : Vec<f64>, 
-    du0 : Vec<f64>,
-    tol : f64, 
-    max_iter : u32, 
+    func : fn(&Vec<f64>) -> Vec<f64>,   // function to minimize 
+    u : Vec<f64>,                       // Point U where du is searched 
+    du0 : Vec<f64>,                     // Initial guess  
+    tol : f64,                          // Convergence tolerance 
+    max_iter : u32,                     // Maximum number of iteration
 ) -> Vec<f64> {
+
+    // Set up all needed matrix and vectors 
+
+    let mut vk : Vec<Vec<f64>> = Vec::new() ;           // Arnoldi basis vector matrix 
+    let mut vk_estimate : Vec<f64> = Vec::new() ;       // Intermediary krylov vector estimation 
+    let mut hessian : Vec<Vec<f64>> = Vec::new();       // Hessenberg matrix, used to construct Vk    
+
+    let mut norm_func : Vec<f64> = Vec::new() ;         // Evaluation of func(u) that will pass through the rotation
+    let mut sn : Vec<f64> = Vec::new() ;                // Given rotation coefficients vectors
+    let mut cn : Vec<f64> = Vec::new() ;                // Given rotation coefficients vectors
+    let mut initial_fu : Vec<f64> = Vec::new() ;        // Evaluation of func(u)
+
+    let mut residual : Vec<f64> = Vec::new() ;          // Residue vector 
+    let mut residual_norm : f64  ;                      // Norm of the residue 
+
+    // Evaluation of func(u)
+    initial_fu = func(&u) ;
+    
+    // Compute initial residual and its norm 
+    residual = jacobian_vec_estimate(&du0, &u, func); 
+    residual_norm = l2_norm(&residual);
+
+    // Compute the first krylov vector as Vk0 = residual/residual_norm
+    vk.push(
+        residual.iter().map(|r| r/residual_norm).collect()
+    );
+
+    norm_func.push(residual_norm); 
+
+
+    // Beginning of the construction of the Krylov basis 
+    while residual_norm > tol {
+
+        // First estimation of the kth basis vector 
+        vk_estimate = jacobian_vec_estimate(&vk[vk.len()], &u, func);
+
+
+
+    }; 
+
+    initial_fu
+    
+
 
 }
