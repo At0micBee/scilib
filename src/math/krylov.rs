@@ -90,4 +90,46 @@ pub fn jacobian_vec_estimate(
     jac_vec
 }
 
+ 
+///  Function that solve the system 
+///  $$ Ux = b $$  
+///  where U is a upper triangular matrix (N,N), and b is a vector N. 
+///  It use the following recursive relation 
+///  $$ x_n = \frac{b_n}{U_{nn}} $$
+///  $$ x_i =  \frac{b_i - \sum_{j=i+1}^n  U_{ij} x_j}{U_{ii}} $$
+///   The algorithm can be found here <https://algowiki-project.org/en/Backward_substitution>
+pub fn back_substitution(u: &Vec<Vec<f64>>,b:&Vec<f64>) -> Vec<f64> {
 
+    // Size of the vector 
+    let n = b.len();
+
+    // Solution wich will be computed 
+    let mut solution  = b.clone();
+
+    // Initialize the loop 
+    solution[n-1] = b[n-1]/u[n-1][n-1];
+
+    // Do the sum 
+    for j in n-1..0 {
+
+        solution[j] = b[j]/u[j][j];
+
+        for i in 0..j-1 {
+            solution[i] = solution[i] - u[i][j] * solution[j];
+        };
+    };
+
+    solution
+
+}
+
+
+pub fn gmres_given(
+    func : fn(&Vec<f64>) -> Vec<f64>, // function to minimize 
+    u : Vec<f64>, 
+    du0 : Vec<f64>,
+    tol : f64, 
+    max_iter : u32, 
+) -> Vec<f64> {
+
+}
