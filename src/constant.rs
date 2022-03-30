@@ -3,7 +3,7 @@
 //!
 //! This file contains many physical constants useful for scientific applications.
 //! They are stored as `f64` to guarantee maximum precision, most are castable to `f32`.
-//!
+//! 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Astrophysics and astronomy
@@ -12,6 +12,7 @@
 ///
 /// - Value: 299 792 458
 /// - Unit: `m.s-1`
+/// - Source: [NASA](https://ssd.jpl.nasa.gov/astro_par.html)
 pub const C: f64 = 299_792_458.0;
 
 /// # Newtonian gravitational constant
@@ -19,6 +20,7 @@ pub const C: f64 = 299_792_458.0;
 /// - Value: 6.674_30×10⁻¹¹
 /// - Uncertainty: 0.000 15×10⁻¹¹
 /// - Unit: `m3.kg-1.s-2`
+/// - Source: [NASA](https://ssd.jpl.nasa.gov/astro_par.html)
 pub const G: f64 = 6.674_30e-11;
 
 /// # Standard earth gravity acceleration
@@ -37,12 +39,14 @@ pub const EARTH_MASS: f64 = 5.972_167_87e24;
 ///
 /// - Value: 6 378 100
 /// - Unit: `m`
+/// - Source: [IAU](https://www.iau.org/static/resolutions/IAU2012_English.pdf)
 pub const EARTH_RADIUS: f64 = 6_378_100.0;
 
 /// # Nominal Earth mass parameter
 ///
 /// - Value: 3.986 004×10¹⁴
 /// - Unit: `m3.s-2`
+/// - Source: [IAU](https://www.iau.org/static/resolutions/IAU2012_English.pdf)
 pub const EARTH_GM: f64 = 3.986_004e14;
 
 /// # Earth Bond albedo
@@ -61,12 +65,14 @@ pub const JUPITER_MASS: f64 = 1.898_124_6e27;
 ///
 /// - Value: 71 492 000
 /// - Unit: `m`
+/// - Source: [IAU](https://www.iau.org/static/resolutions/IAU2012_English.pdf)
 pub const JUPITER_RADIUS: f64 = 71_492_000.0;
 
 /// # Nominal Jupiter mass parameter
 ///
 /// - Value: 1.266_865_3×10¹⁷
 /// - Unit: `m3.s-2`
+/// - Source: [IAU](https://www.iau.org/static/resolutions/IAU2012_English.pdf)
 pub const JUPITER_GM: f64 = 1.266_865_3e17;
 
 /// # Sun mass
@@ -85,37 +91,50 @@ pub const SUN_RADIUS: f64 = 695_700_000.0;
 ///
 /// - Value: 1.327 124 4×10²⁰
 /// - Unit: `m3.s-2`
+/// - Source: [IAU](https://www.iau.org/static/resolutions/IAU2012_English.pdf)
 pub const SUN_GM: f64 = 1.327_124_4e20;
 
 /// # Sun effective temperature
 ///
 /// - Value: 5772
 /// - Unit: `K`
+/// - Source: [IAU](https://www.iau.org/static/resolutions/IAU2012_English.pdf)
 pub const SUN_TEFF: f64 = 5772.0;
+
+/// # Sun irradiance
+/// 
+/// - Value: 1361
+/// - Unit: `W.m-2` = `kg.s−3`
+/// - Source: [IAU](https://www.iau.org/static/resolutions/IAU2012_English.pdf)
+pub const SUN_IRR: f64 = 1361.0;
 
 /// # Sun luminosity
 ///
 /// - Value: 3.828×10²⁶
 /// - Unit: `W` = `kg.m2.s−3`
-pub const SUN_L: f64 = 3.848e26;
+/// - Source: [IAU](https://www.iau.org/static/resolutions/IAU2012_English.pdf)
+pub const SUN_L: f64 = 3.828e26;
 
 /// # Absolute bolometric magnitude
 ///
 /// - Value: 3.012_8×10²⁸
 /// - Unit: `W` = `kg.m2.s−3`
+/// - Source: [IAU](https://www.iau.org/static/resolutions/IAU2012_English.pdf)
 pub const L0: f64 = 3.012_8e28;
 
 /// # Apparent bolometric luminosity
 /// 
 /// - Value: 2.518×10⁻⁸
 /// - Unit: `W.m-2` = `kg.s−3`
+/// - Source: [IAU](https://www.iau.org/static/resolutions/IAU2012_English.pdf)
 pub const F_0: f64 = 2.518_021_002e-8;
 
 /// # Astronomical unit
 ///
 /// - Value: 1.495 978 71×10¹¹
 /// - Unit: `m`
-pub const AU: f64 = 1.495_978_71e11;
+/// - Source: [NASA](https://ssd.jpl.nasa.gov/astro_par.html)
+pub const AU: f64 = 1.495_978_70700e11;
 
 /// # Light year
 ///
