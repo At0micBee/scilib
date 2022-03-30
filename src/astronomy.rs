@@ -119,6 +119,42 @@ impl Radec {
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/// # Apparent magnitude
+/// Uses the standard reference luminosity to compute the apparent magnitude of an object.
+/// $$
+/// m_\mathrm{obj} = -2.5\log\left( \frac{b_\mathrm{obj}}{b_\mathrm{ref}} \right)
+/// $$
+/// Where $F_\mathrm{obj}$ is the flux of the object and $F_\mathrm{ref}$ is the reference flux (see constants).
+/// 
+/// ```
+/// # use scilib::constant;
+/// # use scilib::astronomy::apparent_mag;
+/// let alpha_b = 0.4 * constant::SUN_L;        // Alpha centauri B, roughly
+/// let distance = 4.403 * constant::LY;        // Seen from Earth
+/// let res = apparent_mag(alpha_b, distance);
+/// assert!((res - 1.36).abs() <= 0.03);
+/// ```
+pub fn apparent_mag(lum: f64, dist: f64) -> f64 {
+    // We avoid a division by using the pre-computed value
+    -2.5 * irradiance(lum, dist).log10() - 18.997_351
+}
+
+/// # Absolute magnitude
+/// Same approach that the apparent magnitude, but set at a distance of 10pc.
+/// 
+/// ```
+/// # use scilib::constant;
+/// # use scilib::astronomy::absolute_mag;
+/// let abs = absolute_mag(constant::SUN_L);    // Sun absolute magnitude
+/// assert!((abs - 4.74).abs() <= 0.02);        // As defined IAU
+/// ```
+pub fn absolute_mag(lum: f64) -> f64 {
+    // We avoid a division by using the pre-computed value
+    -2.5 * lum.log10() + 71.197_425
+}
+
 /// # Equilibrium temperature
 ///
 /// Knowing the stellar effective temperature, its radius, the distance from the star

@@ -97,13 +97,19 @@ pub const SUN_TEFF: f64 = 5772.0;
 ///
 /// - Value: 3.828×10²⁶
 /// - Unit: `W` = `kg.m2.s−3`
-pub const SUN_L: f64 = 3.828e26;
+pub const SUN_L: f64 = 3.848e26;
 
-/// # Sun luminosity for bolometric magnitude
+/// # Absolute bolometric magnitude
 ///
 /// - Value: 3.012_8×10²⁸
 /// - Unit: `W` = `kg.m2.s−3`
-pub const SUN_L_BOL: f64 = 3.012_8e28;
+pub const L0: f64 = 3.012_8e28;
+
+/// # Apparent bolometric luminosity
+/// 
+/// - Value: 2.518×10⁻⁸
+/// - Unit: `W.m-2` = `kg.s−3`
+pub const F_0: f64 = 2.518_021_002e-8;
 
 /// # Astronomical unit
 ///
