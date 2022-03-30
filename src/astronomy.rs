@@ -13,6 +13,8 @@ use std::fmt::{             // Formatter display
     Result as DRes          // The associated result
 };
 
+use super::constant;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # Radec coordinate system
@@ -143,6 +145,9 @@ pub fn apparent_mag(lum: f64, dist: f64) -> f64 {
 
 /// # Absolute magnitude
 /// Same approach that the apparent magnitude, but set at a distance of 10pc.
+/// $$
+/// M = -2.5\log\left( \frac{L}{L_0} \right)
+/// $$
 /// 
 /// ```
 /// # use scilib::constant;
@@ -153,6 +158,25 @@ pub fn apparent_mag(lum: f64, dist: f64) -> f64 {
 pub fn absolute_mag(lum: f64) -> f64 {
     // We avoid a division by using the pre-computed value
     -2.5 * lum.log10() + 71.197_425
+}
+
+/// # Distance modulus
+/// Computes the distance of an object based on its apparent and absolute magnitudes:
+/// $$
+/// d = 10^{1 + \frac{m-M}{5}}
+/// $$
+/// Where $m$ is the apparent magnitude and $M$ is the absolute magnitude.
+/// 
+/// ```
+/// # use scilib::constant;
+/// # use scilib::astronomy::{ apparent_mag, absolute_mag, distance_mod };
+/// let app = apparent_mag(constant::SUN_L, 10.0 * constant::PC);
+/// let abs = absolute_mag(constant::SUN_L);
+/// let res = distance_mod(app, abs) / constant::PC;
+/// assert!((res - 10.0).abs() <= 1e-5);
+/// ```
+pub fn distance_mod(m_app: f64, m_abs: f64) -> f64 {
+    10.0_f64.powf(1.0 + (m_app - m_abs) / 5.0) * constant::PC
 }
 
 /// # Equilibrium temperature
