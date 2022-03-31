@@ -85,7 +85,7 @@ impl Legendre {
     pub fn new(l: usize, m: i32) -> Self {
 
         // Checking that the range is good
-        assert!(m >= -(l as i32) && m <= l as i32);
+        assert!(m >= -(l as i32) && m <= l as i32, "The derivative order m isn't valid for the given l!");
 
         // Initializing the vectors
         let mut factor: Vec<f64> = Vec::new();
