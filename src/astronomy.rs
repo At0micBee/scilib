@@ -20,6 +20,7 @@ use super::constant;
 /// # Radec coordinate system
 ///
 /// Right ascension and declination of the object in the sky. The values are stored as `f64` internally, and in radians.
+/// The distance is kept in meters internally, for homogeneousness.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct Radec {
     /// Right ascension
@@ -39,7 +40,7 @@ impl Display for Radec {
 
         // If there is a distance, we print it as well
         match self.dist_earth {
-            Some(d) => write!(f, " :: distance={}ly", d)?,
+            Some(d) => write!(f, " :: distance={}ly", d / constant::LY)?,
             None => {}
         }
         Ok(())
@@ -85,6 +86,24 @@ impl Radec {
             dec: dec.into().to_radians(),
             dist_earth: None
         }
+    }
+
+    /// # Specifying known distance
+    /// 
+    /// Internal structure uses distance in meters.
+    /// 
+    /// ```
+    /// # use scilib::constant;
+    /// # use scilib::astronomy::Radec;
+    /// let mut coord = Radec::from_degree(30.0, 12.3);
+    /// coord.specify_distance(4.403 * constant::LY);
+    /// assert_eq!(coord.ra, 30.0_f64.to_radians());
+    /// assert_eq!(coord.dec, 12.3_f64.to_radians());
+    /// assert_eq!(coord.dist_earth, Some(4.403 * constant::LY));
+    /// ```
+    pub fn specify_distance<T>(&mut self, distance: T)
+    where T: Into<f64> {
+        self.dist_earth = Some(distance.into());
     }
 
     /// # Angular separation computation
@@ -140,7 +159,7 @@ impl Radec {
 /// ```
 pub fn apparent_mag(lum: f64, dist: f64) -> f64 {
     // We avoid a division by using the pre-computed value
-    -2.5 * irradiance(lum, dist).log10() - 18.997_351
+    -2.5 * irradiance(lum, dist).log10() + constant::APP_MAG_SHIFT
 }
 
 /// # Absolute magnitude
@@ -157,7 +176,7 @@ pub fn apparent_mag(lum: f64, dist: f64) -> f64 {
 /// ```
 pub fn absolute_mag(lum: f64) -> f64 {
     // We avoid a division by using the pre-computed value
-    -2.5 * lum.log10() + 71.197_425
+    -2.5 * lum.log10() + constant::ABS_MAG_SHIFT
 }
 
 /// # Distance modulus

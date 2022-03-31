@@ -83,9 +83,10 @@ pub const SUN_MASS: f64 = 1.988_409_87e30;
 
 /// # Sun radius
 ///
-/// - Value: 695 700 000
+/// - Value: 695 658 000
 /// - Unit: `m`
-pub const SUN_RADIUS: f64 = 695_700_000.0;
+/// - Source: [IAU](https://www.iau.org/static/resolutions/IAU2015_English.pdf)
+pub const SUN_RADIUS: f64 = 695_658_000.0;
 
 /// # Nominal Sun mass parameter
 ///
@@ -117,10 +118,17 @@ pub const SUN_L: f64 = 3.828e26;
 
 /// # Absolute bolometric magnitude
 ///
-/// - Value: 3.012_8×10²⁸
+/// - Value: 3.012_75×10²⁸
 /// - Unit: `W` = `kg.m2.s−3`
 /// - Source: [IAU](https://www.iau.org/static/resolutions/IAU2012_English.pdf)
-pub const L0: f64 = 3.012_8e28;
+pub const L0: f64 = 3.012_75e28;
+
+/// # Absolute bolometric magnitude shift
+/// 
+/// - Value: 71.197425756681473979136000883404700135818216505689428018913
+/// - Unit: /
+/// - Source: Computed based on [IAU](https://www.iau.org/static/resolutions/IAU2012_English.pdf)
+pub const ABS_MAG_SHIFT: f64 = 71.197_425_756_681_473_979_136_000_883_404_700_135_818_216_505_689_428_018_913;
 
 /// # Apparent bolometric luminosity
 /// 
@@ -128,6 +136,13 @@ pub const L0: f64 = 3.012_8e28;
 /// - Unit: `W.m-2` = `kg.s−3`
 /// - Source: [IAU](https://www.iau.org/static/resolutions/IAU2012_English.pdf)
 pub const F_0: f64 = 2.518_021_002e-8;
+
+/// # Apparent bolometric magnitude shift
+/// 
+/// - Value: -18.99735162975757186358481945825388631838914130602973905811
+/// - Unit: /
+/// - Source: Computed based on [IAU](https://www.iau.org/static/resolutions/IAU2012_English.pdf)
+pub const APP_MAG_SHIFT: f64 = -18.997_351_629_757_571_863_584_819_458_253_886_318_389_141_306_029_739_058_11;
 
 /// # Astronomical unit
 ///
@@ -138,15 +153,24 @@ pub const AU: f64 = 1.495_978_70700e11;
 
 /// # Light year
 ///
-/// - Value: 9.460 7×10¹⁵
+/// - Value: 9.460 730 472 580 8×10¹⁵
 /// - Unit: `m`
-pub const LY: f64 = 9.460_7e15;
+/// - Source: Computed from definition
+pub const LY: f64 = 9.460_730_472_580_8e15;
 
 /// # Parsec
 ///
-/// - Value: 3.085 677 58×10¹⁶
+/// - Value: 3.085 677 581 491 367 278 913 937 957 796 472×10¹⁶
 /// - Unit: `m`
-pub const PC: f64 = 3.085_677_58e16;
+/// - Source: Computed from definition
+pub const PC: f64 = 3.085_677_581_491_367_278_913_937_957_796_472e16;
+
+/// # Erg
+/// 
+/// - Value: 1×10⁻⁷
+/// - Unit: `J`
+/// Source: [IAU](https://www.iau.org/publications/proceedings_rules/units/)
+pub const ERG: f64 = 1e-7;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Universal constants
@@ -246,6 +270,13 @@ pub const E: f64 = 1.602_176_634e-19;
 /// - Value: 101 325
 /// - Unit: `Pa` = `[kg.m-1.s-2]`
 pub const ATM: f64 = 101_325.0;
+
+/// # Bar pressure unit
+/// 
+/// - Value: 1×10⁵
+/// - Unit: `Pa`
+/// - Source: [IAU](https://www.iau.org/publications/proceedings_rules/units/)
+pub const BAR: f64 = 1e5;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Quantum
