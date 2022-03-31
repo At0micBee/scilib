@@ -15,7 +15,7 @@ This crate is designed to help any mathematical or scientific processes for the 
 
 ## Work in progress; What's coming?
 
-As of the creation of this readme, I am working on this project alone which means a few things:
+As of the creation of this readme, I am working on this project mostly alone which means a few things:
 
 1. The progression will be linked to my schedule
 2. I will work firsts on concept I am familiar with
@@ -173,6 +173,22 @@ let sph = spherical_harmonics(3, 1, 0.2, -0.3);
 
 // Computing the Rnl for n=4, l=2
 let rad = radial_wavefunction(4, 2, 1.3e-12);
+```
+
+---
+
+## Constants
+
+Many useful constants have been added, comprising many different fields, from astrophysics to quantum mechanics, but also mathematics, thermodynamics, electromagnetism, etc... They're listed in the `constant` module.
+
+```rust
+use scilib::constant;
+
+println!("{}", constant::SUN_RADIUS);   // Solar radius
+println!("{}", constant::H_BAR);        // H bar
+println!("{}", constant::K_B);          // Boltzmann constant
+println!("{}", constant::BOHR_MAG);     // Bohr magneton
+// And many more...
 ```
 
 ---
