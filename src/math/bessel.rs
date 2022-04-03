@@ -9,9 +9,9 @@
 //! x^2\frac{d^2y}{dx^2} + x\frac{dy}{dx} + (x^2 - \alpha^2)y = 0
 //! $$
 //! 
-//! ## First kind: J
+//! ## First kind: $J_n$
 //! 
-//! The Jn(x) function is the simplest solution to Bessel's equation. The most generalized case is for
+//! The $J_n(x)$ function is the simplest solution to Bessel's equation. The most generalized case is for
 //! a real index `n` and a complex number `x`, which is possible with this crate. Additionally, two methods are
 //! provided for this equation, one for a integer order (named `j`) and one for a real order (named `jf`). The integer
 //! order one is limited but is faster than its counterpart. The real order function is slower, but can compute any
@@ -25,10 +25,10 @@
 //! let res_f = jf(c, 1.5);             // Would also work with 1.0
 //! ```
 //! 
-//! ## Second kind: Y
+//! ## Second kind: $Y_n$
 //! 
-//! Similar to the first kind, the Y equation are solution of Bessel's equation with a singularity at the origin.
-//! The Y function is itself based on the J function. The function is undefined for any integer order, in which
+//! Similar to the first kind, the $Y_n(x)$ equation are solution of Bessel's equation with a singularity at the origin.
+//! The $Y$ function is itself based on the $J$ function. The function is undefined for any integer order, in which
 //! case the limit has to be taken.
 //! 
 //! ```rust
@@ -39,10 +39,10 @@
 //! let res_i = y(c, 1);                // The function takes the limit in this case
 //! ```
 //! 
-//! ## Modified first kind: I
+//! ## Modified first kind: $I_n$
 //! 
-//! Also known as the hyperbolic Bessel function of the first kind. Its definition is similar to J, but lacks the
-//! alternating `(-1)^k` term in the sum.
+//! Also known as the hyperbolic Bessel function of the first kind. Its definition is similar to $J$, but lacks the
+//! alternating $(-1)^k$ term in the sum.
 //! 
 //! ```rust
 //! # use scilib::math::complex::Complex;
@@ -51,10 +51,10 @@
 //! let res = i(c, -1.2);
 //! ```
 //! 
-//! ## Modified second kind: K
+//! ## Modified second kind: $K_n$
 //! 
-//! Also known as the hyperbolic Bessel function of the second kind. Its definition is similar to Y, but lacks the
-//! `cos(n*pi)`, and is normalized by `pi/2`.
+//! Also known as the hyperbolic Bessel function of the second kind. Its definition is similar to $Y$, but lacks the
+//! $cos(n\pi)$, and is normalized by $\pi/2$.
 //! 
 //! ```rust
 //! # use scilib::math::complex::Complex;
@@ -63,7 +63,7 @@
 //! let res = k(c, 0);
 //! ```
 //! 
-//! ## Hankel functions: H1 and H2
+//! ## Hankel functions: $H_n^{(1)}$ and $H_n^{(2)}$
 //! 
 //! Hankel functions are two linearly independent solutions to Bessel's equation.
 //! 
@@ -77,6 +77,103 @@
 //! 
 //! # Spherical Bessel functions
 //! 
+//! The spherical Bessel functions are used to solve the Helmholtz equation, which is:
+//! $$
+//! x^2\frac{d^2y}{dx^2} + 2x\frac{dy}{dx} + (x^2 - n(n+1))y = 0
+//! $$
+//! 
+//! There is two kinds of spherical Bessel functions, plus the corresponding Hankel functions
+//! 
+//! ## First kind: $j_n$
+//! First solution to the equation, the result is based on the $J_n$ Bessel equation.
+//! 
+//! ```rust
+//! # use scilib::math::complex::Complex;
+//! # use scilib::math::bessel::{ sj, sj_array };
+//! let c: Complex::from(1.44, 2.22);
+//! let res = sj(c, 2);         // Computes the single term
+//! let res_a = sj_array(c, 2); // Computes all term up to 2
+//! ```
+//! 
+//! ## Second kind: $y_n$
+//! Second solution to the equation, the result of this one is based on the $Y_n$ Bessel function.
+//! 
+//! ```rust
+//! # use scilib::math::complex::Complex;
+//! # use scilib::math::bessel::{ sy, sy_array };
+//! let c: Complex::from(2.53, -0.33);
+//! let res = sy(c, 2);         // Computes the single term
+//! let res_a = sy_array(c, 5); // Computes all term up to 5
+//! ```
+//! 
+//! ## Hankel first kind: $h^{(1)}$
+//! Follows the same definition as $H^{(1)}$, but using the spherical version of the Bessel equations.
+//! 
+//! ```rust
+//! # use scilib::math::complex::Complex;
+//! # use scilib::math::bessel::{ sh_first, sh_first_array };
+//! let c: Complex::from(0.2253, 4.25);
+//! let res = sh_first(c, 2);           // Computes the single term
+//! let res_a = sh_first_array(c, 4);   // Computes all term up to 5
+//! ```
+//! 
+//! ## Hankel second kind: $h^{(2)}$
+//! Follows the same definition as $H^{(2)}$, but using the spherical version of the Bessel equations.
+//! 
+//! ```rust
+//! # use scilib::math::complex::Complex;
+//! # use scilib::math::bessel::{ sh_second, sh_second_array };
+//! let c: Complex::from(-5.2, -0.356);
+//! let res = sh_second(c, 2);          // Computes the single term
+//! let res_a = sh_second_array(c, 7);  // Computes all term up to 7
+//! ```
+//! 
+//! # Riccati-Bessel functions
+//! 
+//! The Riccati-Bessel functions are modified Bessel functions, and are solutions to the equation:
+//! $$
+//! x^2\frac{d^2y}{dx^2} + (x^2 - n(n + 1))y = 0
+//! $$
+//! 
+//! ## First kind: $S_n$
+//! Simplest solution to the differential equation, we base the computation off of $J_n(x)$.
+//! 
+//! ```rust
+//! # use scilib::math::complex::Complex;
+//! # use scilib::math::bessel::riccati_s;
+//! let c: Complex::from(0.3, 1.22);
+//! let res = riccati_s(c, 2);
+//! ```
+//! 
+//! ## Second kind: $C_n$
+//! Similar to $S_n$, but is based on the $Y_n(x)$ Bessel function.
+//! 
+//! ```rust
+//! # use scilib::math::complex::Complex;
+//! # use scilib::math::bessel::riccati_c;
+//! let c: Complex::from(-4.2, 2.13);
+//! let res = riccati_c(c, 5);
+//! ```
+//! 
+//! ## Third kind: $\xi_n$
+//! This solution makes use of the first kind of Hankel function $H^{(1)}$.
+//! 
+//! ```rust
+//! # use scilib::math::complex::Complex;
+//! # use scilib::math::bessel::riccati_xi;
+//! let c: Complex::from(2.5, -0.25);
+//! let res = riccati_xi(c, 4);
+//! ```
+//! 
+//! ## Fourth kind: $\zeta_n$
+//! This last solution makes use of the second kind of Hankel function $H^{(2)}$.
+//! 
+//! ```rust
+//! # use scilib::math::complex::Complex;
+//! # use scilib::math::bessel::riccati_zeta;
+//! let c: Complex::from(-1.1, 8.2);
+//! let res = riccati_zeta(c, 3);
+//! ```
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -455,7 +552,7 @@ where T: Into<Complex> + Copy, U: Into<f64> {
     }
 }
 
-/// # First Hankel function: $H^(1)$
+/// # First Hankel function: $H^{(1)}$
 /// 
 /// ## Definition
 /// Computes the first kind of Hankel function, which is defined as:
@@ -491,7 +588,7 @@ where T: Into<Complex> + Copy, U: Into<f64> {
     res_j + res_y
 }
 
-/// # Second Hankel function: $H^(2)$
+/// # Second Hankel function: $H^{(2)}$
 /// 
 /// ## Definition
 /// Computes the first kind of Hankel function, which is defined as:
@@ -743,7 +840,7 @@ where T: Into<Complex> {
     yn
 }
 
-/// # First spherical Hankel function: $h^(1)$
+/// # First spherical Hankel function: $h^{(1)}$
 /// 
 /// ## Definition
 /// The first spherical hankel function is defined as:
@@ -769,7 +866,7 @@ where T: Into<Complex> {
     sj(x, n) + Complex::i() * sy(x, n)
 }
 
-/// # First spherical Hankel function (array): $h^(2)$
+/// # First spherical Hankel function (array): $h^{(1)}$
 /// 
 /// ## Inputs
 /// Compute the first kind of spherical hankel function by recurrence to get an array of function.
@@ -807,7 +904,7 @@ where T: Into<Complex> {
     sh_first
 }
 
-/// # Second spherical Hankel function: $h^(2)$
+/// # Second spherical Hankel function: $h^{(2)}$
 /// 
 /// ## Definition
 /// The second spherical hankel function is defined as:
@@ -834,7 +931,7 @@ where T: Into<Complex> {
     sj(x, n) - Complex::i() * sy(x, n)
 }
 
-/// # Second spherical Hankel function (array): $h^(2)$
+/// # Second spherical Hankel function (array): $h^{(2)}$
 /// 
 /// ## Inputs
 /// Compute the second kind of spherical hankel function by recurrence to get an array of function.
@@ -870,6 +967,88 @@ where T: Into<Complex> {
     }
     
     sh_second
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/// # Riccati-Bessel function $S_n$
+/// ## Definition
+/// The $S_n$ Riccati-Bessel function is defined as:
+/// $$
+/// S_n(z) = \sqrt{\frac{\pi z}{2}}J_{n+\frac{1}{2}}(z)
+/// $$
+/// Where $J_{n+\frac{1}{2}}(z)$ is the Bessel function of the first kind.
+/// 
+/// ## Inputs
+/// - `z` is the value to evaluate ($x$)
+/// - `n` the order of the function ($n$)
+/// 
+/// ## Example
+pub fn riccati_s<T>(x: T, n: usize) -> Complex
+where T: Into<Complex>{
+
+    let z: Complex = x.into();
+    (FRAC_PI_2 * z).sqrt() * jf(z, n as f64 + 0.5)
+}
+
+/// # Riccati-Bessel function $C_n$
+/// ## Definition
+/// The $C_n$ Riccati-Bessel function is defined as:
+/// $$
+/// C_n(z) = -\sqrt{\frac{\pi z}{2}}Y_{n+\frac{1}{2}}(z)
+/// $$
+/// Where $Y_{n+\frac{1}{2}}(z)$ is the Bessel function of the second kind.
+/// 
+/// ## Inputs
+/// - `z` is the value to evaluate ($x$)
+/// - `n` the order of the function ($n$)
+/// 
+/// ## Example
+pub fn riccati_c<T>(x: T, n: usize) -> Complex
+where T: Into<Complex>{
+    
+    let z: Complex = x.into();
+    -(FRAC_PI_2 * z).sqrt() * y(z, n as f64 + 0.5)
+}
+
+/// # Riccati-Bessel function $\xi_n$
+/// ## Definition
+/// The $\xi_n$ Riccati-Bessel function is defined as:
+/// $$
+/// \xi_n(z) = \sqrt{\frac{\pi z}{2}}H_{n+\frac{1}{2}}^{(1)}(z)
+/// $$
+/// Where $H_{n+\frac{1}{2}}^{(1)}(z)$ is the Hankel function of the first kind.
+/// 
+/// ## Inputs
+/// - `z` is the value to evaluate ($x$)
+/// - `n` the order of the function ($n$)
+/// 
+/// ## Example
+pub fn riccati_xi<T>(x: T, n: usize) -> Complex
+where T: Into<Complex>{
+    
+    let z: Complex = x.into();
+    (FRAC_PI_2 * z).sqrt() * hankel_first(z, n as f64 + 0.5)
+}
+
+/// # Riccati-Bessel function $\zeta_n$
+/// ## Definition
+/// The $\zeta_n$ Riccati-Bessel function is defined as:
+/// $$
+/// \zeta_n(z) = \sqrt{\frac{\pi z}{2}}H_{n+\frac{1}{2}}^{(2)}(z)
+/// $$
+/// Where $H_{n+\frac{1}{2}}^{(2)}(z)$ is the Hankel function of the first kind.
+/// 
+/// ## Inputs
+/// - `z` is the value to evaluate ($x$)
+/// - `n` the order of the function ($n$)
+/// 
+/// ## Example
+pub fn riccati_zeta<T>(x: T, n: usize) -> Complex
+where T: Into<Complex>{
+    
+    let z: Complex = x.into();
+    (FRAC_PI_2 * z).sqrt() * hankel_second(z, n as f64 + 0.5)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
