@@ -83,7 +83,7 @@ println!("{}", c1 + c2);
 
 ## Bessel functions
 
-Essential in many maths and physics domain, bessel function are solutions of Bessel's differential equation ([Wiki page](https://en.wikipedia.org/wiki/Bessel_function)). This crate provides functions for both real and complex numbers, and for integer or real function order.
+Essential in many maths and physics domain, bessel function are solutions of Bessel's differential equation ([Wiki page](https://en.wikipedia.org/wiki/Bessel_function)). This crate provides functions for both real and complex numbers, and for integer or real function order. It covers standard Bessel functions, the spherical Bessel functions, and the Riccati-Bessel functions.
 
 All functions are implemented:
 - **J**: First kind
@@ -96,6 +96,10 @@ All functions are implemented:
 - **y**: Spherical second kind
 - **h1**: Spherical hankel first kind
 - **h2**: Spherical hankel second kind
+- **S**: Riccati-Bessel first kind
+- **C**: Riccati-Bessel Second kind
+- **Xi**: Riccati-Bessel Third kind
+- **Zeta**: Riccati-Bessel Fourth kind
 
 ```rust
 // Found in the math crate
@@ -110,8 +114,8 @@ let res_1 = bessel::hankel_first(2, -2);        // Hankel first kind
 let res_2 = bessel::hankel_second(1, -1.32);    // Hankel first kind
 let res_sj = bessel::sj(4.4, 2);                // Spherical first kind
 let res_sy = bessel::sy(-1.54, 3);              // Spherical second kind
-let res_sj = bessel::sh_first(2.11, 4);         // Spherical hankel first kind
-let res_sj = bessel::sh_second(0.253, 0);       // Spherical hankel second kind
+let res_s1 = bessel::sh_first(2.11, 4);         // Spherical hankel first kind
+let res_s2 = bessel::sh_second(0.253, 0);       // Spherical hankel second kind
 ```
 
 Values are compared to known results (thanks, [WolframAlpha](https://www.wolframalpha.com/)), and the results are within small margins of error.
