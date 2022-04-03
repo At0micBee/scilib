@@ -118,7 +118,7 @@ impl Radec {
     ///
     /// assert!((c1.separation(c2) - 2.0685709648870154).abs() < 1.0e-15);
     /// ```
-    pub fn separation(&self, other: Self) -> f64 {
+    pub fn separation(&self, other: &Self) -> f64 {
 
         // Difference in right ascension
         let da: f64 = self.ra - other.ra;
@@ -199,7 +199,6 @@ pub fn distance_mod(m_app: f64, m_abs: f64) -> f64 {
 }
 
 /// # Equilibrium temperature
-///
 /// Knowing the stellar effective temperature, its radius, the distance from the star
 /// and the albedo of the considered planet, we can compute the equilibrium temperature
 /// found at the planet.
@@ -209,9 +208,13 @@ pub fn t_eq(star_t: f64, star_rad: f64, dist: f64, albedo: f64) -> f64 {
 }
 
 /// # Object irradiance
-///
 /// Computes the irradiance at a certain distance from an object, using its luminosity.
 /// The `luminosity` is in Watts and the `distance` is in meters, result is in `W.m-2`.
+/// The formula used is:
+/// $$
+/// I(L, d) = \frac{L}{4\pi d^2}
+/// $$
+/// Where $L$ is the luminosity and $d$ is the distance.
 ///
 /// ```rust
 /// # use scilib::constant;
@@ -229,22 +232,48 @@ pub fn irradiance(luminosity: f64, distance: f64) -> f64 {
     luminosity / (4.0 * PI * distance.powi(2))
 }
 
+/// # Energy received by an object
+/// Computes the received energy by an object of a given surface, at a known distance.
+/// Makes use of the `irradiance` function to compute the surfacic power output by the object,
+/// it is defined as:
+/// $$
+/// E = I(L, d) S
+/// $$
+/// Where $I(L, d)$ is the irradiance function and $S$ is the surface of the object.
+pub fn received_energy(luminosity: f64, distance: f64, surface: f64) -> f64 {
+    // Following the formula
+    irradiance(luminosity, distance) * surface
+}
+
 /// # Planetary luminosity
-///
-/// Computes the luminosity of a planet, based on the received irradiance and the albedo.
+/// Computes the luminosity of a planet, based on the received irradiance and the albedo:
+/// $$
+/// L_\mathrm{P} = E_\mathrm{received} A = I(L, d) S A
+/// $$
+/// Where $S$ is the surface, $A$ the albedo, and $E_\mathrm{received} = I(L, d) S$ is the energy
+/// received by the planet.
 pub fn planet_luminosity(albedo: f64, received: f64) -> f64 {
     received * albedo
 }
 
-/// # Energy received by an object
-///
-/// Computes the received energy by an object of a given surface, at a known distance.
-/// Makes use of the `insolation` function to compute the surfacic power outputed by the object.
-/// This function can be used both for primary sources of power, or reflective ones; the albedo
-/// should be set to 1 for primary emitters.
-pub fn received_energy(luminosity: f64, distance: f64, surface: f64) -> f64 {
-    // Following the formula
-    irradiance(luminosity, distance) * surface
+/// # Luminosity using Stefan-Boltzmann
+/// Computes the expected luminosity of a star using the Stefan-Boltzmann constant, from:
+/// $$
+/// L = 4\pi\sigma R^2 T^4
+/// $$
+/// 
+/// ```
+/// # use scilib::constant;
+/// # use scilib::astronomy::{ luminosity, absolute_mag };
+/// let sun = luminosity(constant::SUN_RADIUS, constant:: SUN_TEFF);
+/// assert!((sun - constant::SUN_L).abs() / constant::SUN_L <= 1.0e-3);
+/// 
+/// let computed = absolute_mag(sun);
+/// let theory = absolute_mag(constant::SUN_L);
+/// assert!((computed - theory).abs() / theory <= 1.0e-4);
+/// ```
+pub fn luminosity(radius: f64, temperature: f64) -> f64 {
+    4.0 * PI * constant::SIGMA_SB * radius.powi(2) * temperature.powi(4)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
