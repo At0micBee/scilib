@@ -101,9 +101,8 @@ const DISTANCE_Y_LIM: f64 = 0.001;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # $J$ Bessel function, integer index
-///
-/// `x` is the value to evaluate, and `n` the order of the function.
 /// 
+/// ## Definition
 /// The $J$ Bessel represent the first kind of Bessel function, and are solution to Bessel differential equation,
 /// and is defined as follows:
 /// $$
@@ -113,7 +112,14 @@ const DISTANCE_Y_LIM: f64 = 0.001;
 /// The bessel function depend on an infinite sum of terms; which we can't have.
 /// The criterion chosen here is check each new term impacts the results significantly enough.
 /// The default value selected in the program is defined by `const PRECISION_CONVERGENCE: f64 = 1.0e-8;`.
+///
+/// ## Inputs
+/// - `x`: the value to evaluate ($x$)
+/// - `n`: the order of the function ($n$)
 /// 
+/// Returns the value of the $n^{th}$ order of the Bessel $J$ function at $x$.
+/// 
+/// ## Example
 /// ```
 /// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::j;
@@ -189,9 +195,8 @@ pub fn j<T: Into<Complex>>(x: T, n: i32) -> Complex {
 }
 
 /// # $J$ Bessel function, real index
-///
-/// `x` is the value to evaluate, and `n` the order of the function.
 /// 
+/// ## Definition
 /// $$
 /// J_\alpha(x) = \sum_{m=0}^{\infty}\frac{(-1)^m}{m!\Gamma(m+\alpha+1)}\left( \frac{x}{2} \right)^{2p+\alpha}
 /// $$
@@ -200,7 +205,14 @@ pub fn j<T: Into<Complex>>(x: T, n: i32) -> Complex {
 /// than an integer. This method is more costly to use than the other, and thus isn't recommended for
 /// integer orders. The function tries to prevent this by trying to fall back on the integer order version
 /// when possible, but could fail in edge cases.
+///
+/// ## Inputs
+/// - `x`: the value to evaluate ($x$)
+/// - `order`: order of the function ($\alpha$)
 /// 
+/// Returns the value of the real order of the Bessel $J$ function at $x$.
+/// 
+/// ## Example
 /// ```
 /// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::{ j, jf };
@@ -273,18 +285,24 @@ pub fn jf<T, U>(x: T, order: U) -> Complex
 
 /// # Y Bessel function, real index
 /// 
+/// ## Definition
 /// The $Y$ Bessel represent the second kind of Bessel function, and are solution to Bessel differential equation,
 /// in the case of a singularity at the origin. It is defined as:
 /// $$
 /// Y_\alpha(x) = \frac{J_\alpha(x)\cos(\alpha\pi) - J_\alpha(x)}{\sin(\alpha\pi)}
 /// $$
 /// 
-/// `x` is the value to evaluate, and `n` the order of the function.
-/// 
 /// Because the function is not continuous for integer values of `n`, we need to compute the limit around these points.
 /// We set the limit distance with `DISTANCE_Y_LIM`, compute the limit above and below the desired point and take the average.
 /// We achieve precision under `1.0e-5` for non-integer`n`, and integer `n` using this approach.
 /// 
+/// ## Inputs
+/// - `x`: the value to evaluate ($x$)
+/// - `order`: the order of the function ($\alpha$)
+/// 
+/// Returns the value of the real order of the Bessel $Y$ function at $x$.
+/// 
+/// ## Example
 /// ```
 /// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::y;
@@ -326,9 +344,8 @@ where T: Into<Complex> + Copy, U: Into<f64> {
 
 /// # $I$ modified Bessel function
 /// 
+/// ## Definition
 /// The $I$ modified First Bessel function represent another kind of solution to the Bessel differential equation.
-/// 
-/// `x` is the value to evaluate, and `n` the order of the function.
 /// 
 /// We use a definition of I based on an infinite series (similar to $J$). This way, we ensure good precision in
 /// the computation, by following the definition:
@@ -336,6 +353,13 @@ where T: Into<Complex> + Copy, U: Into<f64> {
 /// I_\alpha = i^{-\alpha}J_\alpha(ix)=\sum_{m=0}^{\infty}\frac{1}{m!\Gamma(m+\alpha+1)}\left( \frac{x}{2} \right)^{2m+\alpha}
 /// $$
 /// 
+/// ## Inputs
+/// - `x` is the value to evaluate ($x$)
+/// - `order` the order of the function ($\alpha$)
+/// 
+/// Returns the value of the real order of the Bessel $I$ function at $x$.
+/// 
+/// ## Example
 /// ```
 /// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::{i, jf};
@@ -391,15 +415,21 @@ where T: Into<Complex>, U: Into<f64> + Copy {
 
 /// # $K$ modified Bessel function
 /// 
+/// ## Definition
 /// The $K$ modified Second Bessel function represent another kind of solution to the Bessel differential equation.
-/// 
-/// `x` is the value to evaluate, and `n` the order of the function.
 /// 
 /// The definition of $K$ is similar to $Y$, but is based on $I$ and not $J$:
 /// $$
 /// K_\alpha(x) = \frac{\pi}{2}\frac{I_{-\alpha}(x) - I_\alpha(x)}{\sin(\alpha\pi)}
 /// $$
 /// 
+/// ## Inputs
+/// - `x` is the value to evaluate ($x$)
+/// - `order` the order of the function ($\alpha$)
+/// 
+/// Returns the value of the real order of the Bessel $K$ function at $x$.
+/// 
+/// ## Example
 /// ```
 /// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::k;
@@ -425,13 +455,21 @@ where T: Into<Complex> + Copy, U: Into<f64> {
     }
 }
 
-/// # First Hankel function: H1
+/// # First Hankel function: $H^(1)$
 /// 
+/// ## Definition
 /// Computes the first kind of Hankel function, which is defined as:
 /// $$
 /// H_\alpha^{(1)}(x) = J_\alpha(x) + iY_\alpha(x)
 /// $$
 /// 
+/// ## Inputs
+/// - `x` is the value to evaluate ($x$)
+/// - `order` the order of the function ($\alpha$)
+/// 
+/// Returns the value of the real order of the first hankel function at $x$.
+/// 
+/// ## Example
 /// ```
 /// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::hankel_first;
@@ -453,13 +491,21 @@ where T: Into<Complex> + Copy, U: Into<f64> {
     res_j + res_y
 }
 
-/// # Second Hankel function: H2
+/// # Second Hankel function: $H^(2)$
 /// 
+/// ## Definition
 /// Computes the first kind of Hankel function, which is defined as:
 /// $$
 /// H_\alpha^{(2)}(x) = J_\alpha(x) - iY_\alpha(x)
 /// $$
 /// 
+/// ## Inputs
+/// - `x` is the value to evaluate ($x$)
+/// - `order` the order of the function ($\alpha$)
+/// 
+/// Returns the value of the real order of the second hankel function at $x$.
+/// 
+/// ## Example
 /// ```
 /// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::hankel_second;
@@ -484,15 +530,19 @@ where T: Into<Complex> + Copy, U: Into<f64> {
 
 /// # First spherical Bessel function: $j$
 /// 
+/// ## Definition
 /// We follow the definition based on the $J$ Bessel functions:
 /// $$
 /// j_n(x) = \sqrt{\frac{\pi}{2x}}J_{n+\frac{1}{2}}(x)
 /// $$
 /// 
-/// Compute the first kind of spherical bessel function.
-/// * `z` - where the function is evaluated
-/// * `n` - order evaluated
+/// ## Inputs
+/// - `z`: where the function is evaluated ($x$)
+/// - `n`: order evaluated ($n$)
 /// 
+/// Returns the first kind of spherical bessel function.
+/// 
+/// ## Example
 /// ```
 /// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::*;
@@ -542,10 +592,14 @@ where T: Into<Complex> {
 
 /// # First spherical Bessel function (array): j
 /// 
+/// ## Inputs
 /// Computes the first kind of spherical bessel function by recurrence to get an array of function.
-/// * `z` - where the function is evaluated
-/// * `n` - maximum order evaluated, return a vector from 0 to the nth order included : `sj[0]` to `sj[n]`
+/// - `z`: where the function is evaluated
+/// - `n`: maximum order evaluated
 /// 
+/// Returns a vector from 0 to the nth order included : `sj[0]` to `sj[n]`.
+/// 
+/// ## Example
 /// ```
 /// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::*;
@@ -607,15 +661,19 @@ where T: Into<Complex> {
 
 /// # Second spherical Bessel function: $y$
 /// 
+/// ## Definition
 /// We follow the definition based on the $Y$ Bessel functions:
 /// $$
 /// y_n(x) = \sqrt{\frac{\pi}{2x}}Y_{n+\frac{1}{2}}(x)
 /// $$
 /// 
-/// Compute the second kind of spherical bessel function.
-/// * `z` - where the function is evaluated
-/// * `n` - order evaluated
+/// ## Inputs
+/// - `z`: where the function is evaluated
+/// - `n`: order evaluated
 /// 
+/// Returns the second kind of spherical bessel function.
+/// 
+/// ## Example
 /// ```
 /// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::*;
@@ -630,10 +688,14 @@ where T: Into<Complex> {
 
 /// # Second spherical Bessel function (array): y
 /// 
+/// ## Inputs
 /// Computes the second kind of spherical bessel function by recurrence to get an array of function.
-/// * `z` - where the function is evaluated
-/// * `n` - maximum order evaluated, return a vector from 0 to the nth order included : `sy[0]` to `sy[n]`
+/// - `z`: where the function is evaluated
+/// - `n`: maximum order evaluated
 /// 
+/// Returns a vector from 0 to the nth order included : `sy[0]` to `sy[n]`.
+/// 
+/// ## Example
 /// ```
 /// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::*;
@@ -681,17 +743,20 @@ where T: Into<Complex> {
     yn
 }
 
-/// # First spherical Hankel function: h1
+/// # First spherical Hankel function: $h^(1)$
 /// 
+/// ## Definition
 /// The first spherical hankel function is defined as:
 /// $$
 /// h_n^{(1)}(x) = j_n(x) + iy_n(x)
 /// $$
 /// 
+/// ## Inputs
 /// Compute the first kind of spherical hankel function.
-/// * `z` - where the function is evaluated
-/// * `n` - order evaluated
+/// - `z`: where the function is evaluated ($x$)
+/// - `n`: order evaluated ($n$)
 /// 
+/// # Example
 /// ```
 /// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::*;
@@ -704,12 +769,16 @@ where T: Into<Complex> {
     sj(x, n) + Complex::i() * sy(x, n)
 }
 
-/// # First spherical Hankel function (array): h1
+/// # First spherical Hankel function (array): $h^(2)$
 /// 
+/// ## Inputs
 /// Compute the first kind of spherical hankel function by recurrence to get an array of function.
-/// * `z` - where the function is evaluated
-/// * `n` - maximum order evaluated, return a vector from 0 to the nth order included : `sh_first[0]` to `sh_first[n]`
+/// - `z`: where the function is evaluated
+/// - `n`: maximum order evaluated
 /// 
+/// Returns a vector from 0 to the nth order included : `sh_first[0]` to `sh_first[n]`.
+/// 
+/// # Example
 /// ```
 /// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::*;
@@ -738,17 +807,21 @@ where T: Into<Complex> {
     sh_first
 }
 
-/// # Second spherical Hankel function: h2
+/// # Second spherical Hankel function: $h^(2)$
 /// 
+/// ## Definition
 /// The second spherical hankel function is defined as:
 /// $$
 /// h_n^{(2)}(x) = j_n(x) - iy_n(x)
 /// $$
 /// 
-/// Compute the second kind of spherical hankel function.
-/// * `z` - where the function is evaluated
-/// * `n` - order evaluated
+/// ## Inputs
+/// - `z`: where the function is evaluated ($x$)
+/// - `n`: order evaluated ($n$)
 /// 
+/// Returns the second kind of spherical hankel function.
+/// 
+/// ## Example
 /// ```
 /// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::*;
@@ -761,12 +834,16 @@ where T: Into<Complex> {
     sj(x, n) - Complex::i() * sy(x, n)
 }
 
-/// # Second spherical Hankel function (array): h2
+/// # Second spherical Hankel function (array): $h^(2)$
 /// 
+/// ## Inputs
 /// Compute the second kind of spherical hankel function by recurrence to get an array of function.
-/// * `z` - where the function is evaluated
-/// * `n` - maximum order evaluated, return a vector from 0 to the nth order included : `sh_second[0]` to `sh_second[n]`
+/// - `z`: where the function is evaluated
+/// - `n`: maximum order evaluated
 /// 
+/// Returns a vector from 0 to the nth order included : `sh_second[0]` to `sh_second[n]`.
+/// 
+/// ## Example
 /// ```
 /// # use scilib::math::complex::Complex;
 /// # use scilib::math::bessel::*;
