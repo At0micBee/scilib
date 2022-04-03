@@ -19,8 +19,18 @@ use super::constant;
 
 /// # Radec coordinate system
 ///
+/// ## Definition
 /// Right ascension and declination of the object in the sky. The values are stored as `f64` internally, and in radians.
 /// The distance is kept in meters internally, for homogeneousness.
+/// 
+/// ## Example
+/// ```
+/// # use scilib::astronomy::Radec;
+/// let radec = Radec { ra: 0.3, dec: 1.2, dist_earth: None };
+/// assert_eq!(radec.ra, 0.3);
+/// assert_eq!(radec.dec, 1.2);
+/// assert_eq!(radec.dist_earth, None);
+/// ```
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct Radec {
     /// Right ascension
@@ -50,8 +60,16 @@ impl Display for Radec {
 /// Implementing required methods
 impl Radec {
 
-    /// # Radec coordinates from angles in radians
-    ///
+    /// # Radec coordinates from radians
+    /// Generates the struct from angles given in radians.
+    /// 
+    /// ## Inputs
+    /// - `ra`: right ascension, in radians
+    /// - `dec`:  declination, in radians
+    /// 
+    /// Returns a new Radec struct.
+    /// 
+    /// ## Example
     /// ```
     /// # use std::f64::consts::{ FRAC_PI_3, FRAC_PI_6 };
     /// # use scilib::astronomy::Radec;
@@ -70,7 +88,15 @@ impl Radec {
     }
 
     /// # Radec coordinates from angles in degrees
+    /// Generates the struct from angles given in degrees.
     ///
+    /// ## Inputs
+    /// - `ra`: right ascension, in degrees
+    /// - `dec`:  declination, in degrees
+    /// 
+    /// Returns a new Radec struct.
+    /// 
+    /// ## Example
     /// ```
     /// # use std::f64::consts::{ FRAC_PI_3, FRAC_PI_6 };
     /// # use scilib::astronomy::Radec;
@@ -89,9 +115,14 @@ impl Radec {
     }
 
     /// # Specifying known distance
+    /// Appends the distance to the Radec struct.
     /// 
-    /// Internal structure uses distance in meters.
+    /// ## Input
+    /// - `distance`: distance of the object from earth, in meters ($m$)
     /// 
+    /// Returns the initial struct with the distance appended.
+    /// 
+    /// ## Example
     /// ```
     /// # use scilib::constant;
     /// # use scilib::astronomy::Radec;
@@ -108,15 +139,22 @@ impl Radec {
 
     /// # Angular separation computation
     ///
+    /// ## Definition
     /// We use the Vincenty formula to compute the angular separation, as it should remain stable no matter
-    /// the separations and positions of the objects. The resulting separation will be in the range [0, pi];
+    /// the separations and positions of the objects. The resulting separation will be in the range [0, $\pi$];
     ///
+    /// ## Inputs
+    /// - `self`: the first object in Radec
+    /// - `other`: the second object in Radec
+    /// 
+    /// Returns the angular separation in radians ($rad$).
+    /// 
+    /// ## Example
     /// ```
-    /// use scilib::astronomy::Radec;
+    /// # use scilib::astronomy::Radec;
     /// let c1 = Radec::from_rad(1.0, -1.2);
     /// let c2 = Radec::from_rad(-2.02, 0.13);
-    ///
-    /// assert!((c1.separation(c2) - 2.0685709648870154).abs() < 1.0e-15);
+    /// assert!((c1.separation(&c2) - 2.0685709648870154).abs() < 1.0e-15);
     /// ```
     pub fn separation(&self, other: &Self) -> f64 {
 
@@ -143,12 +181,22 @@ impl Radec {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # Apparent magnitude
+/// 
+/// ## Definition
 /// Uses the standard reference luminosity to compute the apparent magnitude of an object.
 /// $$
-/// m_\mathrm{obj} = -2.5\log\left( \frac{b_\mathrm{obj}}{b_\mathrm{ref}} \right)
+/// m = -2.5\log\left( \frac{F}{F_\circ} \right)
 /// $$
-/// Where $F_\mathrm{obj}$ is the flux of the object and $F_\mathrm{ref}$ is the reference flux (see constants).
+/// Where $F$ is the irradiance of the object, computed with $F = I(L, d)$
+/// and $F_\circ$ is the apparent bolometric luminosity.
 /// 
+/// ## Inputs
+/// - `lum`: luminosity of the object ($L$), in watts ($W$)
+/// - `dist`: distance from the observer ($d$), in meters ($m$)
+/// 
+/// Returns the apparent magnitude of the object, dimensionless.
+/// 
+/// ## Example
 /// ```
 /// # use scilib::constant;
 /// # use scilib::astronomy::apparent_mag;
@@ -163,11 +211,20 @@ pub fn apparent_mag(lum: f64, dist: f64) -> f64 {
 }
 
 /// # Absolute magnitude
+/// 
+/// ## Definition
 /// Same approach that the apparent magnitude, but set at a distance of 10pc.
 /// $$
-/// M = -2.5\log\left( \frac{L}{L_0} \right)
+/// M = -2.5\log\left( \frac{L}{L_\circ} \right)
 /// $$
+/// Where $L_\circ$ is the absolute bolometric magnitude.
 /// 
+/// ## Inputs
+/// - `lum`: luminosity of the object ($L$), in watts ($W$)
+/// 
+/// Returns the magnitude of the object, dimensionless.
+/// 
+/// ## Example
 /// ```
 /// # use scilib::constant;
 /// # use scilib::astronomy::absolute_mag;
@@ -180,12 +237,21 @@ pub fn absolute_mag(lum: f64) -> f64 {
 }
 
 /// # Distance modulus
+/// 
+/// ## Definition
 /// Computes the distance of an object based on its apparent and absolute magnitudes:
 /// $$
 /// d = 10^{1 + \frac{m-M}{5}}
 /// $$
 /// Where $m$ is the apparent magnitude and $M$ is the absolute magnitude.
 /// 
+/// ## Inputs
+/// - `m_app`: apparent magnitude ($m$), dimensionless
+/// - `m_abs`: absolute magnitude ($M$), dimensionless
+/// 
+/// Returns the distance in parsecs ($pc$).
+/// 
+/// ## Example
 /// ```
 /// # use scilib::constant;
 /// # use scilib::astronomy::{ apparent_mag, absolute_mag, distance_mod };
@@ -199,15 +265,32 @@ pub fn distance_mod(m_app: f64, m_abs: f64) -> f64 {
 }
 
 /// # Equilibrium temperature
+/// 
+/// ## Definition
 /// Knowing the stellar effective temperature, its radius, the distance from the star
 /// and the albedo of the considered planet, we can compute the equilibrium temperature
-/// found at the planet.
-pub fn t_eq(star_t: f64, star_rad: f64, dist: f64, albedo: f64) -> f64 {
+/// found at the planet, computed with:
+/// $$
+/// T_\mathrm{eq} = T_\mathrm{star} \sqrt{\frac{R_\mathrm{star}}{2d}} (1 - A)
+/// $$
+/// Where $T_\mathrm{star}$ and $R_\mathrm{star}$ are the effective temperature of the host star and its radius,
+/// $d$ is the distance from the star and $A$ is the albedo of the planet.
+/// 
+/// ## Inputs
+/// - `star_t`: star effective temperature ($T_\mathrm{star}$), in kelvins ($K$)
+/// - `star_rad`: star radius ($R_\mathrm{star}$), in meters ($m$)
+/// - `dist`: distance to host star ($d$), in meters ($m$)
+/// - `albedo`: albedo of the planet ($A$), dimensionless
+/// 
+/// Returns the temperature in kelvins ($K$).
+pub fn equilibrium_temperature(star_t: f64, star_rad: f64, dist: f64, albedo: f64) -> f64 {
     // Following the formula
     star_t * (star_rad / (2.0 * dist)).sqrt() * (1.0 - albedo).sqrt()
 }
 
 /// # Object irradiance
+/// 
+/// ## Definition
 /// Computes the irradiance at a certain distance from an object, using its luminosity.
 /// The `luminosity` is in Watts and the `distance` is in meters, result is in `W.m-2`.
 /// The formula used is:
@@ -216,6 +299,13 @@ pub fn t_eq(star_t: f64, star_rad: f64, dist: f64, albedo: f64) -> f64 {
 /// $$
 /// Where $L$ is the luminosity and $d$ is the distance.
 ///
+/// ## Inputs
+/// - `luminosity`: luminosity of the object ($L$), in watts ($W$)
+/// - `distance`: distance form the object ($d$), in meters ($m$)
+/// 
+/// Returns the irradiance in watt per square meters ($W.m^{-2}$)
+/// 
+/// ## Example
 /// ```rust
 /// # use scilib::constant;
 /// # use scilib::astronomy;
@@ -233,6 +323,8 @@ pub fn irradiance(luminosity: f64, distance: f64) -> f64 {
 }
 
 /// # Energy received by an object
+/// 
+/// ## Definition
 /// Computes the received energy by an object of a given surface, at a known distance.
 /// Makes use of the `irradiance` function to compute the surfacic power output by the object,
 /// it is defined as:
@@ -240,28 +332,52 @@ pub fn irradiance(luminosity: f64, distance: f64) -> f64 {
 /// E = I(L, d) S
 /// $$
 /// Where $I(L, d)$ is the irradiance function and $S$ is the surface of the object.
+/// 
+/// ## Inputs
+/// - `luminosity`: luminosity of the object ($L$), in watts ($W$)
+/// - `distance`: distance form the object ($d$), in meters ($m$)
+/// - `surface`: exposed surface of the object ($S$), in square meters ($m^2$)
+/// 
+/// Returns the irradiance of the object in watts ($W$).
 pub fn received_energy(luminosity: f64, distance: f64, surface: f64) -> f64 {
     // Following the formula
     irradiance(luminosity, distance) * surface
 }
 
 /// # Planetary luminosity
+/// 
+/// ## Definition
 /// Computes the luminosity of a planet, based on the received irradiance and the albedo:
 /// $$
 /// L_\mathrm{P} = E_\mathrm{received} A = I(L, d) S A
 /// $$
 /// Where $S$ is the surface, $A$ the albedo, and $E_\mathrm{received} = I(L, d) S$ is the energy
 /// received by the planet.
+/// 
+/// ## Inputs
+/// - `albedo`: albedo of the object ($A$), dimensionless
+/// - `received`: power received by the object ($I(L, d)$), in watts ($W$)
+/// 
+/// Returns the luminosity in watts ($W$).
 pub fn planet_luminosity(albedo: f64, received: f64) -> f64 {
     received * albedo
 }
 
 /// # Luminosity using Stefan-Boltzmann
+/// 
+/// ## Definition
 /// Computes the expected luminosity of a star using the Stefan-Boltzmann constant, from:
 /// $$
 /// L = 4\pi\sigma R^2 T^4
 /// $$
 /// 
+/// ## Inputs
+/// - `radius`: radius of the star ($R$), in meters ($m$)
+/// - `temperature`: effective temperature of the star ($T$), in kelvins ($K$)
+/// 
+/// Returns the luminosity of the star in watts ($W$).
+/// 
+/// ## Example
 /// ```
 /// # use scilib::constant;
 /// # use scilib::astronomy::{ luminosity, absolute_mag };
