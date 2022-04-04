@@ -12,6 +12,7 @@ use super::{            // Using parts from the crate
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # Legendre polynomials
+/// ## Definition
 /// The [Legendre polynomials](https://en.wikipedia.org/wiki/Legendre_polynomials) are used as solution to the Legendre differential equations, which can be written as:
 /// $$
 /// (1-x^2)\frac{d^2P_n(x)}{dx^2} - 2x\frac{dP_n(x)}{dx} + n(n+1)P_n(x) = 0
@@ -61,13 +62,17 @@ impl std::fmt::Display for Legendre {
 
 /// Implementing the required methods
 impl Legendre {
+    /// # Creates a new instance of Legendre
+    /// ## Inputs
     /// Produces the factors and powers for nth order polynomial, where
-    /// `l` is the order of the Legendre polynomial and `m` is the derivative order.
+    /// - `l`: the order of the Legendre polynomial
+    /// - `m`: the derivative order
     /// 
     /// By definition, we have that $l\ge0$ and $-l\le m\le l$.
     /// 
-    /// Returns: `Self`, the corresponding struct
+    /// Returns a `Self`, the corresponding Legendre struct.
     ///
+    /// ## Example
     /// ```
     /// # use scilib::math::polynomial::Legendre;
     /// let p20 = Legendre::new(2, 0);      // l=2, m=0
@@ -120,6 +125,7 @@ impl Legendre {
         poly
     }
 
+    /// # Polynomial derivation
     /// Computes the m derivative of the polynomial
     ///
     /// This is used to produce the $P_n^m(x)$ version of the polynomial.
@@ -152,10 +158,13 @@ impl Legendre {
         }
     }
 
-    /// Computes the value of `x` for the given polynomial (`x`: real).
+    /// # Compute the polynomial for a real number
+    /// ## Inputs
+    /// - `x`: the value to evaluate (`x`: real)
     /// 
-    /// Returns: the result of the polynomial $P_l^m(x)$.
+    /// Returns the result of the polynomial $P_l^m(x)$.
     /// 
+    /// ## Example
     /// ```
     /// # use scilib::math::polynomial::Legendre;
     /// let x = -0.25;                      // Example value
@@ -177,10 +186,13 @@ impl Legendre {
         pre * self.factor.iter().zip(&self.power).fold(0.0, |res, (f, p)| res + f * x.powi(*p))
     }
 
-    /// Computes the value of `z` for the given polynomial (`z`: complex).
+    /// # Compute the polynomial for a complex number
+    /// ## Inputs
+    /// - `z`: the value to evaluate (`z`: complex)
     /// 
-    /// Returns: the result of the polynomial $P_l^m(z)$.
+    /// Returns the result of the polynomial $P_l^m(z)$.
     /// 
+    /// ## Example
     /// ```
     /// # use scilib::math::complex::Complex;
     /// # use scilib::math::polynomial::Legendre;
@@ -204,6 +216,7 @@ impl Legendre {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # Laguerre polynomials
+/// ## Definition
 /// The [Laguerre polynomials](https://en.wikipedia.org/wiki/Laguerre_polynomials) are the solution to the Laguerre differential equation:
 /// $$
 /// x\frac{d^2L_n}{dx^2} + (1-x)\frac{dL_n}{dx} + mL_n = 0
@@ -249,14 +262,18 @@ impl std::fmt::Display for Laguerre {
 
 /// Implementing the required methods
 impl Laguerre {
+    /// # Creates a new instance of Laguerre
+    /// ## Inputs
     /// Produces the factors and powers for nth order polynomial, where
-    /// `l`: the order of the Legendre polynomial and `m`: The derivative order.
+    /// - `l`: the order of the Legendre polynomial
+    /// - `m`: the derivative order.
     /// 
     /// The factors of the polynomials are normalized.
-    /// 
     /// By definition, we have that $l\ge0$ and $m\ge0$.
     /// 
-    /// Returns: `Self`, the corresponding struct
+    /// Returns a `Self`, the corresponding struct.
+    /// 
+    /// ## Example
     /// ```
     /// # use scilib::math::polynomial::Laguerre;
     /// let p20 = Laguerre::new(2, 0);      // l=2, m=0
@@ -293,10 +310,13 @@ impl Laguerre {
         }
     }
 
-    /// Computes the value of `x` for the given polynomial (x: real).
+    /// # Compute the polynomial for a real number
+    /// ## Inputs
+    /// - `x`: the value to evaluate (`x`: real)
     /// 
-    /// Returns: the result of the polynomial $P_l^m(x)$.
+    /// Returns the result of the polynomial $L_n^m(x)$.
     /// 
+    /// ## Example
     /// ```
     /// # use scilib::math::polynomial::Laguerre;
     /// let x = 0.2;                        // Example value
@@ -314,10 +334,13 @@ impl Laguerre {
         self.factor.iter().zip(&self.power).fold(0.0, |res, (f, p)| res + f * x.powi(*p))
     }
 
-    /// Computes the value of `z` for the given polynomial (z: complex).
+    /// # Compute the polynomial for a complex number
+    /// ## Inputs
+    /// - `z`: the value to evaluate (`z`: complex)
     /// 
-    /// Returns: the result of the polynomial $P_l^m(z)$.
+    /// Returns the result of the polynomial L_n^m(z)$.
     /// 
+    /// ## Example
     /// ```
     /// # use scilib::math::complex::Complex;
     /// # use scilib::math::polynomial::Laguerre;
@@ -341,6 +364,7 @@ impl Laguerre {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # Bernoulli polynomials
+/// ## Definition
 /// The [Bernoulli polynomial](https://en.wikipedia.org/wiki/Bernoulli_polynomials) are present in a great variety
 /// of particular functions, and are closely related to the Euler polynomial (also in this crate).
 /// They are defined by the generating function:
@@ -385,12 +409,18 @@ impl std::fmt::Display for Bernoulli {
 impl Bernoulli {
 
     /// # Bernoulli number generator
-    /// 
+    /// ## Definition
     /// Following the $B_m^{-}$ convention, we use the formula:
     /// $$
     /// B_m^{-} = \sum_{k=0}^{m}\sum_{v=0}^{k}(-1)^v \binom{k}{v}\frac{v^m}{k+1}
     /// $$
     /// 
+    /// ## Inputs
+    /// - `m`: the index of the number to compute
+    /// 
+    /// Returns the Associated Bernoulli number.
+    /// 
+    /// ## Example
     /// ```
     /// # use scilib::math::polynomial::Bernoulli;
     /// let num_0: f64 = Bernoulli::gen_number(0);
@@ -423,12 +453,15 @@ impl Bernoulli {
         res
     }
 
-    /// Produces the factors and powers for nth order polynomial.
+    /// # Creates a new instance of Bernoulli
+    /// ## Inputs
+    /// - `n`: the order of the polynomial
     /// 
     /// By definition, we have that $n\ge0$.
     /// 
-    /// Returns: `Self`, the corresponding struct
+    /// Returns a `Self`, the corresponding struct.
     /// 
+    /// ## Example
     /// ```
     /// # use scilib::math::polynomial::Bernoulli;
     /// let p2 = Bernoulli::new(2);         // n=2
@@ -454,10 +487,13 @@ impl Bernoulli {
         }
     }
 
-    /// Computes the value of `x` for the given polynomial (`x`: real).
+    /// # Compute the polynomial for a real number
+    /// ## Inputs
+    /// - `x`: the value to evaluate (`x`: real)
     /// 
-    /// Returns: the result of the polynomial $B_n(x)$.
+    /// Returns the result of the polynomial $B_n(x)$.
     /// 
+    /// ## Example
     /// ```
     /// # use scilib::math::polynomial::Bernoulli;
     /// let x = 2.5;                        // Example value
@@ -475,10 +511,13 @@ impl Bernoulli {
         self.factor.iter().zip(&self.power).fold(0.0, |res, (f, p)| res + f * x.powi(*p))
     }
 
-    /// Computes the value of `z` for the given polynomial (`z`: complex).
+    /// # Compute the polynomial for a complex number
+    /// ## Inputs
+    /// - `z`: the value to evaluate (`z`: complex)
     /// 
-    /// Returns: the result of the polynomial $B_n(z)$.
+    /// Returns the result of the polynomial $B_n(z)$.
     /// 
+    /// ## Example
     /// ```
     /// # use scilib::math::complex::Complex;
     /// # use scilib::math::polynomial::Bernoulli;
@@ -502,6 +541,7 @@ impl Bernoulli {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # Euler polynomials
+/// ## Definition
 /// The [Euler polynomial](https://en.wikipedia.org/wiki/Bernoulli_polynomials) are present in a great variety
 /// of particular functions, and are closely related to the Euler polynomial (also in this crate).
 /// They are defined by the generating function:
@@ -545,13 +585,19 @@ impl std::fmt::Display for Euler {
 /// Implementing the required methods
 impl Euler {
     /// # Euler number generator
-    /// 
+    /// ## Definition
     /// We use the formula:
     /// $$
     /// E_k = \sum_{i=1}^{k}(-1)^{i}\frac{1}{2^i}\sum_{l=0}^{2i}(-1)^l\binom{2i}{l}(i-l)^{k}
     /// $$
     /// For every even $k$; else the result is 0.
     /// 
+    /// ## Inputs
+    /// - `m`: the index of the number to generate
+    /// 
+    /// Returns the associated Euler number.
+    /// 
+    /// ## Example
     /// ```
     /// # use scilib::math::polynomial::Euler;
     /// // We know that all odd Euler numbers are 0
@@ -599,12 +645,15 @@ impl Euler {
         res
     }
 
-    /// Produces the factors and powers for nth order polynomial.
+    /// # Creates a new instance of Euler
+    /// ## Inputs
+    /// - `n`: order of the polynomial
     /// 
     /// By definition, we have that $n\ge0$.
     /// 
-    /// Returns: `Self`, the corresponding struct
+    /// Returns a `Self`, the corresponding struct.
     /// 
+    /// ## Example
     /// ```
     /// # use scilib::math::polynomial::Euler;
     /// let p3 = Euler::new(3);             // n=3
@@ -637,10 +686,13 @@ impl Euler {
         }
     }
 
-    /// Computes the value of `x` for the given polynomial (`x`: real).
+    /// # Compute the polynomial for a real number
+    /// ## Inputs
+    /// - `x`: the value to evaluate (`x`: real)
     /// 
-    /// Returns: the result of the polynomial $E_n(x)$
+    /// Returns the result of the polynomial $E_n(x)$.
     /// 
+    /// ## Example
     /// ```
     /// # use scilib::math::polynomial::Euler;
     /// let x = -1.1;                    // Example value
@@ -658,10 +710,13 @@ impl Euler {
         self.factor.iter().zip(&self.power).fold(0.0, |res, (f, p)| res + f * x.powi(*p))
     }
 
-    /// Computes the value of `z` for the given polynomial (`z`: complex).
+    /// # Compute the polynomial for a complex number
+    /// ## Inputs
+    /// - `z`: the value to evaluate (`z`: complex)
     /// 
-    /// Returns: the result of the polynomial $E_n(z)$
+    /// Returns the result of the polynomial $E_n(z)$.
     /// 
+    /// ## Example
     /// ```
     /// # use scilib::math::complex::Complex;
     /// # use scilib::math::polynomial::Euler;
