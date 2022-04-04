@@ -90,7 +90,7 @@
 //! ```rust
 //! # use scilib::math::complex::Complex;
 //! # use scilib::math::bessel::{ sj, sj_array };
-//! let c: Complex::from(1.44, 2.22);
+//! let c = Complex::from(1.44, 2.22);
 //! let res = sj(c, 2);         // Computes the single term
 //! let res_a = sj_array(c, 2); // Computes all term up to 2
 //! ```
@@ -101,7 +101,7 @@
 //! ```rust
 //! # use scilib::math::complex::Complex;
 //! # use scilib::math::bessel::{ sy, sy_array };
-//! let c: Complex::from(2.53, -0.33);
+//! let c = Complex::from(2.53, -0.33);
 //! let res = sy(c, 2);         // Computes the single term
 //! let res_a = sy_array(c, 5); // Computes all term up to 5
 //! ```
@@ -112,7 +112,7 @@
 //! ```rust
 //! # use scilib::math::complex::Complex;
 //! # use scilib::math::bessel::{ sh_first, sh_first_array };
-//! let c: Complex::from(0.2253, 4.25);
+//! let c = Complex::from(0.2253, 4.25);
 //! let res = sh_first(c, 2);           // Computes the single term
 //! let res_a = sh_first_array(c, 4);   // Computes all term up to 5
 //! ```
@@ -123,7 +123,7 @@
 //! ```rust
 //! # use scilib::math::complex::Complex;
 //! # use scilib::math::bessel::{ sh_second, sh_second_array };
-//! let c: Complex::from(-5.2, -0.356);
+//! let c = Complex::from(-5.2, -0.356);
 //! let res = sh_second(c, 2);          // Computes the single term
 //! let res_a = sh_second_array(c, 7);  // Computes all term up to 7
 //! ```
@@ -141,7 +141,7 @@
 //! ```rust
 //! # use scilib::math::complex::Complex;
 //! # use scilib::math::bessel::riccati_s;
-//! let c: Complex::from(0.3, 1.22);
+//! let c = Complex::from(0.3, 1.22);
 //! let res = riccati_s(c, 2);
 //! ```
 //! 
@@ -151,7 +151,7 @@
 //! ```rust
 //! # use scilib::math::complex::Complex;
 //! # use scilib::math::bessel::riccati_c;
-//! let c: Complex::from(-4.2, 2.13);
+//! let c = Complex::from(-4.2, 2.13);
 //! let res = riccati_c(c, 5);
 //! ```
 //! 
@@ -161,7 +161,7 @@
 //! ```rust
 //! # use scilib::math::complex::Complex;
 //! # use scilib::math::bessel::riccati_xi;
-//! let c: Complex::from(2.5, -0.25);
+//! let c = Complex::from(2.5, -0.25);
 //! let res = riccati_xi(c, 4);
 //! ```
 //! 
@@ -171,7 +171,7 @@
 //! ```rust
 //! # use scilib::math::complex::Complex;
 //! # use scilib::math::bessel::riccati_zeta;
-//! let c: Complex::from(-1.1, 8.2);
+//! let c = Complex::from(-1.1, 8.2);
 //! let res = riccati_zeta(c, 3);
 //! ```
 
