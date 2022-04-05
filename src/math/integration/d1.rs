@@ -1,14 +1,16 @@
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#[inline(always)]
 fn chunk_rect(a: f64, offset: f64) -> f64 {
     a * offset
 }
 
+#[inline(always)]
 fn chunk_trapz(a: f64, b: f64, offset: f64) -> f64 {
     (a + b) / 2.0 * offset
 }
 
+#[inline(always)]
 fn chunk_simp(
     p0: (f64 /*a0*/, f64 /*b0*/),
     p1: f64, /*b1*/
@@ -25,7 +27,9 @@ fn chunk_simp(
 /// * `lower_bound` - First limit of the integral (Fixed value)
 /// * `upper_bound` - Second limit of the integral (Fixed value)
 /// * `div` - Number of chunk evaluated: _big_ = high precision & low performances, _small_ = high performances & low precision
-/// 
+///
+/// **CAUTION**: `div` must be greater than 1
+///
 /// ```
 /// # use scilib::math::integration::d1::*;
 /// # use std::f64::consts::PI;
@@ -38,7 +42,7 @@ pub fn rect_fn(
     upper_bound: f64,
     div: usize,
 ) -> f64 {
-    assert!(div >= 1);
+    assert!(div >= 1, "div parameter must be greater than 1!");
     let mut area = 0.0;
     let step = (upper_bound - lower_bound) / div as f64;
     for i in 0..div {
@@ -53,7 +57,9 @@ pub fn rect_fn(
 /// * `lower_bound` - First limit of the integral (Fixed value)
 /// * `upper_bound` - Second limit of the integral (Fixed value)
 /// * `div` - Number of chunk evaluated: _big_ = high precision & low performances, _small_ = high performances & low precision
-/// 
+///
+/// **CAUTION**: `div` must be greater than 1
+///
 /// ```
 /// # use scilib::math::integration::d1::*;
 /// let res = trapz_fn(|x| x.exp(), -2.0, 10.0, 10_000);
@@ -65,7 +71,7 @@ pub fn trapz_fn(
     upper_bound: f64,
     div: usize,
 ) -> f64 {
-    assert!(div >= 1);
+    assert!(div >= 1, "div parameter must be greater than 1!");
     let mut area = 0.0;
     let step = (upper_bound - lower_bound) / div as f64;
     let mut a = function(lower_bound);
@@ -84,6 +90,8 @@ pub fn trapz_fn(
 /// * `upper_bound` - Second limit of the integral (Fixed value)
 /// * `div` - Number of chunk evaluated: _big_ = high precision & low performances, _small_ = high performances & low precision
 ///
+/// **CAUTION**: `div` must be an even number greater than 2
+///
 /// ```
 /// # use scilib::math::integration::d1::*;
 /// let res = simp_fn(|x| x.exp(), -2.0, 10.0, 1000);
@@ -95,7 +103,10 @@ pub fn simp_fn(
     upper_bound: f64,
     div: usize,
 ) -> f64 {
-    assert!(div >= 2 && div % 2 == 0);
+    assert!(
+        div >= 2 && div % 2 == 0,
+        "div paramater must be an even number greater than 2!"
+    );
     let mut area = 0.0;
     let step = (upper_bound - lower_bound) / div as f64;
     let mut p0 = (lower_bound, function(lower_bound));
@@ -113,7 +124,7 @@ pub fn simp_fn(
 /// # (d1) Rectangle rule - Data by tuples
 /// Integrate one-dimensional function represented by data enclosed in tuples through the rectangle rule:
 /// * `data` - array of tuples corresponding to `x` and `y` rescpectively
-/// 
+///
 /// ```
 /// # use scilib::math::integration::d1::*;
 /// let count = 1_000;
@@ -139,7 +150,7 @@ pub fn rect_dt_tup(data: &[(f64, f64)]) -> f64 {
 /// # (d1) Trapezoidal rule - Data by tuples
 /// Integrate one-dimensional function represented by data enclosed in tuples through the trapezoidal rule:
 /// * `data` - array of tuples corresponding to `x` and `y` rescpectively
-/// 
+///
 /// ```
 /// # use scilib::math::integration::d1::*;
 /// let count = 100;
@@ -162,6 +173,7 @@ pub fn trapz_dt_tup(data: &[(f64, f64)]) -> f64 {
     area
 }
 
+#[inline(always)]
 fn chunk_simp_dt(
     p0: (f64 /*a0*/, f64 /*b0*/),
     p1: (f64 /*a1*/, f64 /*b1*/),
@@ -169,15 +181,16 @@ fn chunk_simp_dt(
 ) -> f64 {
     let h0 = p1.0 - p0.0;
     let h1 = p2.0 - p1.0;
-    (h0 + h1) / 6.0 * ((2.0 - h1 / h0) * p0.1 + (h0 + h1).powi(2) / (h0 * h1) * p1.1 + (2.0 - h0 / h1) * p2.1)
+    (h0 + h1) / 6.0
+        * ((2.0 - h1 / h0) * p0.1 + (h0 + h1).powi(2) / (h0 * h1) * p1.1 + (2.0 - h0 / h1) * p2.1)
 }
 
 /// # (d1) Simpson's rule - Data by tuples
 /// Integrate one-dimensional function represented by data enclosed in tuples through the trapezoidal rule:
 /// * `data` - array of tuples corresponding to `x` and `y` rescpectively
-/// 
+///
 /// **CAUTION**: `data.len()` must be an uneven number greater than 3
-/// 
+///
 /// ```
 /// # use scilib::math::integration::d1::*;
 /// let count = 11;
@@ -193,7 +206,10 @@ fn chunk_simp_dt(
 /// assert!(res.abs() < 1.0e-4);
 /// ```
 pub fn simp_dt_tup(data: &[(f64, f64)]) -> f64 {
-    assert!(data.len() >= 3 && data.len() % 2 == 1);
+    assert!(
+        data.len() >= 3 && data.len() % 2 == 1,
+        "size of data paramater must be an uneven number greater than 3!"
+    );
     let mut area = 0.0;
     for i in (0..data.len() - 2).step_by(2) {
         area += chunk_simp_dt(data[i], data[i + 1], data[i + 2]);
@@ -207,7 +223,9 @@ pub fn simp_dt_tup(data: &[(f64, f64)]) -> f64 {
 /// Integrate one-dimensional function represented by data enclosed in slices through the rectangle rule:
 /// * `x` - array of x-coordinates
 /// * `y` - array of y-coordinates
-/// 
+///
+/// **CAUTION**: `x.len()` and `y.len()` must be equals
+///
 /// ```
 /// # use scilib::math::integration::d1::*;
 /// let count = 1_000;
@@ -225,7 +243,10 @@ pub fn simp_dt_tup(data: &[(f64, f64)]) -> f64 {
 /// assert!(res.abs() < 1.0e-1);
 /// ```
 pub fn rect_dt_sli(x: &[f64], y: &[f64]) -> f64 {
-    assert!(x.len() == y.len());
+    assert!(
+        x.len() == y.len(),
+        "`x.len()` and `y.len()` must be equals!"
+    );
     let mut area = 0.0;
     for i in 0..x.len() - 1 {
         area += chunk_rect(y[i], x[i + 1] - x[i]);
@@ -237,7 +258,9 @@ pub fn rect_dt_sli(x: &[f64], y: &[f64]) -> f64 {
 /// Integrate one-dimensional function represented by data enclosed in slices through the trapezoidal rule:
 /// * `x` - array of x-coordinates
 /// * `y` - array of y-coordinates
-/// 
+///
+/// **CAUTION**: `x.len()` and `y.len()` must be equals
+///
 /// ```
 /// # use scilib::math::integration::d1::*;
 /// let count = 100;
@@ -255,7 +278,10 @@ pub fn rect_dt_sli(x: &[f64], y: &[f64]) -> f64 {
 /// assert!(res.abs() < 1.0e-3);
 /// ```
 pub fn trapz_dt_sli(x: &[f64], y: &[f64]) -> f64 {
-    assert!(x.len() == y.len());
+    assert!(
+        x.len() == y.len(),
+        "`x.len()` and `y.len()` must be equals!"
+    );
     let mut area = 0.0;
     for i in 0..x.len() - 1 {
         area += chunk_trapz(y[i], y[i + 1], x[i + 1] - x[i]);
@@ -267,7 +293,9 @@ pub fn trapz_dt_sli(x: &[f64], y: &[f64]) -> f64 {
 /// Integrate one-dimensional function represented by data enclosed in slices through the simpson rule:
 /// * `x` - array of x-coordinates
 /// * `y` - array of y-coordinates
-/// 
+///
+/// **CAUTION**: `x.len()` and `y.len()` must be equals and `x.len()` must be an uneven number greater than 3
+///
 /// ```
 /// # use scilib::math::integration::d1::*;
 /// let count = 11;
@@ -285,7 +313,7 @@ pub fn trapz_dt_sli(x: &[f64], y: &[f64]) -> f64 {
 /// assert!(res.abs() < 1.0e-4);
 /// ```
 pub fn simp_dt_sli(x: &[f64], y: &[f64]) -> f64 {
-    assert!(x.len() == y.len() && x.len() >= 3 && x.len() % 2 == 1);
+    assert!(x.len() == y.len() && x.len() >= 3 && x.len() % 2 == 1, "`x.len()` and `y.len()` must be equals and `x.len()` must be an uneven number greater than 3!");
     let mut area = 0.0;
     for i in (0..x.len() - 2).step_by(2) {
         area += chunk_simp_dt((x[i], y[i]), (x[i + 1], y[i + 1]), (x[i + 2], y[i + 2]));
