@@ -392,4 +392,59 @@ pub fn luminosity(radius: f64, temperature: f64) -> f64 {
     4.0 * PI * constant::SIGMA_SB * radius.powi(2) * temperature.powi(4)
 }
 
+/// # Rayleigh criterion
+/// ## Definition
+/// The Rayleigh criterion qualifies the minimum separation of two points that can be resolved
+/// as two distinct points by an instrument. It equates simply as:
+/// $$
+/// \epsilon = 1.22\frac{\lambda}{D}
+/// $$
+/// Where $\lambda$ is the considered wavelength and $D$ is the diameter of the instrument.
+/// 
+/// ## Inputs
+/// - `lambda`: considered wavelength ($\lambda$), in meters ($m$)
+/// - `d`: the diameter of the instrument ($d$), in meters ($m$)
+/// 
+/// ## Example
+/// ```
+/// # use scilib::constant;
+/// # use scilib::astronomy::rayleigh_criterion;
+/// let wave: f64 = 500.0 * constant::NANO;     // Greenish light
+/// let diam: f64 = 8.2;                        // VLT diameter
+/// let criterion = rayleigh_criterion(wave, diam);
+/// assert!((criterion - 7.43902439024e-8).abs() < 1.0e-8)
+/// ```
+pub fn rayleigh_criterion(lambda: f64, d: f64) -> f64 {
+    1.22 * lambda / d
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/// # Orbital speed of an object
+/// ## Definition
+/// Computation for the velocity of an object on an elliptical orbit. The definition is:
+/// $$
+/// v = \sqrt{GM\left( \frac{2}{R} - \frac{1}{a} \right)}
+/// $$
+/// Where $G$ is the gravitational constant, $M$ is the mass of the orbited body, $R$ is the current distance
+/// of the object from the center of mass of the orbited body and $a$ is the semi-major axis of the orbit.
+/// 
+/// ## Inputs
+/// - `mass`: the mass of the center body ($M$), in kilograms ($kg$)
+/// - `r`: distance from the center of focal point ($R$), in meters ($m$)
+/// - `a`: semi-major axis of the orbit ($a$), in meters ($m$)
+/// 
+/// ## Example
+/// ```
+/// # use scilib::constant;
+/// # use scilib::astronomy::orbital_speed;
+/// let rad = constant::EARTH_RADIUS + 421.0e3;     // ISS perigee
+/// let semi = 6795.0e3;                            // ISS semi-major axis
+/// let v = orbital_speed(constant::EARTH_MASS, rad, semi);
+/// assert!((v - 7654.416466312335).abs() < 1.0e-10);
+/// ```
+pub fn orbital_speed(mass: f64, r: f64, a: f64) -> f64 {
+    ( constant::G * mass * (2.0 / r - 1.0 / a) ).sqrt()
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
