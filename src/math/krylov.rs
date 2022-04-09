@@ -44,19 +44,19 @@ pub fn l2_norm(u : &Vec<f64>) -> f64 {
 }
 
 
-// /// # Matrix Vector multiplication 
-// /// 
-// /// Compute a matrix vector product
-// /// 
+/// # Matrix Vector multiplication 
+/// 
+/// Compute a matrix vector product
+/// 
 
-// pub fn mat_vec_product<T>(mat : &Vec<Vec<T>> ,  vector : &Vec<T> )
-// where T : Add + Mul {
+pub fn mat_vec_product<T>(mat : &Vec<Vec<T>> ,  vector : &Vec<T> )
+where T : Add + Mul {
     
-//     assert_eq!(mat.len(),vector.len(),"Matrix and vector must have the same length")
+    assert_eq!(mat.len(),vector.len(),"Matrix and vector must have the same length");
 
-//     mat.iter().zip(vector.iter()).map(||)
+   
     
-// }
+}
 
 /// # N-dimension Vector dot product
 ///  
@@ -196,6 +196,8 @@ pub fn gmres_given(
     let mut residual : Vec<f64> = Vec::new() ;          // Residue vector 
     let mut residual_norm : f64  ;                      // Norm of the residue 
 
+    let mut iterator : u32 = 0 ;                        // Algorithm iterator
+
     // Evaluation of func(u)
     initial_fu = func(&u) ;
     
@@ -212,13 +214,65 @@ pub fn gmres_given(
 
 
     // Beginning of the construction of the Krylov basis 
-    while residual_norm > tol {
+    while residual_norm > tol && iterator < max_iter {
 
         // First estimation of the kth basis vector 
         vk_estimate = jacobian_vec_estimate(&vk[vk.len()], &u, func);
 
+        // Othogonalisation of the estimated basis vector 
 
-        exit(20)
+        let mut new_hess_column : Vec<f64> = Vec::new(); // New column to the hessian matrix
+        
+        // For each existing basis vectors 
+        vk.iter().enumerate().for_each(|(j,vec)| {
+
+            // compute the dot product vk[j] 
+            let product = dot_product(vec, &vk_estimate);
+            
+            // add it to the new column of the hessian matrix 
+            new_hess_column.push( product);
+
+            // orthogonalize the estimated new basis vector 
+            vk_estimate =  vk_estimate.iter().enumerate().map(|(i,vec)| vec - product * vk[j][i]).collect();
+
+        });
+
+        // add the new column to the hessian matrix 
+        hessian.push(new_hess_column);
+
+        // Add a new row to the hessian matrix 
+        hessian.iter_mut().for_each(|column| {
+            column.push(0.0)
+        });
+
+        // get hessian matrix size 
+        let dim1 = hessian.len();
+        let dim2  = hessian[0].len();
+        
+        // update the last element of the matrix 
+        hessian[dim1][dim2] = l2_norm(&vk_estimate);
+
+        // Check for stopping conditions, detailed in the original article
+        if hessian[dim1][dim2] != 0.0 && iterator < max_iter {
+
+            // The new basis vector is the estimate normalized 
+            vk.push(
+                vk_estimate.iter().map(|estimate| estimate/hessian[dim1][dim2]).collect()
+            );
+            
+        } else {
+            // If the  stopping condition is met, stop loop and regress iterator by one
+            iterator = iterator - 1;
+            break;
+        }
+
+        // Check for convergence condition 
+        if hessian[dim1][dim2].abs() < tol { break } ;
+
+        // Beginning of the given rotation of the hessian matrix 
+        
+
+        iterator += 1 ;
     }; 
 
     initial_fu
