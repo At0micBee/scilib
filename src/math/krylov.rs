@@ -201,23 +201,30 @@ pub fn gmres_given(
     // Evaluation of func(u)
     initial_fu = func(&u) ;
     
-    // Compute initial residual and its norm 
+    // Compute initial residual as J.V - f(u) and its norm 
     residual = jacobian_vec_estimate(&du0, &u, func); 
-    residual_norm = l2_norm(&residual);
 
+    residual.iter_mut().enumerate().for_each(|(i,res)| *res = *res - initial_fu[i] );
+
+    residual_norm = l2_norm(&residual);
+    
     // Compute the first krylov vector as Vk0 = residual/residual_norm
     vk.push(
         residual.iter().map(|r| r/residual_norm).collect()
     );
+    
+    vk.iter().for_each(|v| print!("{:#?}", v));
 
     norm_func.push(residual_norm); 
-
-
+    
+    
     // Beginning of the construction of the Krylov basis 
     while residual_norm > tol && iterator < max_iter {
-
+        
+        //print!("{:#?}\n\n", hessian);
+        print!("LOLLOLOLOLOLOLOLOL");
         // First estimation of the kth basis vector 
-        vk_estimate = jacobian_vec_estimate(&vk[vk.len()], &u, func);
+        vk_estimate = jacobian_vec_estimate(&vk[vk.len()-1], &u, func);
 
         // Othogonalisation of the estimated basis vector 
 
@@ -226,6 +233,7 @@ pub fn gmres_given(
         // For each existing basis vectors 
         vk.iter().enumerate().for_each(|(j,vec)| {
 
+            print!("{}\n\n",j);
             // compute the dot product vk[j] 
             let product = dot_product(vec, &vk_estimate);
             
@@ -246,15 +254,16 @@ pub fn gmres_given(
         });
 
         // get hessian matrix size 
-        let dim1 = hessian.len();
-        let dim2  = hessian[0].len();
+        let dim1 = hessian.len() - 1;
+        let dim2  = hessian[0].len() - 1;
         
         // update the last element of the matrix 
         hessian[dim1][dim2] = l2_norm(&vk_estimate);
+        
 
         // Check for stopping conditions, detailed in the original article
         if hessian[dim1][dim2] != 0.0 && iterator < max_iter {
-
+            
             // The new basis vector is the estimate normalized 
             vk.push(
                 vk_estimate.iter().map(|estimate| estimate/hessian[dim1][dim2]).collect()
@@ -271,7 +280,6 @@ pub fn gmres_given(
 
         // Beginning of the given rotation of the hessian matrix 
         
-
         iterator += 1 ;
     }; 
 
