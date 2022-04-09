@@ -7,7 +7,9 @@
 //!  - Newton-Krylov 
 //!  - Jacobian Free Newton-Krylov 
 
-use std::ops::{Add, Mul, Deref};
+use std::{ops::{Add, Mul, Deref}, process::exit};
+
+
 
 // Test function for all run test
 pub fn test_func(v : &Vec<f64>) -> Vec<f64> {
@@ -217,6 +219,7 @@ pub fn gmres_given(
         vk_estimate = jacobian_vec_estimate(&vk[vk.len()], &u, func);
 
 
+        exit(20)
 
     }; 
 
