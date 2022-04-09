@@ -43,22 +43,39 @@ pub fn l2_norm(u : &Vec<f64>) -> f64 {
 }
 
 
-/// # Matrix Vector multiplication 
-/// 
-/// Compute a matrix vector product
-/// 
+// /// # Matrix Vector multiplication 
+// /// 
+// /// Compute a matrix vector product
+// /// 
 
-pub fn mat_vec_product<T>(mat : &Vec<Vec<T>> ,  vector : &Vec<T> )
-where T : Add + Mul {
+// pub fn mat_vec_product<T>(mat : &Vec<Vec<T>> ,  vector : &Vec<T> )
+// where T : Add + Mul {
     
-    assert_eq!(mat.len(),vector.len(),"Matrix and vector must have the same length")
+//     assert_eq!(mat.len(),vector.len(),"Matrix and vector must have the same length")
 
-    mat.iter().zip(vector.iter()).map(||)
+//     mat.iter().zip(vector.iter()).map(||)
     
-}
+// }
 
-pub fn dot_product<T>(vec1 : &Vec<T>, vec2 : &Vec<T>) -> T
-where T : Mul<T> + std::iter::Sum<<T as std::ops::Mul>::Output>{
+/// # N-dimension Vector dot product
+///  
+/// Function computing the dot product of two 
+/// vector in a N-dim space : 
+/// $$ \sum_{i=1}^N u_i*v_i  $$
+/// 
+/// ```
+/// # use scilib::math::krylov::dot_product;
+/// 
+/// let u = vec![1.0,4.0,1.0];
+/// let v = vec![1.0,2.0,4.0];
+/// 
+/// let dot = dot_product(&u, &v);
+/// 
+/// assert_eq!(dot,13.0);
+/// ```
+/// 
+pub fn dot_product<T>(vec1 : &Vec<T>, vec2 : &Vec<T>) -> T 
+where T : Mul<T> + std::iter::Sum<<T as std::ops::Mul>::Output> + Copy{
 
     assert_eq!(vec1.len(),vec2.len()," Both vectors must have the same dimensions");
 
