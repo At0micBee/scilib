@@ -8,6 +8,7 @@
 //!  - Jacobian Free Newton-Krylov 
 
 use std::{ops::{Add, Mul, Deref}, process::exit};
+use na::Matrix;
 
 
 // Test function for all run test
@@ -213,7 +214,6 @@ pub fn gmres_given(
         residual.iter().map(|r| r/residual_norm).collect()
     );
     
-    vk.iter().for_each(|v| print!("{:#?}", v));
 
     norm_func.push(residual_norm); 
     
@@ -221,8 +221,8 @@ pub fn gmres_given(
     // Beginning of the construction of the Krylov basis 
     while residual_norm > tol && iterator < max_iter {
         
-        //print!("{:#?}\n\n", hessian);
-        print!("LOLLOLOLOLOLOLOLOL");
+
+        print!("------------------------------------------------------------------------");
         // First estimation of the kth basis vector 
         vk_estimate = jacobian_vec_estimate(&vk[vk.len()-1], &u, func);
 
@@ -256,6 +256,8 @@ pub fn gmres_given(
         // get hessian matrix size 
         let dim1 = hessian.len() - 1;
         let dim2  = hessian[0].len() - 1;
+
+        print!("Iterator: {} / dmi1: / {} / dim2: {}\n\n ", iterator, dim1,dim2);
         
         // update the last element of the matrix 
         hessian[dim1][dim2] = l2_norm(&vk_estimate);
