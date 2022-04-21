@@ -16,5 +16,8 @@ edition = "2021"
 
 ##########
 
+[dependencies]
+nalgebra = "0.30.1"
+
 [profile.test]
 opt-level = 3   # Some functions are costly, might as well go faster
