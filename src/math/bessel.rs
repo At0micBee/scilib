@@ -680,7 +680,7 @@ where T: Into<Complex> {
     jn[count] = Complex::unity();
 
     for i in (1..=count).rev() {
-        jn[i - 1] = (2 * i + 1) as f64 / x * jn[i] - jn[i + 1];
+        jn[i - 1] = (2 * (nl + i) + 1) as f64 / x * jn[i] - jn[i + 1];
     }
     jn.resize(count, Complex::new());
 
