@@ -9,6 +9,7 @@
 
 use std::{ops::{Add, Mul, Deref}, process::exit};
 use na::Matrix;
+use nalgebra::{DMatrix, Dynamic};
 
 
 // Test function for all run test
