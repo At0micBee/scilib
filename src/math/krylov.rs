@@ -232,8 +232,6 @@ pub fn gmres_given(
             // compute the dot product vk[j] 
             let product = dot_product(vec, &vk_estimate);
             
-            // add it to the new column of the hessian matrix 
-            new_hess_column.push( product);
 
             // orthogonalize the estimated new basis vector 
             vk_estimate =  vk_estimate.iter().enumerate().map(|(i,vec)| vec - product * vk[j][i]).collect();
