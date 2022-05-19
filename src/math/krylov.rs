@@ -181,24 +181,24 @@ pub fn gmres_given(
     u : Vec<f64>,                       // Point U where du is searched 
     du0 : Vec<f64>,                     // Initial guess  
     tol : f64,                          // Convergence tolerance 
-    max_iter : u32,                     // Maximum number of iteration
+    max_iter : usize,                     // Maximum number of iteration
 ) -> Vec<f64> {
 
     // Set up all needed matrix and vectors 
 
-    let mut vk : Vec<Vec<f64>> = Vec::new() ;           // Arnoldi basis vector matrix 
-    let mut vk_estimate : Vec<f64> = Vec::new() ;       // Intermediary krylov vector estimation 
-    let mut hessian : Vec<Vec<f64>> = Vec::new();       // Hessenberg matrix, used to construct Vk    
+    let mut vk : Vec<Vec<f64>> = vec![Vec::new();max_iter] ;                     // Arnoldi basis vector matrix 
+    let mut vk_estimate : Vec<f64> = Vec::new() ;                                // Intermediary krylov vector estimation 
+    let mut hessian : Vec<Vec<f64>> = vec![vec![0.0;max_iter];max_iter+1];       // Hessenberg matrix, used to construct Vk    
 
-    let mut norm_func : Vec<f64> = Vec::new() ;         // Evaluation of func(u) that will pass through the rotation
-    let mut sn : Vec<f64> = Vec::new() ;                // Given rotation coefficients vectors
-    let mut cn : Vec<f64> = Vec::new() ;                // Given rotation coefficients vectors
-    let mut initial_fu : Vec<f64> = Vec::new() ;        // Evaluation of func(u)
+    let mut norm_func : Vec<f64> = vec![0.0;max_iter+1] ;                        // Evaluation of func(u) that will pass through the rotation
+    let mut sn : Vec<f64> = vec![0.0;max_iter] ;                                 // Given rotation coefficients vectors
+    let mut cn : Vec<f64> = vec![0.0;max_iter] ;                                 // Given rotation coefficients vectors
+    let mut initial_fu : Vec<f64> = Vec::new() ;                                 // Evaluation of func(u)
 
-    let mut residual : Vec<f64> = Vec::new() ;          // Residue vector 
-    let mut residual_norm : f64  ;                      // Norm of the residue 
+    let mut residual : Vec<f64> = Vec::new() ;                                   // Residue vector 
+    let mut residual_norm : f64  ;                                               // Norm of the residue 
 
-    let mut iterator : u32 = 0 ;                        // Algorithm iterator
+    let mut iterator : usize = 0 ;                                               // Algorithm iterator
 
     // Evaluation of func(u)
     initial_fu = func(&u) ;
@@ -211,25 +211,19 @@ pub fn gmres_given(
     residual_norm = l2_norm(&residual);
     
     // Compute the first krylov vector as Vk0 = residual/residual_norm
-    vk.push(
-        residual.iter().map(|r| r/residual_norm).collect()
-    );
+    vk[0] = residual.iter().map(|r| r/residual_norm).collect() ;
     
-
-    norm_func.push(residual_norm); 
+    // Store the first residual norm
+    norm_func[0] = residual_norm; 
     
     
     // Beginning of the construction of the Krylov basis 
-    while residual_norm > tol && iterator < max_iter {
+    for j in (0..max_iter).into_iter(){
         
-
-        print!("------------------------------------------------------------------------");
         // First estimation of the kth basis vector 
-        vk_estimate = jacobian_vec_estimate(&vk[vk.len()-1], &u, func);
+        vk_estimate = jacobian_vec_estimate(&vk[j], &u, func);
 
-        // Othogonalisation of the estimated basis vector 
-
-        let mut new_hess_column : Vec<f64> = Vec::new(); // New column to the hessian matrix
+        //-------- Othogonalisation of the estimated basis vector-------------
         
         // For each existing basis vectors 
         vk.iter().enumerate().for_each(|(j,vec)| {
