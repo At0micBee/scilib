@@ -2,7 +2,7 @@
 //! # Constants
 //!
 //! This file contains many physical constants useful for scientific applications.
-//! They are stored as `f64` to guarantee maximum precision, most are castable to `f32`.
+//! They are stored as `f64` to guarantee maximum precision, all are castable to `f32`.
 //! 
 //! The `constant` modules provides a wide variety of useful mathematical and physical constants. It covers many
 //! domains, from quantum mechanics to mathematics, but also thermodynamics, electromagnetism, astrophysics, etc...

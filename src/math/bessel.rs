@@ -195,6 +195,9 @@ const PRECISION_CONVERGENCE: f64 = 1.0e-8;
 /// # Limit when computing Bessel Y
 const DISTANCE_Y_LIM: f64 = 0.001;
 
+/// #
+const PACK: usize = 50;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # $J$ Bessel function, integer index
@@ -726,7 +729,6 @@ where T: Into<Complex> {
         return sj_upward_recurrence(x, n);
     }
 
-    const PACK: usize = 50;
     let num_big_loop = n / PACK;
     let mut jn_all = Vec::<Vec<Complex>>::new();
 

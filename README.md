@@ -183,7 +183,7 @@ let rad = radial_wavefunction(4, 2, 1.3e-12);
 
 ## Constants
 
-Many useful constants have been added, comprising many different fields, from astrophysics to quantum mechanics, but also mathematics, thermodynamics, electromagnetism, etc... They're listed in the `constant` module.
+Many useful constants have been added, comprising many different fields, from astrophysics to quantum mechanics, but also mathematics, thermodynamics, electromagnetism, etc... They're listed in the `constant` module. Note that all constants are provided with a link to the source.
 
 ```rust
 use scilib::constant;
