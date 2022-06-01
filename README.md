@@ -164,6 +164,24 @@ let eul = Euler::new(5);        // n=5
 
 ---
 
+## Astronomy and astrophysics
+
+We provide practical functions for astronomy and astrophysics applications, from a Radec coordinate system to equilibrium temperature computation and a magnitude calculator.
+
+```rust
+// Found in the astronomy crate
+use scilib::astronomy::*;
+use scilib::constant as cst;
+
+// Creating a Radec system
+let coord: Radec = Radec::from_degree(32, 21.22534);
+
+// Apparent magnitude of the Sun at a light year distance
+let mag = apparent_mag(cst::SUN_L, cst::LY);
+```
+
+---
+
 ## Quantum mechanics
 
 Both the radial wave function Rnl(r) and the spherical harmonics Ylm(theta, phi) have been added to the quantum section. The Ylm is also valid for acoustics as well.
