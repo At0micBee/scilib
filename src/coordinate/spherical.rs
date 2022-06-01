@@ -116,12 +116,10 @@ impl Spherical {
     /// ```
     pub fn from_degree<T, U, V>(r: T, theta: U, phi: V) -> Self
     where T: Into<f64>, U: Into<f64>, V: Into<f64> {
-        let td: f64 = theta.into();
-        let pd: f64 = phi.into();
         Self {
             r: r.into(),
-            theta: td.to_radians() % TAU,
-            phi: pd.to_radians() % PI
+            theta: theta.into().to_radians() % TAU,
+            phi: phi.into().to_radians() % PI
         }
     }
 
@@ -157,13 +155,12 @@ impl Spherical {
     /// 
     /// assert_eq!(s1.distance(s2), 2.0);
     /// ```
-    pub fn distance(&self, other: Self) -> f64 {
-        let r1: f64 = self.r.powi(2);
-        let r2: f64 = other.r.powi(2);
+    pub fn distance(self, other: Self) -> f64 {
+
         let a1: f64 = self.phi.sin() * other.phi.sin() * (self.theta - other.theta).cos();
         let a2: f64 = self.phi.cos() * other.phi.cos();
 
-        (r1 + r2 - 2.0 * r1 * r2 * (a1 + a2)).sqrt()
+        (self.r.powi(2) + other.r.powi(2) - 2.0 * self.r * other.r * (a1 + a2)).sqrt()
     }
 }
 

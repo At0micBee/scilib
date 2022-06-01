@@ -150,7 +150,7 @@ impl Cartesian {
     /// 
     /// assert!((f.distance(p) - 4.358898943540674).abs() < 1.0e-15);
     /// ```
-    pub fn distance(&self, other: Self) -> f64 {
+    pub fn distance(self, other: Self) -> f64 {
         let dist: Self = other - self;
         (dist.x.powi(2) + dist.y.powi(2) + dist.z.powi(2)).sqrt()
     }

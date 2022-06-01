@@ -5,7 +5,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 use std::f64::consts::{     // Using std lib constants
-    PI                      // Pi
+    PI,                     // Pi
+    FRAC_PI_2               // Pi / 2
 };
 
 use std::fmt::{             // Formatter display
@@ -14,6 +15,7 @@ use std::fmt::{             // Formatter display
 };
 
 use super::constant;
+use super::coordinate::spherical::Spherical;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -174,6 +176,48 @@ impl Radec {
             res + PI
         } else {
             res
+        }
+    }
+
+    /// # Distance in space between two objects
+    /// 
+    /// ## Definition
+    /// Computes the actual distance in space between two objects, using the spherical coordinates
+    /// 
+    /// ## Inputs
+    /// `self`: the first object in Radec
+    /// `other`: the second object in Radec
+    /// 
+    /// Returns the distance between the two objects.
+    /// 
+    /// ## Example
+    /// ```
+    /// # use std::f64::consts::SQRT_2;
+    /// # use scilib::astronomy::Radec;
+    /// let mut c1 = Radec::from_degree(0, 0);
+    /// c1.specify_distance(1.0);
+    /// 
+    /// let mut c2 = Radec::from_degree(0, 90);
+    /// c2.specify_distance(1.0);
+    /// 
+    /// assert!((c1.distance_with(c2) - SQRT_2).abs() < 1.0e-12);
+    /// ```
+    pub fn distance_with(self, other: Self) -> f64 {
+
+        let obj_1: Spherical = self.into();
+        let obj_2: Spherical = other.into();
+
+        obj_1.distance(obj_2)
+    }
+}
+
+/// # Conversion to spherical coordinates
+impl Into<Spherical> for Radec {
+    fn into(self) -> Spherical {
+        Spherical {
+            r: self.dist_earth.unwrap(),
+            theta: self.ra,
+            phi: FRAC_PI_2 - self.dec
         }
     }
 }
