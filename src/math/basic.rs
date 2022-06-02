@@ -589,7 +589,7 @@ pub fn exp_int(val: f64, order: usize) -> Option<f64> {
 
     // Checking the validity of the inputs
     assert!(
-        !(val < 0.0 || (val == 0.0 && order < 1)),
+        !(val < 0.0 || (val == 0.0 && order <= 1)),
         "Invalid arguments in exponential integral!"
     );
 
@@ -628,7 +628,7 @@ pub fn exp_int(val: f64, order: usize) -> Option<f64> {
             h *= term;
 
             // If we have reached convergence we break
-            if (term - 1.0).abs() < 1.0e-8 {
+            if (term - 1.0).abs() < PRECISION {
                 return Some(h * (-val).exp());
             }
 
@@ -676,7 +676,7 @@ pub fn exp_int(val: f64, order: usize) -> Option<f64> {
             res += term;
 
             // If we have reached our precision we return
-            if term.abs() < res.abs() * 1.0e-8 {
+            if term.abs() < res.abs() * PRECISION {
                 return Some(res)
             }
         }
