@@ -560,7 +560,7 @@ where T: Into<Complex64> {
 /// The [exponential integral](https://en.wikipedia.org/wiki/Exponential_integral) is a special case
 /// of the incomplete gamma function an is defined as:
 /// $$
-/// E_{n}(x) = x^{n-1}\Gamma(1-n, x)
+/// E_{n}(x) = x^{n-1}\Gamma(1-n, x) = \int_1^\infty \frac{\exp(-xt)}{t^n}dt~\mathrm{for}~x>0,~n=0,1,...
 /// $$
 /// 
 /// We take advantage of the fact that
@@ -569,8 +569,10 @@ where T: Into<Complex64> {
 /// $$
 /// 
 /// ## Inputs
-/// - `val`: The value to evaluate
-/// - `order`: The order of the exponential function to evaluate
+/// - `val`: The value to evaluate ($x$)
+/// - `order`: The order of the exponential function to evaluate ($n$)
+/// 
+/// Returns the value of the $n$th order exponential integral for $x$.
 /// 
 /// ## Example
 /// ```
@@ -677,11 +679,100 @@ pub fn exp_int(val: f64, order: usize) -> Option<f64> {
 
             // If we have reached our precision we return
             if term.abs() < res.abs() * PRECISION {
-                return Some(res)
+                return Some(res);
             }
         }
 
         // If we haven't reached convergence we exit
+        None
+    }
+}
+
+/// # Principal exponential integral
+/// 
+/// ## Definition
+/// The [principal exponential integral](https://mathworld.wolfram.com/ExponentialIntegral.html) is defined as:
+/// $$
+/// \mathrm{Ei}(x) = \int_{-\infty}^{x}\frac{\exp(t)}{t}dt~\mathrm{for}~x>0
+/// $$
+/// 
+/// ## Inputs
+/// - `val`: the value to evaluate ($x$)
+/// 
+/// Returns the value of the principal exponential integral for $x$.
+/// 
+/// ## Example
+/// ```
+/// # use scilib::math::basic::exp_int_i;
+/// let res1 = exp_int_i(3.2).unwrap();
+/// let res2 = exp_int_i(1.0e-9).unwrap();
+/// 
+/// assert!((res1 - 11.3673026569).abs() < 1.0e-8);
+/// assert!((res2 - -20.1460501710).abs() < 1.0e-8);
+/// ```
+pub fn exp_int_i(val: f64) -> Option<f64> {
+
+    assert!(val >= 0.0, "Invalid arguments in principal exponential integral!");
+
+    // We check for special cases
+    if val < 1.0e-30 {
+
+        Some(val.ln() + constant::EULER_MASCHERONI)
+
+    // If we can we use the power series
+    } else if val <= - PRECISION.ln() {
+
+        let mut i_f64: f64;
+        let mut ct: f64;
+        let mut sum: f64 = 0.0;
+        let mut fact: f64 = 1.0;
+
+        // We compute the convergence
+        for i in 1..=100 {
+            i_f64 = i as f64;
+            fact *= val / i_f64;
+            ct = fact / i_f64;
+            sum += ct;
+
+            // If convergence is reached
+            if ct < PRECISION * sum {
+                return Some(sum + val.ln() + constant::EULER_MASCHERONI);
+            }
+        }
+
+        None
+
+    // Else we brute force the series
+    } else {
+
+        // Initializing the variables
+        let mut i_f64: f64;
+        let mut ct: f64;
+        let mut sum: f64 = 0.0;
+        let mut fact: f64 = 1.0;
+
+        // We compute the convergence
+        for i in 1..=100 {
+            i_f64 = i as f64;
+            ct = fact;
+            fact *= i_f64 / val;
+
+            // We check the evolution of the control term
+            // If we're under the required precision, we return
+            if fact < PRECISION {
+                return Some(val.exp() * (1.0 + sum) / val);
+        
+            // If It keeps getting smaller we keep going
+            } else if fact < ct {
+                sum += ct;
+
+            // If it stop diminishing we return
+            } else {
+                sum -= ct;
+                return Some(val.exp() * (1.0 + sum) / val);
+            }
+        }
+
         None
     }
 }
