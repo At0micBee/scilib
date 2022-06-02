@@ -8,9 +8,7 @@ use std::f64::consts::{     // Using std lib constants
     PI                      // Pi
 };
 
-use crate::{                // Calling other modules
-    math::complex::Complex  // Using Complex numbers
-};
+use num_complex::Complex64; // Using complex numbers from the num crate
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -122,17 +120,17 @@ where T: std::ops::Mul<Output = T> + std::ops::AddAssign + Default + Copy {
 
 /// # Fast Fourier transform
 /// 
-/// Computes the FFT for a one-dimensional array, based on the discrete fourier transform.
+/// Computes the FFT for a one-dimensional array, based on the discrete Fourier transform.
 /// This function accepts complex input. The FFT is computed using
 /// [Bluestein's algorithm](https://en.wikipedia.org/wiki/Chirp_Z-transform#Bluestein.27s_algorithm).
 /// 
 /// ```
+/// # use num_complex::Complex64;
 /// # use scilib::range;
-/// # use scilib::math::complex::Complex;
 /// # use scilib::signal::fft;
 /// // We create a Vec with the value sin(v) + cos(v)i
 /// let r = range::linear(0.0, 10.0, 15);
-/// let s: Vec<Complex> = r.iter().map(|val| (Complex::i() * val.cos()) + val.sin()).collect();
+/// let s: Vec<Complex64> = r.iter().map(|val| (Complex64::i() * val.cos()) + val.sin()).collect();
 /// let res = fft(&s);
 /// 
 /// // Checking for some values...
@@ -141,24 +139,24 @@ where T: std::ops::Mul<Output = T> + std::ops::AddAssign + Default + Copy {
 /// assert!((res[9].re - -0.02709553).abs() < 1.0e-8 && (res[9].im - 1.02037473).abs() < 1.0e-8);
 /// assert!((res[14].re - 4.77371673).abs() < 1.0e-8 && (res[14].im - -2.58964065).abs() < 1.0e-8);
 /// ```
-pub fn fft<T>(data: &[T]) -> Vec<Complex>
-where T: Into<Complex> + Copy {
+pub fn fft<T>(data: &[T]) -> Vec<Complex64>
+where T: Into<Complex64> + Copy {
 
     let length: isize = data.len() as isize;
 
     // The pre-factor in the exponential terms
-    let ipi_n: Complex = Complex::i() * PI / length as f64;
+    let ipi_n: Complex64 = Complex64::i() * PI / length as f64;
 
-    let mut res: Vec<Complex> = Vec::with_capacity(data.len());
+    let mut res: Vec<Complex64> = Vec::with_capacity(data.len());
 
-    let mut an: Complex;
-    let mut bkn: Complex;
-    let mut bk_star: Complex;
-    let mut sum_k: Complex;
+    let mut an: Complex64;
+    let mut bkn: Complex64;
+    let mut bk_star: Complex64;
+    let mut sum_k: Complex64;
 
     for k in 0..length {
-        sum_k = Complex::default();
-        bk_star = (k.pow(2) as f64 * ipi_n).exp().conjugate();
+        sum_k = Complex64::default();
+        bk_star = (k.pow(2) as f64 * ipi_n).exp().conj();
 
         for (n, val) in data.iter().enumerate() {
             an = (- (n.pow(2) as f64) * ipi_n).exp() * (*val).into();
@@ -174,15 +172,15 @@ where T: Into<Complex> + Copy {
 
 /// # Inverse fast Fourier transform
 /// 
-/// Computes the IFFT for a one-dimensional array, based on the discrete fourier transform.
+/// Computes the IFFT for a one-dimensional array, based on the discrete Fourier transform.
 /// This function accepts complex input. The FFT is computed using
 /// [Bluestein's algorithm](https://en.wikipedia.org/wiki/Chirp_Z-transform#Bluestein.27s_algorithm).
 /// 
 /// This function yields `v = ifft(fft(v))`, within numerical errors.
 /// 
 /// ```
+/// # use num_complex::Complex64;
 /// # use scilib::range;
-/// # use scilib::math::complex::Complex;
 /// # use scilib::signal::{ fft, ifft };
 /// // We create a Vec with the value sin(v) + cos(v)i
 /// let r = range::linear(0.0, 10.0, 15);
@@ -193,25 +191,25 @@ where T: Into<Complex> + Copy {
 ///     assert!((ori - comp.re).abs() < 1.0e-14 && comp.im < 1.0e-14);
 /// }
 /// ```
-pub fn ifft<T>(data: &[T]) -> Vec<Complex>
-where T: Into<Complex> + Copy {
+pub fn ifft<T>(data: &[T]) -> Vec<Complex64>
+where T: Into<Complex64> + Copy {
 
     let length: isize = data.len() as isize;
     let norm: f64 = length as f64;
 
     // The pre-factor in the exponential terms
-    let ipi_n: Complex = -Complex::i() * PI / length as f64;
+    let ipi_n: Complex64 = -Complex64::i() * PI / length as f64;
 
-    let mut res: Vec<Complex> = Vec::with_capacity(data.len());
+    let mut res: Vec<Complex64> = Vec::with_capacity(data.len());
 
-    let mut an: Complex;
-    let mut bkn: Complex;
-    let mut bk_star: Complex;
-    let mut sum_k: Complex;
+    let mut an: Complex64;
+    let mut bkn: Complex64;
+    let mut bk_star: Complex64;
+    let mut sum_k: Complex64;
 
     for k in 0..length {
-        sum_k = Complex::default();
-        bk_star = (k.pow(2) as f64 * ipi_n).exp().conjugate();
+        sum_k = Complex64::default();
+        bk_star = (k.pow(2) as f64 * ipi_n).exp().conj();
 
         for (n, val) in data.iter().enumerate() {
             an = (- (n.pow(2) as f64) * ipi_n).exp() * (*val).into();

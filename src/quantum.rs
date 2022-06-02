@@ -28,11 +28,12 @@ use std::f64::consts::{     // Using std lib constants
 use crate::{                // Calling other modules
     math::{                 // Math crate
         basic,              // Basic functions
-        complex::Complex,   // Using Complex numbers
         polynomial          // Special polynomials
     },
     constant as cst         // Calling scilib constants
 };
+
+use num_complex::Complex64; // Using complex numbers from the num crate
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -181,11 +182,11 @@ pub fn radial_vec(n: usize, l: usize, r: &[f64]) -> Vec<f64> {
 /// let res = spherical_harmonics(2, 1, 0.2, -0.7);
 /// assert!((res.re - -0.11504928).abs() < 1.0e-8 && (res.im - 0.09690468).abs() < 1.0e-8);
 /// ```
-pub fn spherical_harmonics(l: usize, m: i32, theta: f64, phi: f64) -> Complex {
+pub fn spherical_harmonics(l: usize, m: i32, theta: f64, phi: f64) -> Complex64 {
 
     // We do the computation for the positive value
     let mp: i32 = m.abs();
-    let cpx: Complex = Complex::from(0, mp as f64 * phi).exp();
+    let cpx: Complex64 = Complex64::new(0.0, mp as f64 * phi).exp();
     let poly = polynomial::Legendre::new(l, mp);
 
     // We follow QM norm
@@ -195,11 +196,11 @@ pub fn spherical_harmonics(l: usize, m: i32, theta: f64, phi: f64) -> Complex {
 
     // Computation with Legendre polynomial
     // (-1.0_f64).powi(m) term for the Condon-Shortley phase
-    let res: Complex = (-1.0_f64).powi(m) * cpx * (norm * top / bot).sqrt() * poly.compute(theta.cos());
+    let res: Complex64 = (-1.0_f64).powi(m) * cpx * (norm * top / bot).sqrt() * poly.compute(theta.cos());
 
     // Modifying the result depending on the sign of m
     if m.is_negative() {
-        res.conjugate() * (-1.0_f64).powi(mp)
+        res.conj() * (-1.0_f64).powi(mp)
     } else {
         res
     }

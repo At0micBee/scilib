@@ -14,9 +14,10 @@ use std::f64::consts::{     // Using std lib constants
 
 use super::{                // Using parts from the crate
     super::constant,        // Calling scilib constants
-    complex::Complex,       // Using Complex numbers
     polynomial::Bernoulli   // Bernoulli polynomials
 };
+
+use num_complex::Complex64; // Using complex numbers from the num crate
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -152,9 +153,9 @@ where T: Into<usize> {
 /// let res1 = stieltjes(0, 1.0.into());
 /// assert!((res1.re - 0.577215664).abs() <= 1e-6);
 /// ```
-pub fn stieltjes(n: usize, a: Complex) -> Complex {
+pub fn stieltjes(n: usize, a: Complex64) -> Complex64 {
 
-    let mut res: Complex = - (a + STIELTJES_M as f64).ln().powi(n as i32 + 1) / (n as f64 + 1.0);
+    let mut res: Complex64 = - (a + STIELTJES_M as f64).ln().powi(n as i32 + 1) / (n as f64 + 1.0);
 
     for k in 0..STIELTJES_M {
         res += (a + k as f64).ln().powi(n as i32) / (a + k as f64);
@@ -166,11 +167,11 @@ pub fn stieltjes(n: usize, a: Complex) -> Complex {
 /// # Hurwitz Zeta function
 /// 
 /// WARNING: still under development, results cannot be guarantee.
-pub fn zeta<T, U>(s: T, a: U) -> Complex
-where T: Into<f64>, U: Into<Complex> {
+pub fn zeta<T, U>(s: T, a: U) -> Complex64
+where T: Into<f64>, U: Into<Complex64> {
 
     // Conversions
-    let a_c: Complex = a.into();
+    let a_c: Complex64 = a.into();
     let s_f: f64 = s.into();
 
     // If a is negative and even, we use Bernoulli
@@ -179,12 +180,12 @@ where T: Into<f64>, U: Into<Complex> {
         return -ber.compute_complex(a_c) / (-s_f + 1.0);
     }
 
-    let mut res: Complex = Complex::from(1.0 / (s_f - 1.0), 0.0);
+    let mut res: Complex64 = Complex64::new(1.0 / (s_f - 1.0), 0.0);
 
     let mut n: usize = 0;
     let mut sign: f64 = -1.0;
     let mut div: f64;
-    let mut term: Complex;
+    let mut term: Complex64;
 
     'convergence: loop {
 
@@ -221,31 +222,31 @@ where T: Into<f64>, U: Into<Complex> {
 /// 
 /// ## Example
 /// ```
-/// # use scilib::math::complex::Complex;
+/// # use num_complex::Complex64;
 /// # use scilib::math::basic::li;
-/// let val: Complex = Complex::from(0.52, -0.55);
+/// let val: Complex64 = Complex64::new(0.52, -0.55);
 /// let res = li(1.35, val);
 /// assert!((res.re - 0.38167313).abs() <= 1.0e-8);
 /// assert!((res.im - -0.794472094).abs() <= 1.0e-8);
 /// ```
-pub fn li(s: f64, z: Complex) -> Complex {
+pub fn li(s: f64, z: Complex64) -> Complex64 {
 
     let mut n: usize = 1;
-    let mut res_z: Complex = z;
-    let mut div: Complex = (1.0_f64).powf(s).into();
+    let mut res_z: Complex64 = z;
+    let mut div: Complex64 = (1.0_f64).powf(s).into();
 
-    let mut term: Complex = res_z / div;
+    let mut term: Complex64 = res_z / div;
 
-    if term.modulus() <= 1.0e-8 {
+    if term.norm() <= 1.0e-8 {
         return term;
     }
 
-    let mut res: Complex = Complex::new();
+    let mut res: Complex64 = Complex64::default();
 
     'convergence: loop {
         res += term;
 
-        if (term / res).modulus() <= 1.0e-8 {
+        if (term / res).norm() <= 1.0e-8 {
             break 'convergence;
         }
 
@@ -458,28 +459,28 @@ pub fn gaussian_normed(mu: f64, sigma: f64, x: f64) -> f64 {
 /// 
 /// ## Example
 /// ```
-/// # use scilib::math::complex::Complex;
+/// # use num_complex::Complex64;
 /// # use scilib::math::basic::erf;
 /// let r = erf(2.1);
-/// let c = erf(Complex::from(-0.1, 0.7));
+/// let c = erf(Complex64::new(-0.1, 0.7));
 /// assert!((r.re - 0.997021).abs() < 1.0e-5);
 /// assert!((c.re - -0.18297754).abs() < 1.0e-5 && (c.im - 0.92747498).abs() < 1.0e-5);
 /// ```
-pub fn erf<T>(val: T) -> Complex
-where T: Into<Complex> {
+pub fn erf<T>(val: T) -> Complex64
+where T: Into<Complex64> {
 
-    let x: Complex = val.into();
+    let x: Complex64 = val.into();
 
-    let mut n: f64 = 0.0;               // Index of iteration
-    let mut d1: f64 = 1.0;              // First div
-    let mut d2: f64;                    // Second div
-    let mut sg: f64 = 1.0;              // Sign of the term
+    let mut n: f64 = 0.0;                   // Index of iteration
+    let mut d1: f64 = 1.0;                  // First div
+    let mut d2: f64;                        // Second div
+    let mut sg: f64 = 1.0;                  // Sign of the term
     
-    let mut term: Complex = x;          // Term at each iter
-    let mut res: Complex = 0.0.into();  // Result
+    let mut term: Complex64 = x;            // Term at each iter
+    let mut res: Complex64 = 0.0.into();    // Result
 
     // If the term is too small we exit
-    if term.modulus() < PRECISION {
+    if term.norm() < PRECISION {
         return res;
     }
 
@@ -487,7 +488,7 @@ where T: Into<Complex> {
         res += term;
 
         // We exit when convergence reaches the precision
-        if (term / res).modulus() < PRECISION {
+        if (term / res).norm() < PRECISION {
             break 'convergence;
         }
 
@@ -516,15 +517,15 @@ where T: Into<Complex> {
 /// 
 /// ## Example
 /// ```
-/// # use scilib::math::complex::Complex;
+/// # use num_complex::Complex64;
 /// # use scilib::math::basic::erfc;
-/// let c = Complex::from(1.25, 0.3);
+/// let c = Complex64::new(1.25, 0.3);
 /// let res = erfc(c);
 /// assert!((res.re - 0.0505570).abs() < 1.0e-5 && (res.im - -0.0663174).abs() < 1.0e-5);
 /// ```
-pub fn erfc<T>(val: T) -> Complex
-where T: Into<Complex> {
-    Complex::unity() - erf(val)
+pub fn erfc<T>(val: T) -> Complex64
+where T: Into<Complex64> {
+    Complex64::new(1.0, 0.0) - erf(val)
 }
 
 /// # Imaginary error function
@@ -542,15 +543,15 @@ where T: Into<Complex> {
 /// 
 /// ## Example
 /// ```
-/// # use scilib::math::complex::Complex;
+/// # use num_complex::Complex64;
 /// # use scilib::math::basic::erfi;
-/// let c = Complex::from(0.07, -1.1);
+/// let c = Complex64::new(0.07, -1.1);
 /// let res = erfi(c);
 /// assert!((res.re - 0.02349883).abs() < 1.0e-5 && (res.im - -0.88201955).abs() < 1.0e-5);
 /// ```
-pub fn erfi<T>(val: T) -> Complex
-where T: Into<Complex> {
-    -Complex::i() * erf(Complex::i() * val)
+pub fn erfi<T>(val: T) -> Complex64
+where T: Into<Complex64> {
+    -Complex64::i() * erf(Complex64::i() * val.into())
 }
 
 /// # Builds Pascal's triangle line

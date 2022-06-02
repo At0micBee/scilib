@@ -4,10 +4,9 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-use super::{            // Using parts from the crate
-    basic,              // Basic functions
-    complex::Complex    // Using Complex numbers
-};
+use super::basic;           // Basic functions
+
+use num_complex::Complex64; // Using complex numbers from the num crate
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -194,9 +193,9 @@ impl Legendre {
     /// 
     /// ## Example
     /// ```
-    /// # use scilib::math::complex::Complex;
+    /// # use num_complex::Complex64;
     /// # use scilib::math::polynomial::Legendre;
-    /// let z = Complex::from(0.2, 3.1);    // Example value
+    /// let z = Complex64::new(0.2, 3.1);   // Example value
     /// 
     /// let p30 = Legendre::new(2, 0);      // l=3, m=0
     /// 
@@ -207,9 +206,9 @@ impl Legendre {
     /// assert!((res30.re - -14.855).abs() < 1.0e-12);
     /// assert!((res30.im - 1.86).abs() < 1.0e-12);
     /// ```
-    pub fn compute_complex(&self, z: Complex) -> Complex {
+    pub fn compute_complex(&self, z: Complex64) -> Complex64 {
         // Iterates through the values of the factors and powers
-        self.factor.iter().zip(&self.power).fold(Complex::new(), |res, (f, p)| res + *f * z.powi(*p))
+        self.factor.iter().zip(&self.power).fold(Complex64::default(), |res, (f, p)| res + *f * z.powi(*p))
     }
 }
 
@@ -342,9 +341,9 @@ impl Laguerre {
     /// 
     /// ## Example
     /// ```
-    /// # use scilib::math::complex::Complex;
+    /// # use num_complex::Complex64;
     /// # use scilib::math::polynomial::Laguerre;
-    /// let z = Complex::from(1.2, -0.4);   // Example value
+    /// let z = Complex64::new(1.2, -0.4);  // Example value
     /// 
     /// let p = Laguerre::new(2, 1);        // l=2, m=1
     /// 
@@ -355,9 +354,9 @@ impl Laguerre {
     /// assert!((res.re - 0.04).abs() < 1.0e-12);
     /// assert!((res.im - 0.72).abs() < 1.0e-12);
     /// ```
-    pub fn compute_complex(&self, z: Complex) -> Complex {
+    pub fn compute_complex(&self, z: Complex64) -> Complex64 {
         // Iterates through the values of the factors and powers
-        self.factor.iter().zip(&self.power).fold(Complex::new(), |res, (f, p)| res + *f * z.powi(*p))
+        self.factor.iter().zip(&self.power).fold(Complex64::default(), |res, (f, p)| res + *f * z.powi(*p))
     }
 }
 
@@ -519,9 +518,9 @@ impl Bernoulli {
     /// 
     /// ## Example
     /// ```
-    /// # use scilib::math::complex::Complex;
+    /// # use num_complex::Complex64;
     /// # use scilib::math::polynomial::Bernoulli;
-    /// let z = Complex::from(-2.1, 1.1);   // Example value
+    /// let z = Complex64::new(-2.1, 1.1);  // Example value
     /// 
     /// let p = Bernoulli::new(4);          // n=4
     /// 
@@ -532,9 +531,9 @@ impl Bernoulli {
     /// assert!((res.re - -4.6617333333).abs() < 1.0e-8);
     /// assert!((res.im - -60.632).abs() < 1.0e-8);
     /// ```
-    pub fn compute_complex(&self, z: Complex) -> Complex {
+    pub fn compute_complex(&self, z: Complex64) -> Complex64 {
         // Iterates through the values of the factors and powers
-        self.factor.iter().zip(&self.power).fold(Complex::new(), |res, (f, p)| res + *f * z.powi(*p))
+        self.factor.iter().zip(&self.power).fold(Complex64::default(), |res, (f, p)| res + *f * z.powi(*p))
     }
 }
 
@@ -718,11 +717,11 @@ impl Euler {
     /// 
     /// ## Example
     /// ```
-    /// # use scilib::math::complex::Complex;
+    /// # use num_complex::Complex64;
     /// # use scilib::math::polynomial::Euler;
-    /// let z = Complex::from(1, -2.5); // Example value
+    /// let z = Complex64::new(1.0, -2.5);  // Example value
     /// 
-    /// let p = Euler::new(6);          // n=6
+    /// let p = Euler::new(6);              // n=6
     /// 
     /// // Computing the results for the polynomial
     /// let res = p.compute_complex(z);
@@ -731,9 +730,9 @@ impl Euler {
     /// assert!((res.re - -244.141).abs() <= 1.0e-3);
     /// assert!((res.im - -378.594).abs() <= 1.0e-3);
     /// ```
-    pub fn compute_complex(&self, z: Complex) -> Complex {
+    pub fn compute_complex(&self, z: Complex64) -> Complex64 {
         // Iterates through the values of the factors and powers
-        self.factor.iter().zip(&self.power).fold(Complex::new(), |res, (f, p)| res + *f * z.powi(*p))
+        self.factor.iter().zip(&self.power).fold(Complex64::default(), |res, (f, p)| res + *f * z.powi(*p))
     }
 }
 
