@@ -41,7 +41,7 @@ let g = gamma(3.2);
 let b = beta(-1.2, 2.5);
 
 // The erf function can compute Complex numbers (erfc, erfi as well)
-let c = Complex::from(-0.1, 0.7);
+let c = Complex64::new(-0.1, 0.7);
 let e = erf(c);
 ```
 
@@ -59,25 +59,6 @@ let car = cartesian::Cartesian::from(2.0, 1, 0.25);
 let sph = spherical::Spherical::from_degree(1.2, 30, 60.2);
 let cyl = spherical::Cylindrical::from_degree(1.2, 30, -2.55);
 ```
-
----
-
-## Complex numbers
-
-This crate provides basic functionalities for complex numbers, mainly to support its other goals. The implementation uses `f64` for both the real and imaginary parts, to ensure precision in the computations.
-
-Basic operations have been implemented to facilitate their use, and should be pretty easy to manipulate.
-
-```rust
-// They are found in the complex crate
-use scilib::math::complex::Complex;
-
-let c1 = Complex::from(2, 3.5);
-let c2 = Complex::from(-1.2, 4) * 2;
-println!("{}", c1 + c2);
-```
-
-***More functionalities are on their way, they will be added as they are needed for other domains.***
 
 ---
 
@@ -136,7 +117,7 @@ use scilib::signal::*
 
 // Computing values of the sinus
 let r = range::linear(0.0, 10.0, 15);
-let s: Vec<Complex> = r.iter().map(|val| val.sin()).collect();
+let s: Vec<Complex64> = r.iter().map(|val| val.sin()).collect();
 
 let res = fft(&s);
 let res2 = ifft(&res);
