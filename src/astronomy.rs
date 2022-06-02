@@ -185,8 +185,8 @@ impl Radec {
     /// Computes the actual distance in space between two objects, using the spherical coordinates
     /// 
     /// ## Inputs
-    /// `self`: the first object in Radec
-    /// `other`: the second object in Radec
+    /// - `self`: the first object in Radec
+    /// - `other`: the second object in Radec
     /// 
     /// Returns the distance between the two objects.
     /// 
