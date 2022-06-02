@@ -554,6 +554,138 @@ where T: Into<Complex64> {
     -Complex64::i() * erf(Complex64::i() * val.into())
 }
 
+/// # Exponential integral
+/// 
+/// ## Definition
+/// The [exponential integral](https://en.wikipedia.org/wiki/Exponential_integral) is a special case
+/// of the incomplete gamma function an is defined as:
+/// $$
+/// E_{n}(x) = x^{n-1}\Gamma(1-n, x)
+/// $$
+/// 
+/// We take advantage of the fact that
+/// $$
+/// E_0(x) = \frac{\exp(-x)}{x}~\mathrm{and}~E_n(0) = \frac{1}{n-1}~\mathrm{for}~n>1
+/// $$
+/// 
+/// ## Inputs
+/// - `val`: The value to evaluate
+/// - `order`: The order of the exponential function to evaluate
+/// 
+/// ## Example
+/// ```
+/// # use scilib::math::basic::exp_int;
+/// let res1 = exp_int(5.5, 3).unwrap();
+/// let res2 = exp_int(2.1, 0).unwrap();
+/// let res3 = exp_int(0.0, 5).unwrap();
+/// let res4 = exp_int(0.5, 1).unwrap();
+/// 
+/// assert!((res1 - 0.0004987707).abs() < 1.0e-8);
+/// assert!((res2 - 0.0583125848).abs() < 1.0e-8);
+/// assert_eq!(res3, 0.25);
+/// assert!((res4 - 0.5597735947).abs() < 1.0e-6);
+/// ```
+pub fn exp_int(val: f64, order: usize) -> Option<f64> {
+
+    // Checking the validity of the inputs
+    assert!(
+        !(val < 0.0 || (val == 0.0 && order < 1)),
+        "Invalid arguments in exponential integral!"
+    );
+
+    // We go through all the cases
+    // If the order is zero it's easy
+    if order == 0 {
+
+        Some((-val).exp() / val)
+    
+    // If the value is zero it's easy
+    } else if val == 0.0 {
+
+        Some(1.0 / (order - 1) as f64)
+    
+    // We compute the infinite fraction series
+    } else if val > 1.0 {
+
+        // Initializing variables
+        let mut a: f64;
+        let mut i_f64: f64;
+        let mut term: f64;
+        let mut b: f64 = val + order as f64;
+        let mut c: f64 = 1.0 / 1.0e-30;
+        let mut d: f64 = 1.0 / b;
+        let mut h: f64 = d;
+        let orderm1: f64 = (order - 1) as f64;
+
+        // Iterating for the convergence
+        for i in 1..=100 {
+            i_f64 = i as f64;                   // Casting once to avoid doing it twice
+            a = -i_f64 * (orderm1 + i_f64);
+            b += 2.0;
+            d = 1.0 / (a * d + b);
+            c = b + a / c;
+            term = c * d;
+            h *= term;
+
+            // If we have reached convergence we break
+            if (term - 1.0).abs() < 1.0e-8 {
+                return Some(h * (-val).exp());
+            }
+
+        }
+
+        // If we haven't we return None
+        None
+    
+    // For any other case we brute force the series
+    } else {
+
+        let orderm1: usize = order - 1;
+        let orderm1_f64: f64 = orderm1 as f64;
+
+        // Initializing the first term
+        let mut res: f64 = match orderm1 {
+            0 => - val.ln() - constant::EULER_MASCHERONI,
+            _ => 1.0 / orderm1_f64
+        };
+
+        // Initializing the rest of the variables
+        let mut i_f64: f64;
+        let mut term: f64;
+        let mut psi: f64;
+        let mut f: f64 = 1.0;
+
+        // Iterating for the convergence
+        for i in 1..=100 {
+            i_f64 = i as f64;
+            f *= - val / i_f64;
+
+            if i != orderm1 {
+                term = -f / (i_f64 - orderm1_f64);
+            } else {
+                psi = -constant::EULER_MASCHERONI;
+
+                for j in 1..orderm1 {
+                    psi += 1.0 / j as f64;
+                }
+
+                term = f * (- val.ln() + psi);
+            }
+
+            // Updating the result
+            res += term;
+
+            // If we have reached our precision we return
+            if term.abs() < res.abs() * 1.0e-8 {
+                return Some(res)
+            }
+        }
+
+        // If we haven't reached convergence we exit
+        None
+    }
+}
+
 /// # Builds Pascal's triangle line
 /// 
 /// ## Definition
