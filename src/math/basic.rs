@@ -577,17 +577,17 @@ where T: Into<Complex64> {
 /// ## Example
 /// ```
 /// # use scilib::math::basic::exp_int;
-/// let res1 = exp_int(5.5, 3).unwrap();
-/// let res2 = exp_int(2.1, 0).unwrap();
-/// let res3 = exp_int(0.0, 5).unwrap();
-/// let res4 = exp_int(0.5, 1).unwrap();
+/// let res1 = exp_int(5.5, 3);
+/// let res2 = exp_int(2.1, 0);
+/// let res3 = exp_int(0.0, 5);
+/// let res4 = exp_int(0.5, 1);
 /// 
 /// assert!((res1 - 0.0004987707).abs() < 1.0e-8);
 /// assert!((res2 - 0.0583125848).abs() < 1.0e-8);
 /// assert_eq!(res3, 0.25);
 /// assert!((res4 - 0.5597735947).abs() < 1.0e-6);
 /// ```
-pub fn exp_int(val: f64, order: usize) -> Option<f64> {
+pub fn exp_int(val: f64, order: usize) -> f64 {
 
     // Checking the validity of the inputs
     assert!(
@@ -599,12 +599,12 @@ pub fn exp_int(val: f64, order: usize) -> Option<f64> {
     // If the order is zero it's easy
     if order == 0 {
 
-        Some((-val).exp() / val)
+        (-val).exp() / val
     
     // If the value is zero it's easy
     } else if val == 0.0 {
 
-        Some(1.0 / (order - 1) as f64)
+        1.0 / (order - 1) as f64
     
     // We compute the infinite fraction series
     } else if val > 1.0 {
@@ -631,13 +631,14 @@ pub fn exp_int(val: f64, order: usize) -> Option<f64> {
 
             // If we have reached convergence we break
             if (term - 1.0).abs() < PRECISION {
-                return Some(h * (-val).exp());
+                return h * (-val).exp();
             }
 
         }
 
-        // If we haven't we return None
-        None
+        // If it doesn't, we return the last value for now
+        // TODO: this should be changed to 0.0 probably
+        h * (-val).exp()
     
     // For any other case we brute force the series
     } else {
@@ -679,12 +680,13 @@ pub fn exp_int(val: f64, order: usize) -> Option<f64> {
 
             // If we have reached our precision we return
             if term.abs() < res.abs() * PRECISION {
-                return Some(res);
+                return res;
             }
         }
 
-        // If we haven't reached convergence we exit
-        None
+        // If it doesn't, we return the last value for now
+        // TODO: this should be changed to 0.0 probably
+        res
     }
 }
 
@@ -704,20 +706,20 @@ pub fn exp_int(val: f64, order: usize) -> Option<f64> {
 /// ## Example
 /// ```
 /// # use scilib::math::basic::exp_int_i;
-/// let res1 = exp_int_i(3.2).unwrap();
-/// let res2 = exp_int_i(1.0e-9).unwrap();
+/// let res1 = exp_int_i(3.2);
+/// let res2 = exp_int_i(1.0e-9);
 /// 
 /// assert!((res1 - 11.3673026569).abs() < 1.0e-8);
 /// assert!((res2 - -20.1460501710).abs() < 1.0e-8);
 /// ```
-pub fn exp_int_i(val: f64) -> Option<f64> {
+pub fn exp_int_i(val: f64) -> f64 {
 
     assert!(val >= 0.0, "Invalid arguments in principal exponential integral!");
 
     // We check for special cases
     if val < 1.0e-30 {
 
-        Some(val.ln() + constant::EULER_MASCHERONI)
+        val.ln() + constant::EULER_MASCHERONI
 
     // If we can we use the power series
     } else if val <= - PRECISION.ln() {
@@ -736,11 +738,13 @@ pub fn exp_int_i(val: f64) -> Option<f64> {
 
             // If convergence is reached
             if ct < PRECISION * sum {
-                return Some(sum + val.ln() + constant::EULER_MASCHERONI);
+                return sum + val.ln() + constant::EULER_MASCHERONI;
             }
         }
 
-        None
+        // If it doesn't, we return the last value for now
+        // TODO: this should be changed to 0.0 probably
+        sum + val.ln() + constant::EULER_MASCHERONI
 
     // Else we brute force the series
     } else {
@@ -760,7 +764,7 @@ pub fn exp_int_i(val: f64) -> Option<f64> {
             // We check the evolution of the control term
             // If we're under the required precision, we return
             if fact < PRECISION {
-                return Some(val.exp() * (1.0 + sum) / val);
+                break;      // TODO: this should be changed to 0.0 probably
         
             // If It keeps getting smaller we keep going
             } else if fact < ct {
@@ -769,11 +773,12 @@ pub fn exp_int_i(val: f64) -> Option<f64> {
             // If it stop diminishing we return
             } else {
                 sum -= ct;
-                return Some(val.exp() * (1.0 + sum) / val);
+                break;      // TODO: this should be changed to 0.0 probably
             }
         }
 
-        None
+        // We return the value
+        val.exp() * (1.0 + sum) / val
     }
 }
 
