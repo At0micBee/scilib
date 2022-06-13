@@ -322,6 +322,81 @@ where T: Into<f64> {
     res * (-x * constant::EULER_MASCHERONI).exp() / x
 }
 
+/// # Series representation for the incomplete gamma function
+fn series_for_gamma(a: f64, x: f64) -> f64 {
+
+    // We check that the value of x is compatible with the series
+    assert!(x > 0.0, "x inferior to 0 in series_for_gamma");
+
+    // For x == 0 the result is always zero
+    if x == 0.0 {
+        return 0.0;
+    }
+
+    // Initializing the variables
+    let lng: f64 = gamma(a).ln();
+    let mut ap: f64 = a;
+    let mut sum: f64 = 1.0 / a;
+    let mut term: f64 = sum;
+
+    // We compute the series term up to 100
+    for _ in 0..100 {
+        ap += 1.0;
+        term *= x / ap;
+        sum += term;
+
+        // When we reach convergence we return the value
+        if term.abs() < sum.abs() * PRECISION {
+            return sum * (-x + a * x.ln() - lng).exp();
+        }
+
+    }
+    
+    // We return 0.0 if we couldn't compute the value
+    0.0
+}
+
+/// # Continued fraction representation for the incomplete gamma function
+fn cf_for_gamma(a: f64, x: f64) -> f64 {
+
+    // Initializing the variables
+    let lng: f64 = gamma(a).ln();
+    let mut an: f64;
+    let mut term: f64;
+    let mut b: f64 = x + 1.0 - a;
+    let mut c: f64 = 1.0 / 1.0e-30;
+    let mut d: f64 = 1.0 / b;
+    let mut h: f64 = d;
+
+    for i in 1..=100 {
+        an = (-i * (i - a as isize)) as f64;
+        b += 2.0;
+        
+        // Computing and correcting d if necessary
+        d = an * d + b;
+        if d.abs() < 1.0e-30 {
+            d = 1.0e-30;
+        }
+
+        // Computing and correcting c if necessary
+        c = b + an / c;
+        if c.abs() < 1.0e-30 {
+            c = 1.0e-30;
+        }
+
+        term = d * c;
+        h *= term;
+
+        // If we reach convergence we return
+        if (term - 1.0).abs() < PRECISION {
+            return h * (-x + a * x.ln() - lng).exp()
+        }
+    }
+
+    // We return 0.0 if we couldn't compute the value
+    0.0
+}
+
 /// # Euler Beta function
 /// 
 /// ## Definition
