@@ -322,11 +322,70 @@ where T: Into<f64> {
     res * (-x * constant::EULER_MASCHERONI).exp() / x
 }
 
-/// # Series representation for the incomplete gamma function
-fn series_for_gamma(a: f64, x: f64) -> f64 {
+/// # Regularized Gamma function P
+/// 
+/// ## Definition
+/// The [regularized gamma functions](https://en.wikipedia.org/wiki/Incomplete_gamma_function) are functions
+/// related to the gamma function. The first one, $P$, is the cumulative distribution function and is defined as:
+/// $$
+/// P(a, x) = \frac{\gamma(a, x)}{\Gamma(a)}
+/// $$
+/// Where $\gamma(a,x)$ is the incomplete lower gamma function and $\Gamma(a)$ is the gamma function.
+/// 
+/// ## Inputs
+/// - `a`: the power in the series ($a$)
+/// - `x`: the value to evaluate ($x$)
+/// 
+/// Returns the value of the regularized gamma function P.
+/// 
+/// ### Example
+pub fn reg_gamma_p(a: f64, x: f64) -> f64 {
 
-    // We check that the value of x is compatible with the series
-    assert!(x > 0.0, "x inferior to 0 in series_for_gamma");
+    // Checking that the range is correct;
+    assert!(x >= 0.0, "x cannot be less than 0 in incomplete_gamma_p!");
+    assert!(a > 0.0, "a cannot be less than or equal to 0 in incomplete_gamma_p!");
+
+    // Calling the appropriate method to compute P
+    if x < a + 1.0 {
+        series_for_gamma(a, x)      // Series
+    } else {
+        1.0 - cf_for_gamma(a, x)    // Continued fraction
+    }
+}
+
+/// # Regularized Gamma function Q
+/// 
+/// ## Definition
+/// The [regularized gamma functions](https://en.wikipedia.org/wiki/Incomplete_gamma_function) are functions
+/// related to the gamma function. The first one, $P$, is the cumulative distribution function and is defined as:
+/// $$
+/// Q(a, x) = \frac{\Gamma(a, x)}{\Gamma(a)} = 1 - P(a,x)
+/// $$
+/// Where $\Gamma(a,x)$ is the incomplete upper gamma function and $\Gamma(a)$ is the gamma function.
+/// 
+/// ## Inputs
+/// - `a`: the power in the series ($a$)
+/// - `x`: the value to evaluate ($x$)
+/// 
+/// Returns the value of the regularized gamma function Q.
+/// 
+/// ### Example
+pub fn reg_gamma_q(a: f64, x: f64) -> f64 {
+
+    // Checking that the range is correct;
+    assert!(x >= 0.0, "x cannot be less than 0 in incomplete_gamma_p!");
+    assert!(a > 0.0, "a cannot be less than or equal to 0 in incomplete_gamma_p!");
+
+    // Calling the appropriate method to compute Q
+    if x < a + 1.0 {
+        1.0 - series_for_gamma(a, x)    // Series
+    } else {
+        cf_for_gamma(a, x)              // Continued fraction
+    }
+}
+
+/// # Series representation for the regularized gamma function
+fn series_for_gamma(a: f64, x: f64) -> f64 {
 
     // For x == 0 the result is always zero
     if x == 0.0 {
@@ -356,7 +415,7 @@ fn series_for_gamma(a: f64, x: f64) -> f64 {
     0.0
 }
 
-/// # Continued fraction representation for the incomplete gamma function
+/// # Continued fraction representation for the regularized gamma function
 fn cf_for_gamma(a: f64, x: f64) -> f64 {
 
     // Initializing the variables
