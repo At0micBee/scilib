@@ -48,3 +48,5 @@ pub mod quantum;
 pub mod range;
 
 pub mod signal;
+
+extern crate nalgebra as na;
