@@ -206,4 +206,35 @@ pub fn spherical_harmonics(l: usize, m: i32, theta: f64, phi: f64) -> Complex64 
     }
 }
 
+/// # Spherical harmonics for multiple angles theta
+pub fn spherical_harmonics_theta_vec(l: usize, m: i32, theta: &[f64], phi: f64) -> Vec<Complex64> {
+
+    // We do the computation for the positive value
+    let mp: i32 = m.abs();
+    let cpx: Complex64 = Complex64::new(0.0, mp as f64 * phi).exp();
+    let poly = polynomial::Legendre::new(l, mp);
+
+    // We follow QM norm
+    let norm: f64 = (2 * l + 1) as f64 / (4.0 * PI);
+    let top: f64 = basic::factorial(l - mp as usize) as f64;
+    let bot: f64 = basic::factorial(l + mp as usize) as f64;
+
+    // Computation with Legendre polynomial
+    // (-1.0_f64).powi(m) term for the Condon-Shortley phase
+    let pre_factor: Complex64 = (-1.0_f64).powi(m) * cpx * (norm * top / bot).sqrt();
+
+    // We compute the vector at each point of the theta input
+    let mut res: Vec<Complex64> = theta.iter().map(|t| {
+        pre_factor * Complex64::new(poly.compute(t.cos()), 0.0)
+    }).collect();
+
+    if m.is_negative() {
+        for p in res.iter_mut() {
+            *p = p.conj() * (-1.0_f64).powi(mp);
+        }
+    }
+
+    res
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
