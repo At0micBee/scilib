@@ -24,4 +24,4 @@ opt-level = 3   # Some functions are costly, might as well go faster
 rustdoc-args = [ "--html-in-header", "katex-header.html" ]
 
 [dependencies]
-num-complex = "0.4.1"
+num-complex = "0.4.2"
