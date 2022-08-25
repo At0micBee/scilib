@@ -7,7 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 use std::f64::consts::{     // Using std lib constants
-    //FRAC_PI_2,              // Pi / 2
     FRAC_2_SQRT_PI,         // 2 / sqrt(Pi)
     TAU                     // Tau constant
 };
@@ -129,60 +128,6 @@ pub fn binomial(n: usize, k: usize) -> usize {
 pub fn factorial<T>(n: T) -> usize
 where T: Into<usize> {
     (1..=n.into()).fold(1, |res, val| res * val)
-}
-
-/// # Mean value of a series
-/// 
-/// ## Definition
-/// We follow the mathematical definition of the mean:
-/// $$
-/// m = \frac{1}{n} \sum^{n}_{i = 1} x_i
-/// $$
-/// 
-/// ## Inputs
-/// - `val`: the slice of the series to compute
-/// 
-/// Returns the mean value of the series.
-/// 
-/// ## Example
-/// ```
-/// # use scilib::math::basic::mean;
-/// # use scilib::range;
-/// let x: Vec<f64> = range::linear(0, 5, 6);
-/// let m: f64 = mean(&x);
-/// assert_eq!(m, 2.5);
-/// ```
-pub fn mean(val: &[f64]) -> f64 {
-
-    val.iter().fold(0.0, |sum, v| sum + v) / val.len() as f64
-}
-
-/// # Standard deviation of a series
-/// 
-/// ## Definition
-/// As for the mean we follow the mathematical definition of the standard deviation:
-/// $$
-/// \sigma = \sqrt{ \frac{1}{n} \sum^{n}_{i = 1} (x_i - m)^2 }
-/// $$
-/// Where $m$ is the mean of the series.
-/// 
-/// ## Inputs
-/// - `val`: the slice of the series to compute
-/// 
-/// Returns the standard deviation value of the series.
-/// 
-/// ## Example
-/// ```
-/// # use scilib::math::basic::std_dev;
-/// # use scilib::range;
-/// let x: Vec<f64> = range::linear(0, 5, 6);
-/// let s: f64 = std_dev(&x);
-/// assert!((s - 1.707825127659933).abs() < 1e-10);
-/// ```
-pub fn std_dev(val: &[f64]) -> f64 {
-
-    let mean: f64 = mean(val);
-    (val.iter().fold(0.0, |sum, v| sum + (v - mean).powi(2)) / val.len() as f64).sqrt()
 }
 
 /// # Stieltjes Gamma function
