@@ -215,7 +215,7 @@ impl Radec {
 impl Into<Spherical> for Radec {
     fn into(self) -> Spherical {
         Spherical {
-            r: self.dist_earth.unwrap(),
+            r: self.dist_earth.unwrap_or_default(),
             theta: self.ra,
             phi: FRAC_PI_2 - self.dec
         }
