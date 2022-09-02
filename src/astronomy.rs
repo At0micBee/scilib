@@ -478,6 +478,8 @@ pub fn rayleigh_criterion(lambda: f64, d: f64) -> f64 {
 /// - `r`: distance from the center of focal point ($R$), in meters ($m$)
 /// - `a`: semi-major axis of the orbit ($a$), in meters ($m$)
 /// 
+/// Returns $v$, the velocity of an object at a given altitude.
+/// 
 /// ## Example
 /// ```
 /// # use scilib::constant;
@@ -489,6 +491,35 @@ pub fn rayleigh_criterion(lambda: f64, d: f64) -> f64 {
 /// ```
 pub fn orbital_speed(mass: f64, r: f64, a: f64) -> f64 {
     ( constant::G * mass * (2.0 / r - 1.0 / a) ).sqrt()
+}
+
+/// # Impact parameter $b$
+/// ## Definition
+/// The impact parameter for an exoplanet orbiting a star is defined as:
+/// $$
+/// b = \frac{a\cdot\cos(i)}{R_s}
+/// $$
+/// 
+/// ## Inputs
+/// - `a`: semi-major axis ($a$), in meters ($m$)
+/// - `radius_star`: the radius of the host star ($R_s$), in meters ($m$)
+/// - `i`: inclination of the planet's orbit ($i$), in degrees
+/// 
+/// Return $b$, the impact parameter of the planet.
+/// 
+/// ## Example
+/// ```
+/// # use scilib::constant;
+/// # use scilib::astronomy::impact_parameter;
+/// let r_star: f64 = 0.834 * constant::SUN_RADIUS;
+/// let a: f64 = 0.07697 * constant::AU;
+/// let i: f64 = 88.7;
+/// let b: f64 = impact_parameter(a, r_star, i);
+/// 
+/// assert!((b - 0.474).abs() <= 0.025);
+/// ```
+pub fn impact_parameter(a: f64, radius_star: f64, i: f64) -> f64 {
+    i.to_radians().cos() * a / radius_star
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
