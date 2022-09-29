@@ -505,7 +505,7 @@ pub fn orbital_speed(mass: f64, r: f64, a: f64) -> f64 {
 /// - `radius_star`: the radius of the host star ($R_s$), in meters ($m$)
 /// - `i`: inclination of the planet's orbit ($i$), in degrees
 /// 
-/// Return $b$, the impact parameter of the planet.
+/// Returns $b$, the impact parameter of the planet.
 /// 
 /// ## Example
 /// ```
@@ -520,6 +520,42 @@ pub fn orbital_speed(mass: f64, r: f64, a: f64) -> f64 {
 /// ```
 pub fn impact_parameter(a: f64, radius_star: f64, i: f64) -> f64 {
     i.to_radians().cos() * a / radius_star
+}
+
+/// # Hill radius
+/// ## Definition
+/// The ![Hill radius](https://en.wikipedia.org/wiki/Hill_sphere) gives an estimate of the sphere
+/// of influence of an object given its mass and its parent body mass. This function provides
+/// the standard approximation for this value, which is:
+/// $$
+/// r_H\approx a(1 - e)\sqrt\[3\]{\frac{m}{3M}}
+/// $$
+/// 
+/// ## Inputs
+/// - `m`: mass of the considered body ($m$), in kilograms ($kg$)
+/// - `m_parent`: mass of the parent body ($M$), in kilograms ($kg$)
+/// - `a`: semi-major axis of the considered body ($a$), in meters ($m$)
+/// - `e`: eccentricity of the considered body ($e$), unit less
+/// 
+/// Returns the approximate Hill radius of the considered body. 
+/// 
+/// ## Example
+/// ```
+/// # use scilib::astronomy::hill_radius;
+/// # use scilib::constant as cst;
+/// let earth_hill_sphere: f64 = hill_radius(cst::EARTH_MASS, cst::SUN_MASS, cst::AU, 0.01671022);
+/// assert!((earth_hill_sphere / 1e9 - 1.4714).abs() < 0.2e-3);
+/// ```
+pub fn hill_radius(m: f64, m_parent: f64, a: f64, e: f64) -> f64 {
+    a * (1.0 - e) * (m / (3.0 * m_parent)).cbrt()
+}
+
+/// # The actual Hill radius equation
+fn hill_equation(m: f64, m_parent: f64, r: f64, r_h: f64) -> f64 {
+    let t1: f64 = m / r_h.powi(2);
+    let t2: f64 = m_parent / (r.powi(2) * (1.0 - ( r_h / r )).powi(2));
+    let t3: f64 = (1.0 - ( r_h / r )) * m_parent / r.powi(2);
+    t1 - t2 + t3
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
