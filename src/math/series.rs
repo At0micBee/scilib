@@ -110,16 +110,39 @@ pub fn mean(val: &[f64]) -> f64 {
 /// 
 /// ## Example
 /// ```
-/// # use scilib::math::basic::std_dev;
+/// # use scilib::math::series::std_dev;
 /// # use scilib::range;
 /// let x: Vec<f64> = range::linear(0, 5, 6);
 /// let s: f64 = std_dev(&x);
+/// println!("{}", s);
 /// assert!((s - 1.707825127659933).abs() < 1e-10);
 /// ```
 pub fn std_dev(val: &[f64]) -> f64 {
 
     let mean: f64 = mean(val);
     (val.iter().fold(0.0, |sum, v| sum + (v - mean).powi(2)) / val.len() as f64).sqrt()
+}
+
+pub fn pearson_r(sample_x: &[f64], sample_y: &[f64]) -> f64 {
+    
+    let mean_x: f64 = mean(sample_x);   // Computing mean for x
+    let mean_y: f64 = mean(sample_y);   // Computing mean for y
+
+    let mut temp_x: f64;                // Creating temporary value for x
+    let mut temp_y: f64;                // Creating temporary value for y
+    let mut t: f64 = 0.0;               // Top part of Pearson
+    let mut b_x: f64 = 0.0;             // First div of Pearson
+    let mut b_y: f64 = 0.0;             // Second div of Pearson
+
+    for (x, y) in sample_x.iter().zip(sample_y) {
+        temp_x = x - mean_x;
+        temp_y = y - mean_y;
+        t += temp_x * temp_y;
+        b_x += temp_x.powi(2);
+        b_y += temp_y.powi(2);
+    }
+
+    t / (b_x * b_y).sqrt()
 }
 
 /// # Min-Max scaling of a series
