@@ -123,6 +123,24 @@ pub fn std_dev(val: &[f64]) -> f64 {
     (val.iter().fold(0.0, |sum, v| sum + (v - mean).powi(2)) / val.len() as f64).sqrt()
 }
 
+/// # Pearson r coefficient
+/// 
+/// ## Definition
+/// The ![Pearson r coefficient](https://en.wikipedia.org/wiki/Pearson_correlation_coefficient)
+/// is a correlation coefficient. Its use is widespread to check the correlation between two series
+/// of data points. It is defined as:
+/// $$
+/// \rho_{X, Y} = \frac{\mathrm{cov}(X, Y)}{\sigma_X\sigma_Y}
+/// = \frac{\sum_{i=0}^{n}(x_i - \bar x)(y_i - \bar y)}{\sqrt{\sum_{i=0}^{n} (x_i-\bar x)^2}\sqrt{\sum_{i=0}^{n} (y_i-\bar y)^2}}
+/// $$
+/// 
+/// ## Inputs
+/// - `sample_x`: the first series of values to check
+/// - `sample_y`: the second series of values to check
+/// 
+/// Returns the Pearson r correlation coefficient between both series.
+/// 
+/// ## Example
 pub fn pearson_r(sample_x: &[f64], sample_y: &[f64]) -> f64 {
     
     let mean_x: f64 = mean(sample_x);   // Computing mean for x
