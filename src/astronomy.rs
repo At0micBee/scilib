@@ -550,11 +550,55 @@ pub fn hill_radius(m: f64, m_parent: f64, a: f64, e: f64) -> f64 {
     a * (1.0 - e) * (m / (3.0 * m_parent)).cbrt()
 }
 
+/// # Exact Hill radius
+/// ## Definitions
+/// Similar to `hill_radius`, but solves the equation of the Hill radius:
+/// $$
+/// \frac{m}{r_H^2} - \frac{M}{r^2}\left( 1 - \frac{2r_H}{r} \right)^{-2} +
+/// \frac{M}{r^2}\left( 1 - \frac{r_H}{r} \right) = 0
+/// $$
+/// This is more costly than the approximation, but yields more accurate values.
+/// Note that $m<<M$ for the equation to be valid.
+/// 
+/// ## Inputs
+/// - `m`: mass of the considered body ($m$), in kilograms ($kg$)
+/// - `m_parent`: mass of the parent body ($M$), in kilograms ($kg$)
+/// - `r`: distance between both objects ($r$), in meters ($m$)
+/// 
+/// Returns the exact hill radius of an object.
+pub fn hill_radius_exact(m: f64, m_parent: f64, r: f64) -> f64 {
+
+    let hill_estimate: f64 = hill_radius(m, m_parent, r, 0.0);  // We compute the estimated radius, e=0
+    let mut hill_computed: f64 = hill_estimate;                 // We initialize the loop variable
+    let mut res_hill: f64;                                      // The result of the Hill equation
+    let mut counter: usize = 0;                                 // The iteration counter
+
+    'convergence: loop {
+
+        // We compute the result of the equation
+        res_hill = hill_equation(m, m_parent, r, hill_computed);
+
+        if res_hill.abs() < 100.0 {         // If the computed hill is close enough to the solution we return it
+            return hill_computed;           // When we reach a certain precision we return
+        }
+
+        hill_computed += res_hill * 10.0;   // Adjusting hill radius
+
+        if counter > 1000 {                 // If we don't reach convergence after a threshold we give up
+            break 'convergence;             // Exiting
+        } else {
+            counter += 1;                   // If not we increment counter
+        }
+    }
+
+    hill_estimate                           // If we couldn't converge, we return the estimation value
+}
+
 /// # The actual Hill radius equation
-fn hill_equation(m: f64, m_parent: f64, r: f64, r_h: f64) -> f64 {
+fn hill_equation(m: f64, m_parent: f64, a: f64, r_h: f64) -> f64 {
     let t1: f64 = m / r_h.powi(2);
-    let t2: f64 = m_parent / (r.powi(2) * (1.0 - ( r_h / r )).powi(2));
-    let t3: f64 = (1.0 - ( r_h / r )) * m_parent / r.powi(2);
+    let t2: f64 = m_parent / (a.powi(2) * (1.0 - ( r_h / a )).powi(2));
+    let t3: f64 = (1.0 - ( r_h / a )) * m_parent / a.powi(2);
     t1 - t2 + t3
 }
 
