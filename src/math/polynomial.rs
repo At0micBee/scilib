@@ -371,6 +371,86 @@ impl Poly {
         }
     }
 
+    /// # Rising factorial polynomial
+    /// 
+    /// ## Definition
+    /// The [rising factorial](https://en.wikipedia.org/wiki/Falling_and_rising_factorials) is
+    /// defined as:
+    /// $$
+    /// x^{\overline{n}} = \prod_{k=0}^{n-1}(x+k)
+    /// $$
+    /// 
+    /// And can be generated using Stirling numbers.
+    /// 
+    /// ## Inputs
+    /// - `n` the order of the polynomial
+    /// 
+    /// ## Example
+    /// ```
+    /// # use scilib::math::polynomial::Poly;
+    /// let p5 = Poly::factorial_rising(5);
+    /// let res = p5.compute(3.2);
+    /// assert!((res - 3119.80032).abs() < 1e-8);
+    /// ```
+    pub fn factorial_rising(n: usize) -> Self {
+
+        let mut factors: Vec<f64> = (0..=n).rev().map(|k| Poly::stirling_number(n, k) as f64).collect();
+        if n > 0 {
+            factors.pop();
+        }
+        let powers: Vec<i32> = factors.iter().enumerate().map(|(i, _)| (n - i) as i32).collect();
+
+        Self {
+            n,
+            l: None,
+            factors,
+            powers,
+            pre_f: None,
+            compute_fn: Self::compute_base,
+            compute_fnc: Self::compute_base_complex
+        }
+    }
+    
+    /// # Falling factorial polynomial
+    /// 
+    /// ## Definition
+    /// The [falling factorial](https://en.wikipedia.org/wiki/Falling_and_rising_factorials) is
+    /// defined as:
+    /// $$
+    /// x^{\overline{n}} = \prod_{k=0}^{n-1}(x-k)
+    /// $$
+    /// 
+    /// And can be generated using Stirling numbers.
+    /// 
+    /// ## Inputs
+    /// - `n` the order of the polynomial
+    /// 
+    /// ## Example
+    /// ```
+    /// # use scilib::math::polynomial::Poly;
+    /// let p5 = Poly::factorial_falling(5);
+    /// let res = p5.compute(3.2);
+    /// assert!((res - -1.35168).abs() < 1e-8);
+    /// ```
+    pub fn factorial_falling(n: usize) -> Self {
+
+        let mut factors: Vec<f64> = (0..=n).rev().map(|k| Poly::stirling_number_signed(n, k) as f64).collect();
+        if n > 0 {
+            factors.pop();
+        }
+        let powers: Vec<i32> = factors.iter().enumerate().map(|(i, _)| (n - i) as i32).collect();
+
+        Self {
+            n,
+            l: None,
+            factors,
+            powers,
+            pre_f: None,
+            compute_fn: Self::compute_base,
+            compute_fnc: Self::compute_base_complex
+        }
+    }
+
     //////////////////////////////////////////////////
     // Polynomial operations
 
@@ -565,6 +645,80 @@ impl Poly {
         }
 
         res
+    }
+
+    /// # Stirling number generator
+    /// 
+    /// ## Definition
+    /// The [Stirling numbers](https://en.wikipedia.org/wiki/Stirling_numbers_of_the_first_kind) are
+    /// defined by the following recurrence:
+    /// $$
+    /// S(n, k) = (n - 1)S(n - 1, k) + S(n, k - 1)
+    /// $$
+    /// With the special conditions that:
+    /// $$
+    /// S(n, 0) = S(0, k) = 0,~ S(0, 0) = 1
+    /// $$
+    /// 
+    /// ## Inputs
+    /// - `n`: the order of the numbers
+    /// - `k`: the position in the row
+    /// 
+    /// Returns the $S(n, k)$ Stirling number.
+    /// 
+    /// ## Example
+    /// We can generate the fifth row of the Stirling numbers.
+    /// 
+    /// ```
+    /// # use scilib::math::polynomial::Poly;
+    /// let res: Vec<usize> = (0..=5).map(|k| Poly::stirling_number(5, k)).collect();
+    /// let expected: Vec<usize> = vec![0, 24, 50, 35, 10, 1];
+    /// assert_eq!(res, expected);
+    /// ```
+    pub fn stirling_number(n: usize, k: usize) -> usize {
+        
+        // We start with the special cases
+        if n == 0 && k == 0 {
+            1
+        } else if n == 0 || k == 0 {
+            0
+        } else {
+            (n - 1) * Poly::stirling_number(n - 1, k) + Poly::stirling_number(n - 1, k - 1)
+        }
+    }
+
+    /// # Signed Stirling number generator
+    /// 
+    /// ## Definition
+    /// The [signed Stirling numbers](https://en.wikipedia.org/wiki/Stirling_numbers_of_the_first_kind)
+    /// have the same definition as the Stirling numbers (see definition of the function), but have
+    /// a sign following the parity of the inputs:
+    /// $$
+    /// s(n, k) = (-1)^{n-k}S(n, k)
+    /// $$
+    /// 
+    /// ## Inputs
+    /// - `n`: the order of the numbers
+    /// - `k`: the position in the row
+    /// 
+    /// Returns the $s(n, k)$ signed Stirling number.
+    /// 
+    /// ## Example
+    /// We can generate the fourth row of the signed Stirling numbers.
+    /// The values are similar to that of the Stirling numbers, but
+    /// have some negatives
+    /// 
+    /// ```
+    /// # use scilib::math::polynomial::Poly;
+    /// let res: Vec<i32> = (0..=4).map(|k| Poly::stirling_number_signed(4, k)).collect();
+    /// let expected: Vec<i32> = vec![0, -6, 11, -6, 1];
+    /// assert_eq!(res, expected);
+    /// ```
+    pub fn stirling_number_signed(n: usize, k: usize) -> i32 {
+        // We start with the special cases
+        let res = Self::stirling_number(n, k) as i32;
+
+        (-1.0_f64).powi((n - k) as i32) as i32 * res
     }
 }
 
