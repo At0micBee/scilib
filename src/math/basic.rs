@@ -157,6 +157,42 @@ where T: Into<f64>, U: Into<usize> {
     (0..k.into()).fold(1.0, |res, val| res * (z + val as f64))
 }
 
+pub fn confluent_m(a: f64, b: f64, x: f64) -> f64 {
+
+    // Preparing the base values
+    let mut n: usize = 0;                   // Iteration counter
+    let mut f_n: f64 = 1.0;                 // Factorial at iteration
+    let mut x_n: f64 = 1.0;                 // X^n
+    let mut a_n: f64 = 1.0;                 // a at iteration n
+    let mut b_n: f64 = 1.0;                 // b at iteration n
+
+    let mut term: f64 = 1.0;                // The term at each iteration
+    let mut res: f64 = 0.0;                 // The sum
+
+    'convergence: loop {
+
+        if (term / res).abs() < 1.0e-8 {
+            break 'convergence;
+        }
+        res += term;
+
+        // Exit condition
+        if n > 50 {                         // We have a n!, it's gonna go down quickly
+            break 'convergence;
+        }
+
+        n += 1;
+        f_n *= n as f64;
+        x_n *= x;
+        a_n *= a + (n - 1) as f64;
+        b_n *= b + (n - 1) as f64;
+        term = a_n * x_n / (b_n * f_n);
+        println!("{}", term);
+    }
+
+    res
+}
+
 /// # Falling factorial
 /// 
 /// ## Definition
