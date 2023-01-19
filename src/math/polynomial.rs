@@ -12,7 +12,7 @@ use num_complex::Complex64; // Using complex numbers from the num crate
 
 pub struct Poly {
     pub n: usize,
-    pub l: Option<i32>,
+    pub l: Option<f64>,
     factors: Vec<f64>,
     powers: Vec<i32>,
     pub pre_f: Option<f64>,
@@ -140,7 +140,7 @@ impl Poly {
         // Returning associated struct
         let mut poly: Self = Self {
             n,
-            l: Some(l.abs()),
+            l: Some(l.abs() as f64),
             factors,
             powers,
             pre_f: Some(pre_f),
@@ -176,7 +176,7 @@ impl Poly {
     /// - `m`: the derivative order.
     /// 
     /// The factors of the polynomials are normalized.
-    /// By definition, we have that $l\ge0$ and $m\ge0$.
+    /// By definition, we have that $l\ge0$.
     /// 
     /// Returns a `Self`, the corresponding struct.
     /// 
@@ -184,8 +184,9 @@ impl Poly {
     /// ```
     /// # use num_complex::Complex64;
     /// # use scilib::math::polynomial::Poly;
-    /// let p21 = Poly::laguerre(2, 1);     // l=2, m=1
-    /// let p73 = Poly::laguerre(7, 3);     // l=7, m=3
+    /// let p21 = Poly::laguerre(2, 1.0);       // l=2, m=1
+    /// let p73 = Poly::laguerre(7, 3.0);       // l=7, m=3
+    /// let p515 = Poly::laguerre(5, -1.5);     // l=5, partial order m=-1.5
     /// 
     /// let x = 0.2;                        // Example value
     /// let z = Complex64::new(1.2, -0.4);  // Example value
@@ -193,12 +194,15 @@ impl Poly {
     /// // Computing the results for the polynomial
     /// let res = p21.compute(x);
     /// let res_c = p73.compute_complex(z);
+    /// let res_p = p515.compute_complex(z);
     /// 
     /// let expected_c = Complex64::new(-7.429297330793, 10.152990394920);
+    /// let expected_p = Complex64::new(0.310088583333, -0.058726333333);
     ///
     /// // Comparing to tabulated values
     /// assert_eq!(res, 2.42);
     /// assert!((res_c - expected_c).norm() < 1.0e-10);
+    /// assert!((res_p - expected_p).norm() < 1.0e-10);
     /// ```
     /// 
     /// In the previous example, we have generated the second order:
@@ -209,9 +213,7 @@ impl Poly {
     /// $$
     /// L_2^1(x) = \frac{x^2}{2} - 3x + 3
     /// $$
-    pub fn laguerre(n: usize, l: i32) -> Self {
-
-        assert!(l >= 0, "l must be positive!");
+    pub fn laguerre(n: usize, l: f64) -> Self {
 
         // Initializing the vectors
         let mut factors: Vec<f64> = Vec::new();
@@ -220,7 +222,7 @@ impl Poly {
         // Going through the powers of the order
         for i in (0..=n).rev() {
             powers.push(i as i32);
-            let coef: f64 = (-1.0_f64).powi(i as i32) * basic::binomial(n + l as usize, n - i) as f64 / basic::factorial(i) as f64;
+            let coef: f64 = (-1.0_f64).powi(i as i32) * basic::binomial_reduced(n as f64 + l, n - i) as f64 / basic::factorial(i) as f64;
             factors.push(coef);
         }
 

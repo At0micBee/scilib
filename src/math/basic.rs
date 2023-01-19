@@ -106,6 +106,32 @@ pub fn binomial(n: usize, k: usize) -> usize {
     res
 }
 
+/// # Generalized binomial function
+/// 
+/// ## Definition
+/// The [generalized binomial theorem](https://en.wikipedia.org/wiki/Binomial_theorem) is defined as:
+/// $$
+/// \binom{n}{k} = \frac{n^\overline{k}}{k!}
+/// $$
+/// 
+/// 
+/// ## Inputs
+/// - `n`: the number of options ($n$), can be real.
+/// - `k`: is the selection ($k$).
+/// 
+/// Returns `k` among `n`.
+/// 
+/// ## Example
+/// ```
+/// # use scilib::math::basic::binomial_reduced;
+/// let res: f64 = binomial_reduced(4.2, 2_usize);
+/// assert!((res - 6.72).abs() < 1.0e-10);
+/// ```
+pub fn binomial_reduced(n: f64, r: usize) -> f64 {
+
+    falling_factorial(n, r) / factorial(r) as f64
+}
+
 /// # Factorial function
 /// 
 /// ## Definition
