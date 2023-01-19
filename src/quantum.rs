@@ -123,7 +123,7 @@ pub fn radial_wavefunction(n: usize, l: usize, r: f64) -> f64 {
     norm *= basic::factorial(n - l - 1) as f64 / (2 * n * basic::factorial(n + l)) as f64;
 
     // Computing the term associated to the Laguerre polynomial
-    let poly: f64 = polynomial::Laguerre::new(n - l - 1, 2 * l as i32 + 1).compute(2.0 * factor);
+    let poly: f64 = polynomial::Poly::laguerre(n - l - 1, 2 * l as i32 + 1).compute(2.0 * factor);
 
     // Finishing computation and returning
     (2.0 * factor).powi(l as i32) * norm.sqrt() * poly * (-factor).exp()
@@ -145,7 +145,7 @@ pub fn radial_wavefunction(n: usize, l: usize, r: f64) -> f64 {
 pub fn radial_vec(n: usize, l: usize, r: &[f64]) -> Vec<f64> {
 
     // Preparing the poly
-    let poly = polynomial::Laguerre::new(n - l - 1, 2 * l as i32 + 1);
+    let poly = polynomial::Poly::laguerre(n - l - 1, 2 * l as i32 + 1);
 
     // Computing the norm of the function
     let mut norm: f64 = (2.0 / (n as f64 * cst::A_0)).powi(3);
@@ -187,7 +187,7 @@ pub fn spherical_harmonics(l: usize, m: i32, theta: f64, phi: f64) -> Complex64 
     // We do the computation for the positive value
     let mp: i32 = m.abs();
     let cpx: Complex64 = Complex64::new(0.0, mp as f64 * phi).exp();
-    let poly = polynomial::Legendre::new(l, mp);
+    let poly = polynomial::Poly::legendre(l, mp);
 
     // We follow QM norm
     let norm: f64 = (2 * l + 1) as f64 / (4.0 * PI);
@@ -196,7 +196,7 @@ pub fn spherical_harmonics(l: usize, m: i32, theta: f64, phi: f64) -> Complex64 
 
     // Computation with Legendre polynomial
     // (-1.0_f64).powi(m) term for the Condon-Shortley phase
-    let res: Complex64 = (-1.0_f64).powi(m) * cpx * (norm * top / bot).sqrt() * poly.compute(theta.cos());
+    let res: Complex64 = cpx * (norm * top / bot).sqrt() * poly.compute(theta.cos());
 
     // Modifying the result depending on the sign of m
     if m.is_negative() {
@@ -212,7 +212,7 @@ pub fn spherical_harmonics_theta_vec(l: usize, m: i32, theta: &[f64], phi: f64) 
     // We do the computation for the positive value
     let mp: i32 = m.abs();
     let cpx: Complex64 = Complex64::new(0.0, mp as f64 * phi).exp();
-    let poly = polynomial::Legendre::new(l, mp);
+    let poly = polynomial::Poly::legendre(l, mp);
 
     // We follow QM norm
     let norm: f64 = (2 * l + 1) as f64 / (4.0 * PI);

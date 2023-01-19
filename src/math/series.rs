@@ -83,7 +83,7 @@ where T: std::cmp::PartialOrd + Copy {
 /// 
 /// ## Example
 /// ```
-/// # use scilib::math::basic::mean;
+/// # use scilib::math::series::mean;
 /// # use scilib::range;
 /// let x: Vec<f64> = range::linear(0, 5, 6);
 /// let m: f64 = mean(&x);

@@ -13,7 +13,7 @@ use std::f64::consts::{     // Using std lib constants
 
 use super::{                // Using parts from the crate
     super::constant,        // Calling scilib constants
-    polynomial::Bernoulli   // Bernoulli polynomials
+    polynomial::Poly        // Bernoulli polynomials
 };
 
 use num_complex::Complex64; // Using complex numbers from the num crate
@@ -130,6 +130,60 @@ where T: Into<usize> {
     (1..=n.into()).fold(1, |res, val| res * val)
 }
 
+/// # Rising factorial
+/// 
+/// ## Definition
+/// The [rising factorial](https://en.wikipedia.org/wiki/Falling_and_rising_factorials) is a polynomial, which can
+/// be computed directly with:
+/// $$
+/// x^{\overline{n}} = \prod_{k=0}^{n-1}(x+k)
+/// $$
+/// 
+/// ## Inputs
+/// - `x`: the value to pass to to the function ($x$).
+/// - `n`: the integer at which to evaluate the rising factorial factorial ($n$).
+/// 
+/// Returns the value of the rising factorial $x^{\overline{n}}$.
+/// 
+/// ## Example
+/// ```
+/// # use scilib::math::basic::rising_factorial;
+/// let res: f64 = rising_factorial(3.2, 5_usize);
+/// assert!((res - 3119.80032).abs() < 1e-12);
+/// ```
+pub fn rising_factorial<T, U>(x: T, k: U) -> f64
+where T: Into<f64>, U: Into<usize> {
+    let z: f64 = x.into();
+    (0..k.into()).fold(1.0, |res, val| res * (z + val as f64))
+}
+
+/// # Falling factorial
+/// 
+/// ## Definition
+/// The [falling factorial](https://en.wikipedia.org/wiki/Falling_and_rising_factorials) is a polynomial, which can
+/// be computed directly with:
+/// $$
+/// x^{\underline{n}} = \prod_{k=0}^{n-1}(x-k)
+/// $$
+/// 
+/// ## Inputs
+/// - `x`: the value to pass to to the function ($x$).
+/// - `n`: the integer at which to evaluate the falling factorial factorial ($n$).
+/// 
+/// Returns the value of the falling factorial $x^{\underline{n}}$.
+/// 
+/// ## Example
+/// ```
+/// # use scilib::math::basic::falling_factorial;
+/// let res: f64 = falling_factorial(3.2, 5_usize);
+/// assert!((res - -1.35168).abs() < 1e-12);
+/// ```
+pub fn falling_factorial<T, U>(x: T, k: U) -> f64 
+where T: Into<f64>, U: Into<usize> {
+    let z: f64 = x.into();
+    (0..k.into()).fold(1.0, |res, val| res * (z - val as f64))
+}
+
 /// # Stieltjes Gamma function
 /// 
 /// ## Definition
@@ -175,7 +229,7 @@ where T: Into<f64>, U: Into<Complex64> {
 
     // If a is negative and even, we use Bernoulli
     if s_f == 0.0 || (s_f.is_sign_negative() && s_f % 2.0 == 0.0) {
-        let ber: Bernoulli = Bernoulli::new(-s_f as usize + 1);
+        let ber: Poly = Poly::bernoulli(-s_f as usize + 1);
         return -ber.compute_complex(a_c) / (-s_f + 1.0);
     }
 
