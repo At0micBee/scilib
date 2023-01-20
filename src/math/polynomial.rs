@@ -24,21 +24,23 @@ pub struct Poly {
 impl std::fmt::Display for Poly {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         
-        let mut s: String = String::new();
-
-        for (f, p) in self.factors.iter().zip(&self.powers) {
-            match p {
-                0 => s += &format!("{:+} ", f),
-                1 => s += &format!("{:+}x ", f),
-                _ => s += &format!("{:+}x^{} ", f, p)
-            }
-            
+        // We write the power and associated factors
+        writeln!(f, "Power :: Factor")?;
+        for (factor, power) in self.factors.iter().zip(&self.powers) {
+            writeln!(f, "{:5} :: {}", power, factor)?;
         }
-        write!(f, "{}", s)?;
+
+        // If there is a pre-factor we show it as well
+        match self.pre_f {
+            Some(pre) => writeln!(f, "Pre factor: {}", pre)?,
+            None => ()
+        }
+
         Ok(())
     }
 }
 
+// Default value for Poly
 impl Default for Poly {
     fn default() -> Self {
         Self {
@@ -53,6 +55,7 @@ impl Default for Poly {
     }
 }
 
+/// # Polynomial implementation
 impl Poly {
 
     //////////////////////////////////////////////////
@@ -66,54 +69,51 @@ impl Poly {
     /// (1-x^2)\frac{d^2P_n(x)}{dx^2} - 2x\frac{dP_n(x)}{dx} + n(n+1)P_n(x) = 0
     /// $$
     /// 
-    /// The generating formula used in the program is as follows:
+    /// The close form used in the program is as follows:
     /// $$
     /// P_n(x) = \frac{1}{2^n}\sum_k^{\left\lfloor\frac{n}{2}\right\rfloor}(-1)^k\binom{n}{k}\binom{2n-2k}{n}x^{n-2k}
     /// $$
-    ///
-    /// For negative $n$, we follow the convention:
+    /// 
+    /// Which can be generalized with a given derivative order $l$, following the formula:
     /// $$
-    /// P_n^{-m}(x) = (-1)^m\frac{(n-m)!}{(n+m)!}P_n^m(x)
+    /// P_n^l(x) = (-1)^l (1 - x^2)^{l/2} \frac{d^l P_n(x)}{dx^l}
+    /// $$
+    ///
+    /// We can also compute the associated polynomials when $l<0$, following the convention:
+    /// $$
+    /// P_n^{-l}(x) = (-1)^l\frac{(n-l)!}{(n+l)!}P_n^l(x)
     /// $$
     /// 
     /// ## Inputs
     /// Produces the factors and powers for nth order polynomial, where
-    /// - `l`: the order of the Legendre polynomial
-    /// - `m`: the derivative order
+    /// - `n`: the order of the Legendre polynomial
+    /// - `l`: the derivative order
     /// 
-    /// By definition, we have that $l\ge0$ and $-l\le m\le l$.
+    /// By definition, we have that $n\ge0$ and $-n\le l\le n$.
     /// 
-    /// Returns a `Self`, the corresponding Legendre struct.
+    /// Returns a `Poly` struct, corresponding to the associated Legendre polynomial.
     ///
     /// ## Example
     /// ```
     /// # use num_complex::Complex64;
     /// # use scilib::math::polynomial::Poly;
-    /// let p71 = Poly::legendre(7, 1);     // l=7, m=1
-    /// let p72 = Poly::legendre(7, -2);    // l=7, m=-2
+    /// let p71 = Poly::legendre(7, 1);     // n=7, l=1
+    /// let p72 = Poly::legendre(7, -2);    // n=7, l=-2
     /// 
-    /// let x = -0.25;                      // Example value
-    /// let z = Complex64::new(-1.2, 0.2);
+    /// let x = -0.25;                      // Example real
+    /// let z = Complex64::new(-1.2, 0.2);  // Example complex
     /// 
     /// // Computing the results for each polynomial
     /// let res71 = p71.compute(x);
     /// let res72 = p72.compute_complex(z);
     /// 
+    /// // Expected result
     /// let expected_c = Complex64::new(-0.1297952, -0.324460533333);
     ///
     /// // Comparing to tabulated values
     /// assert!((res71 - -0.681433146961).abs() < 1.0e-10);
     /// assert!((res72 - expected_c).norm() < 1.0e-10);
     /// ```
-    /// 
-    /// In the previous example, we have generated the second order:
-    /// $$
-    /// P_2(x) = \frac{3x^2}{2} - \frac{1}{2}
-    /// $$
-    /// and its first derivative:
-    /// $$
-    /// P_2^1(x) = -3x
-    /// $$
     pub fn legendre(n: usize, l: i32) -> Self {
 
         // Checking that the range is good
@@ -155,47 +155,48 @@ impl Poly {
         poly
     }
 
-    /// /// # Laguerre polynomials
+    /// # Laguerre polynomials
     /// 
     /// ## Definition
     /// The [Laguerre polynomials](https://en.wikipedia.org/wiki/Laguerre_polynomials) are the solution to the Laguerre differential equation:
     /// $$
-    /// x\frac{d^2L_n}{dx^2} + (1-x)\frac{dL_n}{dx} + mL_n = 0
+    /// x\frac{d^2L_n^{(\alpha)}}{dx^2} + (\alpha+1-x)\frac{dL_n^{(\alpha)}}{dx} + nL_n^{(\alpha)} = 0
     /// $$
     /// 
-    /// In this crate, we use the generalized form of the Laguerre polynomial $L_n^m$, using:
+    /// In this crate, we use the generalized form of the Laguerre polynomial $L_n^{(\alpha)}$, using the closed form:
     /// $$
-    /// L_n^m(x) = \sum_{i=0}^{n} (-1)^i\binom{n+m}{n+i}\frac{x^i}{i!}
+    /// L_n^{(\alpha)}(x) = \sum_{i=0}^{n} (-1)^i\binom{n+\alpha}{n-i}\frac{x^i}{i!}
     /// $$
     /// 
-    /// Which yields the standard Laguerre polynomial for $m=0$, but lets the polynomial be used
+    /// Which yields the standard Laguerre polynomial for $\alpha=0$, but lets the polynomial be used
     /// to solve a wider variety of equations (such as radial wave function in quantum mechanics).
+    /// The binomial is the generalized version, which allows real input. The factors of the
+    /// polynomials are normalized.
+    /// 
     /// ## Inputs
     /// Produces the factors and powers for nth order polynomial, where
-    /// - `l`: the order of the Legendre polynomial
-    /// - `m`: the derivative order.
+    /// - `n`: the order of the Legendre polynomial ($n$)
+    /// - `l`: the derivative order $\alpha$
     /// 
-    /// The factors of the polynomials are normalized.
-    /// By definition, we have that $l\ge0$.
-    /// 
-    /// Returns a `Self`, the corresponding struct.
+    /// Returns a `Poly` struct, corresponding to the associated Laguerre polynomial.
     /// 
     /// ## Example
     /// ```
     /// # use num_complex::Complex64;
     /// # use scilib::math::polynomial::Poly;
-    /// let p21 = Poly::laguerre(2, 1.0);       // l=2, m=1
-    /// let p73 = Poly::laguerre(7, 3.0);       // l=7, m=3
-    /// let p515 = Poly::laguerre(5, -1.5);     // l=5, partial order m=-1.5
+    /// let p21 = Poly::laguerre(2, 1.0);       // n=2, l=1
+    /// let p73 = Poly::laguerre(7, 3.0);       // n=7, l=3
+    /// let p515 = Poly::laguerre(5, -1.5);     // n=5, partial order l=-1.5
     /// 
-    /// let x = 0.2;                        // Example value
-    /// let z = Complex64::new(1.2, -0.4);  // Example value
+    /// let x = 0.2;                            // Example real
+    /// let z = Complex64::new(1.2, -0.4);      // Example complex
     /// 
     /// // Computing the results for the polynomial
     /// let res = p21.compute(x);
     /// let res_c = p73.compute_complex(z);
     /// let res_p = p515.compute_complex(z);
     /// 
+    /// // Expected results
     /// let expected_c = Complex64::new(-7.429297330793, 10.152990394920);
     /// let expected_p = Complex64::new(0.310088583333, -0.058726333333);
     ///
@@ -204,16 +205,10 @@ impl Poly {
     /// assert!((res_c - expected_c).norm() < 1.0e-10);
     /// assert!((res_p - expected_p).norm() < 1.0e-10);
     /// ```
-    /// 
-    /// In the previous example, we have generated the second order:
-    /// $$
-    /// L_2(x) = \frac{x^2}{2} - 2x + 1
-    /// $$
-    /// And the associated generalized form $L_2^1(x)$:
-    /// $$
-    /// L_2^1(x) = \frac{x^2}{2} - 3x + 3
-    /// $$
-    pub fn laguerre(n: usize, l: f64) -> Self {
+    pub fn laguerre<U>(n: usize, l: U) -> Self
+    where U: Into<f64> {
+
+        let alpha: f64 = l.into();
 
         // Initializing the vectors
         let mut factors: Vec<f64> = Vec::new();
@@ -222,14 +217,14 @@ impl Poly {
         // Going through the powers of the order
         for i in (0..=n).rev() {
             powers.push(i as i32);
-            let coef: f64 = (-1.0_f64).powi(i as i32) * basic::binomial_reduced(n as f64 + l, n - i) as f64 / basic::factorial(i) as f64;
+            let coef: f64 = (-1.0_f64).powi(i as i32) * basic::binomial_reduced(n as f64 + alpha, n - i) as f64 / basic::factorial(i) as f64;
             factors.push(coef);
         }
 
         // Returning associated struct
         Self {
             n,
-            l: Some(l),
+            l: Some(alpha),
             factors,
             powers,
             pre_f: None,
@@ -246,17 +241,19 @@ impl Poly {
     /// $$
     /// \frac{t\exp(xt)}{\exp(t) - 1} = \sum_{n=0}^{\infty}B_n(x)\frac{t^n}{n!}
     /// $$
-    /// To generate the polynomials, we use the explicit formula:
+    /// To generate the polynomials, we use the explicit closed form:
     /// $$
     /// B_n(x) = \sum_{k=0}^{n}\binom{n}{k}B_{n-k}x^{k}
     /// $$
-    /// Where $B_{n-k}$ correspond to the $(n-k)^\mathrm{th}$ [Bernoulli number](https://en.wikipedia.org/wiki/Bernoulli_number).
+    /// Where $B_{n-k}$ correspond to the $(n-k)^\mathrm{th}$ [Bernoulli number](https://en.wikipedia.org/wiki/Bernoulli_number),
+    /// also available in this crate.
+    /// 
     /// ## Inputs
     /// - `n`: the order of the polynomial
     /// 
     /// By definition, we have that $n\ge0$.
     /// 
-    /// Returns a `Self`, the corresponding struct.
+    /// Returns a `Poly` struct, corresponding to the associated Laguerre polynomial.
     /// 
     /// ## Example
     /// ```
@@ -265,8 +262,8 @@ impl Poly {
     /// let p2 = Poly::bernoulli(2);        // n=2
     /// let p3 = Poly::bernoulli(3);        // n=3
     /// 
-    /// let x = 2.5;                        // Example value
-    /// let z = Complex64::new(-1.2, 0.2);
+    /// let x = 2.5;                        // Example real
+    /// let z = Complex64::new(-1.2, 0.2);  // Example complex
     /// 
     /// // Computing the results for the polynomial
     /// let res2 = p2.compute_complex(z);
@@ -314,14 +311,15 @@ impl Poly {
     /// $$
     /// E_n(x) = \sum_{k=0}^{n}\binom{n}{k} \frac{E_k}{2^k}\left( x - \frac{1}{2} \right)^{n-k}
     /// $$
-    /// Where $E_{k}$ correspond to the $k^\mathrm{th}$ [Euler number](https://en.wikipedia.org/wiki/Euler_numbers).
+    /// Where $E_{k}$ correspond to the $k^\mathrm{th}$ [Euler number](https://en.wikipedia.org/wiki/Euler_numbers),
+    /// also available in this crate.
     /// 
     /// ## Inputs
     /// - `n`: order of the polynomial
     /// 
     /// By definition, we have that $n\ge0$.
     /// 
-    /// Returns a `Self`, the corresponding struct.
+    /// Returns a `Poly` struct, corresponding to the associated Laguerre polynomial.
     /// 
     /// ## Example
     /// ```
@@ -330,8 +328,8 @@ impl Poly {
     /// let p5 = Poly::euler(5);            // n=5
     /// let p6 = Poly::euler(6);            // n=7
     /// 
-    /// let x = -1.1;                       // Example value
-    /// let z = Complex64::new(1.0, -2.5);
+    /// let x = -1.1;                       // Example real
+    /// let z = Complex64::new(1.0, -2.5);  // Example complex
     /// 
     /// // Computing the results for the polynomial
     /// let res5 = p5.compute(x);
@@ -382,7 +380,8 @@ impl Poly {
     /// x^{\overline{n}} = \prod_{k=0}^{n-1}(x+k)
     /// $$
     /// 
-    /// And can be generated using Stirling numbers.
+    /// The associated $n^{th}$ order polynomials can be computed using the [Stirling numbers](https://en.wikipedia.org/wiki/Stirling_numbers_of_the_first_kind),
+    /// available in this crate as well.
     /// 
     /// ## Inputs
     /// - `n` the order of the polynomial
@@ -422,7 +421,9 @@ impl Poly {
     /// x^{\overline{n}} = \prod_{k=0}^{n-1}(x-k)
     /// $$
     /// 
-    /// And can be generated using Stirling numbers.
+    /// The associated $n^{th}$ order polynomials can be computed using the
+    /// [signed Stirling numbers](https://en.wikipedia.org/wiki/Stirling_numbers_of_the_first_kind),
+    /// available in this crate as well.
     /// 
     /// ## Inputs
     /// - `n` the order of the polynomial
@@ -489,16 +490,23 @@ impl Poly {
         }
     }
 
-    /// # Calling the correct function
+    /// # Computing for a real value
+    /// 
+    /// ## Definition
+    /// Since there can be behaviors associated to some polynomials,
+    /// we may need to call a specific computation function. To avoid hazards, we provide
+    /// a single callable function that points to the correct computation function
+    /// for a given polynomial.
+    /// 
+    /// ## Inputs
+    /// - `x`: the value to evaluate (`x`: real)
+    /// 
+    /// Returns the value of the polynomial for a given $x$.
     pub fn compute(&self, x: f64) -> f64 {
         (self.compute_fn)(&self, x)
     }
 
     /// # Compute the polynomial for a real number
-    /// ## Inputs
-    /// - `x`: the value to evaluate (`x`: real)
-    /// 
-    /// Returns the result of the polynomial $L_n^m(x)$.
     fn compute_base(&self, x: f64) -> f64 {
 
         // Iterates through the values of the factors and powers
@@ -506,38 +514,41 @@ impl Poly {
     }
 
     /// # Computation for Legendre
-    /// ## Inputs
-    /// - `x`: the value to evaluate (`x`: real)
-    /// 
-    /// Returns the result of the polynomial $L_n^m(x)$.
     fn compute_legendre(&self, x: f64) -> f64 {
 
         // Iterates through the values of the factors and powers
         let pre: f64 = self.pre_f.unwrap() * (1.0 - x.powi(2)).powf(self.l.unwrap() as f64 / 2.0);
         self.factors.iter().zip(&self.powers).fold(0.0, |res, (f, p)| res + f * x.powi(*p)) * pre
     }
-
-    /// # Calling the correct function
+    /// # Computing for a complex value
+    /// 
+    /// ## Definition
+    /// Since there can be behaviors associated to some polynomials,
+    /// we may need to call a specific computation function. To avoid hazards, we provide
+    /// a single callable function that points to the correct computation function
+    /// for a given polynomial.
+    /// 
+    /// ## Inputs
+    /// - `z`: the value to evaluate (`z`: complex)
+    /// 
+    /// Returns the value of the polynomial for a given $z$.
     pub fn compute_complex(&self, z: Complex64) -> Complex64 {
         (self.compute_fnc)(&self, z)
     }
 
     /// # Compute the polynomial for a complex number
-    /// ## Inputs
-    /// - `z`: the value to evaluate (`z`: complex)
-    /// 
-    /// Returns the result of the polynomial L_n^m(z)$.
     fn compute_base_complex(&self, z: Complex64) -> Complex64 {
 
         // Iterates through the values of the factors and powers
-        self.factors.iter().zip(&self.powers).fold(Complex64::default(), |res, (f, p)| res + *f * z.powi(*p))
+        self.factors.iter().zip(&self.powers).fold(Complex64::default(), |res, (f, p)| res + f * z.powi(*p))
     }
 
+    /// # Computation for Legendre
     fn compute_legendre_complex(&self, z: Complex64) -> Complex64 {
 
         // Iterates through the values of the factors and powers
         let pre: Complex64 = self.pre_f.unwrap() * (1.0 - z.powi(2)).powf(self.l.unwrap() as f64 / 2.0);
-        self.factors.iter().zip(&self.powers).fold(Complex64::default(), |res, (f, p)| res + *f * z.powi(*p)) * pre
+        self.factors.iter().zip(&self.powers).fold(Complex64::default(), |res, (f, p)| res + f * z.powi(*p)) * pre
     }
 
     //////////////////////////////////////////////////
@@ -708,7 +719,7 @@ impl Poly {
     /// ## Example
     /// We can generate the fourth row of the signed Stirling numbers.
     /// The values are similar to that of the Stirling numbers, but
-    /// have some negatives
+    /// have some negatives.
     /// 
     /// ```
     /// # use scilib::math::polynomial::Poly;

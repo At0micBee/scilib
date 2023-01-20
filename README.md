@@ -64,7 +64,7 @@ let cyl = spherical::Cylindrical::from_degree(1.2, 30, -2.55);
 
 ## Bessel functions
 
-Essential in many maths and physics domain, bessel function are solutions of Bessel's differential equation ([Wiki page](https://en.wikipedia.org/wiki/Bessel_function)). This crate provides functions for both real and complex numbers, and for integer or real function order. It covers standard Bessel functions, the spherical Bessel functions, and the Riccati-Bessel functions.
+Essential in many maths and physics domain, the **[bessel functions](https://en.wikipedia.org/wiki/Bessel_function)** are solutions of Bessel's differential equation. This crate provides functions for both real and complex numbers, and for integer or real function order. It covers standard Bessel functions, the spherical Bessel functions, and the Riccati-Bessel functions.
 
 All functions are implemented:
 - **J**: First kind
@@ -99,10 +99,6 @@ let res_s1 = bessel::sh_first(2.11, 4);         // Spherical hankel first kind
 let res_s2 = bessel::sh_second(0.253, 0);       // Spherical hankel second kind
 ```
 
-Values are compared to known results (thanks, [WolframAlpha](https://www.wolframalpha.com/)), and the results are within small margins of error.
-
-Thanks to [Neven](https://github.com/Gentil-N) for adding the Spherical versions.
-
 ---
 
 ## Signal functions
@@ -128,19 +124,26 @@ let res3 = convolve(&r, &s);
 
 ## Typical polynomials
 
-Useful polynomials will be implemented to facilitate their uses to everyone; currently the [Legendre](https://docs.rs/scilib/0.4.0/scilib/math/polynomial/struct.Legendre.html), [Laguerre](https://docs.rs/scilib/0.4.0/scilib/math/polynomial/struct.Laguerre.html), [Bernoulli](https://docs.rs/scilib/0.4.0/scilib/math/polynomial/struct.Bernoulli.html) and [Euler](https://docs.rs/scilib/0.4.0/scilib/math/polynomial/struct.Euler.html) polynomials have been implemented.
+A dedicated method for polynomial is implemented in the module `math::polynomial` as `Poly`.
+Many useful polynomials have been implemented:
+
+- **[Legendre](https://docs.rs/scilib/0.4.0/scilib/math/polynomial/struct.Legendre.html)**: `L(n,l)` generalized with with `n` positive integer and `l` positive or negative integer such that `-n < l < n`
+- **[Laguerre](https://docs.rs/scilib/0.4.0/scilib/math/polynomial/struct.Laguerre.html)**: `L(n,l)` generalized with `n` positive integer and `l` a real number
+- **[Bernoulli](https://docs.rs/scilib/0.4.0/scilib/math/polynomial/struct.Bernoulli.html)**: `B(n)` with `n` positive integer
+- **[Euler](https://docs.rs/scilib/0.4.0/scilib/math/polynomial/struct.Euler.html)**: `E(n)` with `n` positive integer
+- **[Rising factorial](https://en.wikipedia.org/wiki/Falling_and_rising_factorials)**: the polynomial associated to the rising factorial function, with `n` positive integer
+- **[Falling factorial](https://en.wikipedia.org/wiki/Falling_and_rising_factorials)**: the polynomial associated to the falling factorial function, with `n` positive integer
 
 ```rust
 // They are found in the polynomial crate
-use scilib::math::polynomial::*;
+use scilib::math::polynomial::Poly;
 
-// Legendre and Laguerre have their generalized versions
-let leg = Legendre::new(2, -1); // l=2, m=-1
-let lag = Laguerre::new(3, 2);  // l=3, m=2
-
-// Standard support for Bernoulli and Euler (numbers and polynomials)
-let ber = Bernoulli::new(3);    // n=3
-let eul = Euler::new(5);        // n=5
+let leg = Poly::legendre(2, -1);        // n=2, l=-1
+let lag = Poly::laguerre(3, 2.78);      // n=3, l=2.78
+let ber = Poly::bernoulli(3);           // n=3
+let eul = Poly::euler(5);               // n=5
+let rf = Poly::factorial_rising(4);     // n=4
+let ff = Poly::factorial_falling(3);    // n=3
 ```
 
 ---
