@@ -10,6 +10,8 @@ use num_complex::Complex64; // Using complex numbers from the num crate
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+/// # Polynomial implementation
 pub struct Poly {
     pub n: usize,
     pub l: Option<f64>,
@@ -55,7 +57,6 @@ impl Default for Poly {
     }
 }
 
-/// # Polynomial implementation
 impl Poly {
 
     //////////////////////////////////////////////////

@@ -114,7 +114,6 @@ pub fn binomial(n: usize, k: usize) -> usize {
 /// \binom{n}{k} = \frac{n^\overline{k}}{k!}
 /// $$
 /// 
-/// 
 /// ## Inputs
 /// - `n`: the number of options ($n$), can be real.
 /// - `k`: is the selection ($k$).
@@ -183,12 +182,35 @@ where T: Into<f64>, U: Into<usize> {
     (0..k.into()).fold(1.0, |res, val| res * (z + val as f64))
 }
 
-pub fn confluent_m(a: f64, b: f64, x: f64) -> f64 {
+/// # Kummer function
+/// 
+/// ## Definition
+/// [Kummer function](https://en.wikipedia.org/wiki/Confluent_hypergeometric_function), is a generalized
+/// hypergeometric series defined by:
+/// $$
+/// M(a,b,z) = \sum_{n=0}^{\infty}\frac{a^{(n)}z^n}{b^{(n)}n!}
+/// $$
+/// 
+/// ## Inputs
+/// - `a`: first parameter, will be computed in the rising factorial ($a$)
+/// - `b`: second parameter, will be computed in the rising factorial ($b$)
+/// - `x`: the value to evaluate ($x$)
+/// 
+/// Returns the value of $M(a,b,x)$.
+/// 
+/// ## Example
+/// ```
+/// # use scilib::math::basic::kummer_function;
+/// let res = kummer_function(0.2, 1.3, 2.0);
+/// let expected = 1.577568150906;
+/// assert!((res - expected).abs() < 1.0e-8);
+/// ```
+pub fn kummer_function(a: f64, b: f64, x: f64) -> f64 {
 
     // Preparing the base values
     let mut n: usize = 0;                   // Iteration counter
     let mut f_n: f64 = 1.0;                 // Factorial at iteration
-    let mut x_n: f64 = 1.0;                 // X^n
+    let mut x_n: f64 = 1.0;                 // x^n
     let mut a_n: f64 = 1.0;                 // a at iteration n
     let mut b_n: f64 = 1.0;                 // b at iteration n
 
@@ -197,7 +219,7 @@ pub fn confluent_m(a: f64, b: f64, x: f64) -> f64 {
 
     'convergence: loop {
 
-        if (term / res).abs() < 1.0e-8 {
+        if (term / res).abs() < 1.0e-10 {
             break 'convergence;
         }
         res += term;
@@ -213,7 +235,6 @@ pub fn confluent_m(a: f64, b: f64, x: f64) -> f64 {
         a_n *= a + (n - 1) as f64;
         b_n *= b + (n - 1) as f64;
         term = a_n * x_n / (b_n * f_n);
-        println!("{}", term);
     }
 
     res
