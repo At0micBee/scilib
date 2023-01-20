@@ -219,7 +219,7 @@ pub fn kummer_function(a: f64, b: f64, x: f64) -> f64 {
 
     'convergence: loop {
 
-        if (term / res).abs() < 1.0e-10 {
+        if (term / res).abs() < PRECISION {
             break 'convergence;
         }
         res += term;
