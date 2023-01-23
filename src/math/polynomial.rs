@@ -4,21 +4,20 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-use std::collections::HashMap;
+use std::collections::HashMap;  // Rust Hashmap
 
-use super::basic;           // Basic functions
+use super::basic;               // Basic functions
 
-use num_complex::Complex64; // Using complex numbers from the num crate
+use num_complex::Complex64;     // Using complex numbers from the num crate
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 /// # Polynomial implementation
+#[derive(Clone)]
 pub struct Poly {
-    pub n: usize,
-    pub l: Option<f64>,
     coef: HashMap<i32, f64>,
-    pub pre_f: Option<f64>,
+    l: Option<f64>,
+    pre_f: Option<f64>,
     compute_fn: fn(&Self, f64) -> f64,
     compute_fnc: fn(&Self, Complex64) -> Complex64
 }
@@ -47,9 +46,8 @@ impl std::fmt::Display for Poly {
 impl Default for Poly {
     fn default() -> Self {
         Self {
-            n: 0,
-            l: None,
             coef: HashMap::new(),
+            l: None,
             pre_f: None,
             compute_fn: Self::compute_base,
             compute_fnc: Self::compute_base_complex,
@@ -58,6 +56,44 @@ impl Default for Poly {
 }
 
 impl Poly {
+
+    /// # Creates a new polynomial
+    /// 
+    /// ## Definition
+    /// We create a polynomial with integer order powers, and real coefficients, such that:
+    /// $$
+    /// p = c_0 + c_1x + c_2x^2 + ... + c_nx^n
+    /// $$
+    /// 
+    /// The computation of the result follows:
+    /// $$
+    /// r = c_ix^i
+    /// $$
+    /// where the $i$ indices are where non zero coefficients exist.
+    /// 
+    /// ## Inputs
+    /// - `pow_fac`: the power and associated factor
+    /// 
+    /// ## Example
+    /// ```
+    /// # use scilib::math::polynomial::Poly;
+    /// // 2 + x + 3x^2
+    /// let p = Poly::from(&[(0, 2.0), (1, 1.0), (2, 3.0)]);
+    /// let res = p.compute(2.0);
+    /// assert_eq!(16.0, res);
+    /// ```
+    pub fn from(pow_fac: &[(i32, f64)]) -> Self {
+
+        let coef: HashMap<i32, f64> = pow_fac.iter().map(|pf| *pf).collect();
+
+        Self {
+            coef,
+            l: None,
+            pre_f: None,
+            compute_fn: Self::compute_base,
+            compute_fnc: Self::compute_base_complex,
+        }
+    }
 
     //////////////////////////////////////////////////
     // Creating special polynomials
@@ -138,9 +174,8 @@ impl Poly {
 
         // Returning associated struct
         let mut poly: Self = Self {
-            n,
-            l: Some(l.abs() as f64),
             coef,
+            l: Some(l.abs() as f64),
             pre_f: Some(pre_f),
             compute_fn: Self::compute_legendre,
             compute_fnc: Self::compute_legendre_complex
@@ -219,9 +254,8 @@ impl Poly {
 
         // Returning associated struct
         Self {
-            n,
-            l: Some(alpha),
             coef,
+            l: Some(alpha),
             pre_f: None,
             compute_fn: Self::compute_base,
             compute_fnc: Self::compute_base_complex
@@ -282,9 +316,8 @@ impl Poly {
 
         // Returning associated struct
         Self {
-            n,
-            l: None,
             coef,
+            l: None,
             pre_f: None,
             compute_fn: Self::compute_base,
             compute_fnc: Self::compute_base_complex
@@ -355,9 +388,8 @@ impl Poly {
 
         // Returning associated struct
         Self {
-            n,
-            l: None,
             coef,
+            l: None,
             pre_f: None,
             compute_fn: Self::compute_base,
             compute_fnc: Self::compute_base_complex
@@ -397,9 +429,8 @@ impl Poly {
         }
 
         Self {
-            n,
-            l: None,
             coef,
+            l: None,
             pre_f: None,
             compute_fn: Self::compute_base,
             compute_fnc: Self::compute_base_complex
@@ -440,9 +471,8 @@ impl Poly {
         }
 
         Self {
-            n,
-            l: None,
             coef,
+            l: None,
             pre_f: None,
             compute_fn: Self::compute_base,
             compute_fnc: Self::compute_base_complex
@@ -500,7 +530,7 @@ impl Poly {
     fn compute_legendre(&self, x: f64) -> f64 {
 
         // Iterates through the values of the factors and powers
-        let pre: f64 = self.pre_f.unwrap() * (1.0 - x.powi(2)).powf(self.l.unwrap() as f64 / 2.0);
+        let pre: f64 = self.pre_f.unwrap() * (1.0 - x.powi(2)).powf(self.l.unwrap() / 2.0);
         self.coef.iter().fold(0.0, |res, (p, f)| res + f * x.powi(*p)) * pre
     }
     /// # Computing for a complex value
@@ -530,7 +560,7 @@ impl Poly {
     fn compute_legendre_complex(&self, z: Complex64) -> Complex64 {
 
         // Iterates through the values of the factors and powers
-        let pre: Complex64 = self.pre_f.unwrap() * (1.0 - z.powi(2)).powf(self.l.unwrap() as f64 / 2.0);
+        let pre: Complex64 = self.pre_f.unwrap() * (1.0 - z.powi(2)).powf(self.l.unwrap() / 2.0);
         self.coef.iter().fold(Complex64::default(), |res, (p, f)| res + f * z.powi(*p)) * pre
     }
 
@@ -715,6 +745,44 @@ impl Poly {
         let res = Self::stirling_number(n, k) as i32;
 
         (-1.0_f64).powi((n - k) as i32) as i32 * res
+    }
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Implementing operations
+
+impl<T: Into<f64>> std::ops::AddAssign<T> for Poly {
+    fn add_assign(&mut self, rhs: T) {
+        match self.coef.get_mut(&0) {
+            Some(v) => *v += rhs.into(),
+            None => { self.coef.insert(0, rhs.into()); }
+        }
+    }
+}
+
+impl<T: Into<f64>> std::ops::SubAssign<T> for Poly {
+    fn sub_assign(&mut self, rhs: T) {
+        match self.coef.get_mut(&0) {
+            Some(v) => *v -= rhs.into(),
+            None => { self.coef.insert(0, rhs.into()); }
+        }
+    }
+}
+
+impl<T: Into<f64>> std::ops::MulAssign<T> for Poly {
+    fn mul_assign(&mut self, rhs: T) {
+        let rhs_conv: f64 = rhs.into();
+        for f in self.coef.values_mut() {
+            *f *= rhs_conv;
+        }
+    }
+}
+
+impl<T: Into<f64>> std::ops::DivAssign<T> for Poly {
+    fn div_assign(&mut self, rhs: T) {
+        let rhs_conv: f64 = rhs.into();
+        for f in self.coef.values_mut() {
+            *f /= rhs_conv;
+        }
     }
 }
 
