@@ -4,6 +4,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+use std::collections::HashMap;
+
 use super::basic;           // Basic functions
 
 use num_complex::Complex64; // Using complex numbers from the num crate
@@ -15,8 +17,7 @@ use num_complex::Complex64; // Using complex numbers from the num crate
 pub struct Poly {
     pub n: usize,
     pub l: Option<f64>,
-    factors: Vec<f64>,
-    powers: Vec<i32>,
+    coef: HashMap<i32, f64>,
     pub pre_f: Option<f64>,
     compute_fn: fn(&Self, f64) -> f64,
     compute_fnc: fn(&Self, Complex64) -> Complex64
@@ -28,7 +29,7 @@ impl std::fmt::Display for Poly {
         
         // We write the power and associated factors
         writeln!(f, "Power :: Factor")?;
-        for (factor, power) in self.factors.iter().zip(&self.powers) {
+        for (power, factor) in &self.coef {
             writeln!(f, "{:5} :: {}", power, factor)?;
         }
 
@@ -48,8 +49,7 @@ impl Default for Poly {
         Self {
             n: 0,
             l: None,
-            factors: vec![],
-            powers: vec![],
+            coef: HashMap::new(),
             pre_f: None,
             compute_fn: Self::compute_base,
             compute_fnc: Self::compute_base_complex,
@@ -120,15 +120,13 @@ impl Poly {
         // Checking that the range is good
         assert!(l >= -(n as i32) && l <= n as i32, "The derivative order l isn't valid for the given n!");
 
-        // Initializing the vectors
-        let mut factors: Vec<f64> = Vec::new();
-        let mut powers: Vec<i32> = Vec::new();
+        // Initializing the coefficients
+        let mut coef: HashMap<i32, f64> = HashMap::new();
         
         // Going through the powers of the order
         for k in 0..=(n / 2) {
-            powers.push((n - 2 * k) as i32);
-            let coef: f64 = ((-1.0_f64).powi(k as i32) * (basic::binomial(n, k) * basic::binomial(2*n - 2*k, n)) as f64) / 2.0_f64.powi(n as i32);
-            factors.push(coef);
+            let c: f64 = ((-1.0_f64).powi(k as i32) * (basic::binomial(n, k) * basic::binomial(2*n - 2*k, n)) as f64) / 2.0_f64.powi(n as i32);
+            coef.insert((n - 2 * k) as i32, c);
         }
 
         // Computing the pre-factor associated to m
@@ -142,8 +140,7 @@ impl Poly {
         let mut poly: Self = Self {
             n,
             l: Some(l.abs() as f64),
-            factors,
-            powers,
+            coef,
             pre_f: Some(pre_f),
             compute_fn: Self::compute_legendre,
             compute_fnc: Self::compute_legendre_complex
@@ -212,22 +209,19 @@ impl Poly {
         let alpha: f64 = l.into();
 
         // Initializing the vectors
-        let mut factors: Vec<f64> = Vec::new();
-        let mut powers: Vec<i32> = Vec::new();
+        let mut coef: HashMap<i32, f64> = HashMap::new();
 
         // Going through the powers of the order
         for i in (0..=n).rev() {
-            powers.push(i as i32);
-            let coef: f64 = (-1.0_f64).powi(i as i32) * basic::binomial_reduced(n as f64 + alpha, n - i) as f64 / basic::factorial(i) as f64;
-            factors.push(coef);
+            let c: f64 = (-1.0_f64).powi(i as i32) * basic::binomial_reduced(n as f64 + alpha, n - i) as f64 / basic::factorial(i) as f64;
+            coef.insert(i as i32, c);
         }
 
         // Returning associated struct
         Self {
             n,
             l: Some(alpha),
-            factors,
-            powers,
+            coef,
             pre_f: None,
             compute_fn: Self::compute_base,
             compute_fnc: Self::compute_base_complex
@@ -279,21 +273,18 @@ impl Poly {
     pub fn bernoulli(n: usize) -> Self {
 
         // Initializing the vectors
-        let mut factors: Vec<f64> = Vec::new();
-        let mut powers: Vec<i32> = Vec::new();
+        let mut coef: HashMap<i32, f64> = HashMap::new();
 
         for k in 0..=n {
-            powers.push(k as i32);
-            let coef: f64 = basic::binomial(n, k) as f64 * Self::bernoulli_number(n - k);
-            factors.push(coef);
+            let c: f64 = basic::binomial(n, k) as f64 * Self::bernoulli_number(n - k);
+            coef.insert(k as i32, c);
         }
 
         // Returning associated struct
         Self {
             n,
             l: None,
-            factors,
-            powers,
+            coef,
             pre_f: None,
             compute_fn: Self::compute_base,
             compute_fnc: Self::compute_base_complex
@@ -344,8 +335,7 @@ impl Poly {
     pub fn euler(n: usize) -> Self {
 
         // Initializing the vectors
-        let mut factors: Vec<f64> = vec![0.0; n + 1];
-        let powers: Vec<i32> = (0..=n).map(|x| x as i32).collect();
+        let mut coef: HashMap<i32, f64> = (0..=n).map(|x| (x as i32, 0.0)).collect();
 
         for k in 0..=n {
             let binom: f64 = basic::binomial(n, k) as f64;
@@ -355,8 +345,11 @@ impl Poly {
             for p in 0..=(n-k) {
                 let pre: f64 = (-0.5_f64).powi(p as i32);
                 let triangle_val: f64 = basic::binomial(n-k, p) as f64;
+                let id: i32 = (n-k-p) as i32;
 
-                factors[n-k-p] += binom * f * pre * triangle_val;
+                if let Some(fact) = coef.get_mut(&id) {
+                    *fact += binom * f * pre * triangle_val;
+                }
             }
         }
 
@@ -364,8 +357,7 @@ impl Poly {
         Self {
             n,
             l: None,
-            factors,
-            powers,
+            coef,
             pre_f: None,
             compute_fn: Self::compute_base,
             compute_fnc: Self::compute_base_complex
@@ -396,17 +388,18 @@ impl Poly {
     /// ```
     pub fn factorial_rising(n: usize) -> Self {
 
-        let mut factors: Vec<f64> = (0..=n).rev().map(|k| Poly::stirling_number(n, k) as f64).collect();
+        let mut coef: HashMap<i32, f64> = (0..=n).rev().map(|k| {
+            (k as i32, Poly::stirling_number(n, k) as f64)
+        }).collect();
+
         if n > 0 {
-            factors.pop();
+            coef.remove(&0);
         }
-        let powers: Vec<i32> = factors.iter().enumerate().map(|(i, _)| (n - i) as i32).collect();
 
         Self {
             n,
             l: None,
-            factors,
-            powers,
+            coef,
             pre_f: None,
             compute_fn: Self::compute_base,
             compute_fnc: Self::compute_base_complex
@@ -438,17 +431,18 @@ impl Poly {
     /// ```
     pub fn factorial_falling(n: usize) -> Self {
 
-        let mut factors: Vec<f64> = (0..=n).rev().map(|k| Poly::stirling_number_signed(n, k) as f64).collect();
+        let mut coef: HashMap<i32, f64> = (0..=n).rev().map(|k| {
+            (k as i32, Poly::stirling_number_signed(n, k) as f64)
+        }).collect();
+
         if n > 0 {
-            factors.pop();
+            coef.remove(&0);
         }
-        let powers: Vec<i32> = factors.iter().enumerate().map(|(i, _)| (n - i) as i32).collect();
 
         Self {
             n,
             l: None,
-            factors,
-            powers,
+            coef,
             pre_f: None,
             compute_fn: Self::compute_base,
             compute_fnc: Self::compute_base_complex
@@ -463,31 +457,19 @@ impl Poly {
     ///
     /// This is used to produce the $P_n^m(x)$ version of the polynomial.
     fn derive(&mut self, m: i32) {
-
-        // Creating the marker to know if we need to delete the last element
-        // when the power reaches 0
-        let mut marker: bool;
         
         // Looping the derivation, m times
         for _ in 1..=m {
 
-            // Resetting at false, and starting the computation of the new terms
-            marker = false;
-            for (f, p) in self.factors.iter_mut().zip(&mut self.powers) {
+            let mut temp_c: HashMap<i32, f64> = HashMap::new();
+
+            for (p, f) in &self.coef {
                 match p {
-                    0 => marker = true,     // If p is zero, we do not touch anything
-                    _ => {                  // For anything else, we compute the derivative
-                        *f *= *p as f64;    // Changing th factor value
-                        *p -= 1;            // Changing the power value
-                    }
+                    0 => { },
+                    _ => { temp_c.insert(p - 1, f * *p as f64); }
                 }
             }
-
-            // If the marker is true, we remove the zero power, and the associated factor
-            if marker {
-                self.factors.pop(); // pop() method is fine, 0 can only exist once per derivative
-                self.powers.pop();  // and if so, it will always be at the last position
-            }
+            self.coef = temp_c;
         }
     }
 
@@ -511,7 +493,7 @@ impl Poly {
     fn compute_base(&self, x: f64) -> f64 {
 
         // Iterates through the values of the factors and powers
-        self.factors.iter().zip(&self.powers).fold(0.0, |res, (f, p)| res + f * x.powi(*p))
+        self.coef.iter().fold(0.0, |res, (p, f)| res + f * x.powi(*p))
     }
 
     /// # Computation for Legendre
@@ -519,7 +501,7 @@ impl Poly {
 
         // Iterates through the values of the factors and powers
         let pre: f64 = self.pre_f.unwrap() * (1.0 - x.powi(2)).powf(self.l.unwrap() as f64 / 2.0);
-        self.factors.iter().zip(&self.powers).fold(0.0, |res, (f, p)| res + f * x.powi(*p)) * pre
+        self.coef.iter().fold(0.0, |res, (p, f)| res + f * x.powi(*p)) * pre
     }
     /// # Computing for a complex value
     /// 
@@ -541,7 +523,7 @@ impl Poly {
     fn compute_base_complex(&self, z: Complex64) -> Complex64 {
 
         // Iterates through the values of the factors and powers
-        self.factors.iter().zip(&self.powers).fold(Complex64::default(), |res, (f, p)| res + f * z.powi(*p))
+        self.coef.iter().fold(Complex64::default(), |res, (p, f)| res + f * z.powi(*p))
     }
 
     /// # Computation for Legendre
@@ -549,7 +531,7 @@ impl Poly {
 
         // Iterates through the values of the factors and powers
         let pre: Complex64 = self.pre_f.unwrap() * (1.0 - z.powi(2)).powf(self.l.unwrap() as f64 / 2.0);
-        self.factors.iter().zip(&self.powers).fold(Complex64::default(), |res, (f, p)| res + f * z.powi(*p)) * pre
+        self.coef.iter().fold(Complex64::default(), |res, (p, f)| res + f * z.powi(*p)) * pre
     }
 
     //////////////////////////////////////////////////
