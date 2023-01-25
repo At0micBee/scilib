@@ -856,4 +856,12 @@ impl<T: Into<f64>> std::ops::DivAssign<T> for Poly {
     }
 }
 
+impl std::ops::Neg for Poly {
+    type Output = Self;
+    fn neg(self) -> Self::Output {
+        
+        self * -1
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
