@@ -750,6 +750,23 @@ impl Poly {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Implementing operations
 
+impl<T: Into<f64>> std::ops::Add<T> for Poly {
+    type Output = Self;
+    fn add(self, rhs: T) -> Self::Output {
+
+        let mut coef = self.coef.clone();
+        match coef.get_mut(&0) {
+            Some(v) => *v += rhs.into(),
+            None => { coef.insert(0, rhs.into()); }
+        }
+
+        Self {
+            coef,
+            ..self
+        }
+    }
+}
+
 impl<T: Into<f64>> std::ops::AddAssign<T> for Poly {
     fn add_assign(&mut self, rhs: T) {
         match self.coef.get_mut(&0) {
@@ -759,11 +776,46 @@ impl<T: Into<f64>> std::ops::AddAssign<T> for Poly {
     }
 }
 
+impl<T: Into<f64>> std::ops::Sub<T> for Poly {
+    type Output = Self;
+    fn sub(self, rhs: T) -> Self::Output {
+
+        let mut coef = self.coef.clone();
+        match coef.get_mut(&0) {
+            Some(v) => *v -= rhs.into(),
+            None => { coef.insert(0, -rhs.into()); }
+        }
+
+        Self {
+            coef,
+            ..self
+        }
+    }
+}
+
 impl<T: Into<f64>> std::ops::SubAssign<T> for Poly {
     fn sub_assign(&mut self, rhs: T) {
         match self.coef.get_mut(&0) {
             Some(v) => *v -= rhs.into(),
-            None => { self.coef.insert(0, rhs.into()); }
+            None => { self.coef.insert(0, -rhs.into()); }
+        }
+    }
+}
+
+impl<T: Into<f64>> std::ops::Mul<T> for Poly {
+    type Output = Self;
+    fn mul(self, rhs: T) -> Self::Output {
+
+        let rhs_conv: f64 = rhs.into();
+        let mut coef = self.coef.clone();
+
+        for f in coef.values_mut() {
+            *f *= rhs_conv;
+        }
+        
+        Self {
+            coef,
+            ..self
         }
     }
 }
@@ -773,6 +825,24 @@ impl<T: Into<f64>> std::ops::MulAssign<T> for Poly {
         let rhs_conv: f64 = rhs.into();
         for f in self.coef.values_mut() {
             *f *= rhs_conv;
+        }
+    }
+}
+
+impl<T: Into<f64>> std::ops::Div<T> for Poly {
+    type Output = Self;
+    fn div(self, rhs: T) -> Self::Output {
+
+        let rhs_conv: f64 = rhs.into();
+        let mut coef = self.coef.clone();
+
+        for f in coef.values_mut() {
+            *f /= rhs_conv;
+        }
+        
+        Self {
+            coef,
+            ..self
         }
     }
 }
