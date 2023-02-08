@@ -105,7 +105,7 @@ impl Spherical {
 
     /// # From the point (degrees)
     /// 
-    /// Creates a SPherical struct from three given points in space, with the angles in degrees.
+    /// Creates a Spherical struct from three given points in space, with the angles in degrees.
     /// 
     /// ```
     /// # use scilib::coordinate::spherical::Spherical;
