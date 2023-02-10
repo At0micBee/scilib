@@ -22,7 +22,18 @@ pub struct Poly {
     compute_fnc: fn(&Self, Complex64) -> Complex64
 }
 
-/// Display for polynomials
+/// # Debug for polynomial
+impl std::fmt::Debug for Poly {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        writeln!(f, "{:?}", self.coef)?;
+        writeln!(f, "{:?}", self.l)?;
+        writeln!(f, "{:?}", self.pre_f)?;
+
+        Ok(())
+    }
+}
+
+/// # Display for polynomials
 impl std::fmt::Display for Poly {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         
@@ -42,7 +53,7 @@ impl std::fmt::Display for Poly {
     }
 }
 
-// Default value for Poly
+// # Default value for Poly
 impl Default for Poly {
     fn default() -> Self {
         Self {
@@ -750,6 +761,26 @@ impl Poly {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Implementing operations
 
+impl std::cmp::PartialEq for Poly {
+    fn eq(&self, other: &Self) -> bool {
+
+        let c: bool = self.coef == other.coef;
+        let l: bool = self.l == other.l;
+        let p: bool = self.pre_f == other.pre_f;
+
+        c & l & p
+    }
+}
+
+/// # Addition
+/// 
+/// ```
+/// # use scilib::math::polynomial::Poly;
+/// let mut p = Poly::from(&[(1, 2.0)]);
+/// let mut e = Poly::from(&[(1, 2.0), (0, 5.0)]);
+/// let k = p + 5;
+/// assert_eq!(k, e);
+/// ```
 impl<T: Into<f64>> std::ops::Add<T> for Poly {
     type Output = Self;
     fn add(self, rhs: T) -> Self::Output {
@@ -767,6 +798,15 @@ impl<T: Into<f64>> std::ops::Add<T> for Poly {
     }
 }
 
+/// # Addition assigned
+/// 
+/// ```
+/// # use scilib::math::polynomial::Poly;
+/// let mut p = Poly::from(&[(1, 2.0)]);
+/// let mut e = Poly::from(&[(1, 2.0), (0, 5.0)]);
+/// p += 5;
+/// assert_eq!(p, e);
+/// ```
 impl<T: Into<f64>> std::ops::AddAssign<T> for Poly {
     fn add_assign(&mut self, rhs: T) {
         match self.coef.get_mut(&0) {
@@ -776,6 +816,15 @@ impl<T: Into<f64>> std::ops::AddAssign<T> for Poly {
     }
 }
 
+/// # Subtraction
+/// 
+/// ```
+/// # use scilib::math::polynomial::Poly;
+/// let mut p = Poly::from(&[(1, 2.0)]);
+/// let mut e = Poly::from(&[(1, 2.0), (0, -5.0)]);
+/// let k = p - 5;
+/// assert_eq!(k, e);
+/// ```
 impl<T: Into<f64>> std::ops::Sub<T> for Poly {
     type Output = Self;
     fn sub(self, rhs: T) -> Self::Output {
@@ -793,6 +842,15 @@ impl<T: Into<f64>> std::ops::Sub<T> for Poly {
     }
 }
 
+/// # Subtraction assigned
+/// 
+/// ```
+/// # use scilib::math::polynomial::Poly;
+/// let mut p = Poly::from(&[(1, 2.0)]);
+/// let mut e = Poly::from(&[(1, 2.0), (0, -5.0)]);
+/// p -= 5;
+/// assert_eq!(p, e);
+/// ```
 impl<T: Into<f64>> std::ops::SubAssign<T> for Poly {
     fn sub_assign(&mut self, rhs: T) {
         match self.coef.get_mut(&0) {
@@ -802,6 +860,15 @@ impl<T: Into<f64>> std::ops::SubAssign<T> for Poly {
     }
 }
 
+/// # Multiplication
+/// 
+/// ```
+/// # use scilib::math::polynomial::Poly;
+/// let mut p = Poly::from(&[(1, 2.0), (2, -1.0)]);
+/// let mut e = Poly::from(&[(1, 6.0), (2, -3.0)]);
+/// let k = p * 3;
+/// assert_eq!(k, e);
+/// ```
 impl<T: Into<f64>> std::ops::Mul<T> for Poly {
     type Output = Self;
     fn mul(self, rhs: T) -> Self::Output {
@@ -820,6 +887,15 @@ impl<T: Into<f64>> std::ops::Mul<T> for Poly {
     }
 }
 
+/// # Multiplication assigned
+/// 
+/// ```
+/// # use scilib::math::polynomial::Poly;
+/// let mut p = Poly::from(&[(1, 2.0), (2, -1.0)]);
+/// let mut e = Poly::from(&[(1, 6.0), (2, -3.0)]);
+/// p *= 3;
+/// assert_eq!(p, e);
+/// ```
 impl<T: Into<f64>> std::ops::MulAssign<T> for Poly {
     fn mul_assign(&mut self, rhs: T) {
         let rhs_conv: f64 = rhs.into();
@@ -829,6 +905,15 @@ impl<T: Into<f64>> std::ops::MulAssign<T> for Poly {
     }
 }
 
+/// # Division
+/// 
+/// ```
+/// # use scilib::math::polynomial::Poly;
+/// let mut p = Poly::from(&[(1, 2.0), (2, -1.0)]);
+/// let mut e = Poly::from(&[(1, 1.0), (2, -0.5)]);
+/// let k = p / 2;
+/// assert_eq!(k, e);
+/// ```
 impl<T: Into<f64>> std::ops::Div<T> for Poly {
     type Output = Self;
     fn div(self, rhs: T) -> Self::Output {
@@ -847,6 +932,15 @@ impl<T: Into<f64>> std::ops::Div<T> for Poly {
     }
 }
 
+/// # Division assigned
+/// 
+/// ```
+/// # use scilib::math::polynomial::Poly;
+/// let mut p = Poly::from(&[(1, 2.0), (2, -1.0)]);
+/// let mut e = Poly::from(&[(1, 1.0), (2, -0.5)]);
+/// p /= 2;
+/// assert_eq!(p, e);
+/// ```
 impl<T: Into<f64>> std::ops::DivAssign<T> for Poly {
     fn div_assign(&mut self, rhs: T) {
         let rhs_conv: f64 = rhs.into();
@@ -856,6 +950,15 @@ impl<T: Into<f64>> std::ops::DivAssign<T> for Poly {
     }
 }
 
+/// # Negation
+/// 
+/// ```
+/// # use scilib::math::polynomial::Poly;
+/// let mut p = Poly::from(&[(1, 2.0), (2, -1.0)]);
+/// let mut e = Poly::from(&[(1, -2.0), (2, 1.0)]);
+/// let k = -p;
+/// assert_eq!(k, e);
+/// ```
 impl std::ops::Neg for Poly {
     type Output = Self;
     fn neg(self) -> Self::Output {
