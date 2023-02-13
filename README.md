@@ -164,8 +164,10 @@ use scilib::constant as cst;
 // Creating a Radec system
 let coord: Radec = Radec::from_degree(32, 21.22534);
 
-// Apparent magnitude of the Sun at a light year distance
-let mag = apparent_mag(cst::SUN_L, cst::LY);
+// And other practical function
+let mag = apparent_mag(cst::SUN_L, cst::LY);            // Apparent mag of the Sun at 1 ly
+let hill = hill_radius(mass, mass_star, distance, e);   // Hill radius
+let b = impact_parameter(a, r_star, i, e, w);           // Transit impact parameter
 ```
 
 ---
