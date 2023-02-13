@@ -525,7 +525,7 @@ pub fn orbital_speed(mass: f64, r: f64, a: f64) -> f64 {
 pub fn impact_parameter(a: f64, radius_star: f64, i: f64, e: f64, w: f64) -> f64 {
 
     let base: f64 = i.to_radians().cos() * a / radius_star;
-    let sec: f64 = (1.0 - e.powi(2)) / (1.0 + e * w.to_degrees().sin());
+    let sec: f64 = (1.0 - e.powi(2)) / (1.0 + e * w.to_radians().sin());
     
     base * sec
 }
@@ -550,7 +550,7 @@ pub fn impact_parameter(a: f64, radius_star: f64, i: f64, e: f64, w: f64) -> f64
 pub fn transit_duration_tot(p: f64, r_star: f64, a: f64, k: f64, b: f64, i: f64) -> f64 {
 
     let f: f64 = p / PI;
-    let ratio: f64 = r_star / (a * i.to_degrees().sin());
+    let ratio: f64 = r_star / (a * i.to_radians().sin());
     let top: f64 = ((1.0 + k).powi(2) - b.powi(2)).sqrt();
 
     f * (ratio * top).asin()
@@ -576,7 +576,7 @@ pub fn transit_duration_tot(p: f64, r_star: f64, a: f64, k: f64, b: f64, i: f64)
 pub fn transit_duration_full(p: f64, r_star: f64, a: f64, k: f64, b: f64, i: f64) -> f64 {
 
     let f: f64 = p / PI;
-    let ratio: f64 = r_star / (a * i.to_degrees().sin());
+    let ratio: f64 = r_star / (a * i.to_radians().sin());
     let top: f64 = ((1.0 + k).powi(2) - b.powi(2)).sqrt();
 
     f * (ratio * top).asin()
