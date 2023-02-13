@@ -91,25 +91,27 @@ let res_s2 = bessel::sh_second(0.253, 0);       // Spherical hankel second kind
 ## Typical polynomials
 
 A dedicated method for polynomial is implemented in the module `math::polynomial` as `Poly`.
-Many useful polynomials have been implemented:
+Many useful polynomials have also been implemented.
 
-- **[Legendre](https://docs.rs/scilib/0.4.0/scilib/math/polynomial/struct.Legendre.html)**: `L(n,l)` generalized with with `n` positive integer and `l` positive or negative integer such that `-n < l < n`
-- **[Laguerre](https://docs.rs/scilib/0.4.0/scilib/math/polynomial/struct.Laguerre.html)**: `L(n,l)` generalized with `n` positive integer and `l` a real number
-- **[Bernoulli](https://docs.rs/scilib/0.4.0/scilib/math/polynomial/struct.Bernoulli.html)**: `B(n)` with `n` positive integer
-- **[Euler](https://docs.rs/scilib/0.4.0/scilib/math/polynomial/struct.Euler.html)**: `E(n)` with `n` positive integer
-- **[Rising factorial](https://en.wikipedia.org/wiki/Falling_and_rising_factorials)**: the polynomial associated to the rising factorial function, with `n` positive integer
-- **[Falling factorial](https://en.wikipedia.org/wiki/Falling_and_rising_factorials)**: the polynomial associated to the falling factorial function, with `n` positive integer
+- **Legendre**: `L(n,l)` generalized with with `n` positive integer and `l` positive or negative integer such that `-n < l < n`
+- **Laguerre**: `L(n,l)` generalized with `n` positive integer and `l` a real number
+- **Bernoulli**: `B(n)` with `n` positive integer
+- **Euler**: `E(n)` with `n` positive integer
+- **Rising factorial**: the polynomial associated to the rising factorial function, with `n` positive integer
+- **Falling factorial**: the polynomial associated to the falling factorial function, with `n` positive integer
 
 ```rust
 // They are found in the polynomial crate
 use scilib::math::polynomial::Poly;
 
-let leg = Poly::legendre(2, -1);        // n=2, l=-1
-let lag = Poly::laguerre(3, 2.78);      // n=3, l=2.78
-let ber = Poly::bernoulli(3);           // n=3
-let eul = Poly::euler(5);               // n=5
-let rf = Poly::factorial_rising(4);     // n=4
-let ff = Poly::factorial_falling(3);    // n=3
+let p = Poly::from([(2, 1.0), (1, 2.0), (0, -1.0)]) // x² + 2x - 1
+
+let leg = Poly::legendre(2, -1);                    // n=2, l=-1
+let lag = Poly::laguerre(3, 2.78);                  // n=3, l=2.78
+let ber = Poly::bernoulli(3);                       // n=3
+let eul = Poly::euler(5);                           // n=5
+let rf = Poly::factorial_rising(4);                 // n=4
+let ff = Poly::factorial_falling(3);                // n=3
 ```
 
 ---
