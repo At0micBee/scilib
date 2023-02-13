@@ -7,6 +7,7 @@
 use std::collections::HashMap;  // Rust Hashmap
 
 use super::basic;               // Basic functions
+use super::series;
 
 use num_complex::Complex64;     // Using complex numbers from the num crate
 
@@ -575,6 +576,25 @@ impl Poly {
         self.coef.iter().fold(Complex64::default(), |res, (p, f)| res + f * z.powi(*p)) * pre
     }
 
+    /// # Polynomial orders
+    /// 
+    /// ## Definition
+    /// Extracts the maximum order of the polynomial. Used built-in series function.
+    /// 
+    /// ## Example
+    /// ```
+    /// # use scilib::math::polynomial::Poly;
+    /// let p72 = Poly::factorial_rising(7);    // n=7, l=-2
+    /// assert_eq!(p72.get_order(), 7);
+    /// ```
+    pub fn get_order(&self) -> i32 {
+        // Collecting the powers
+        let p: Vec<i32> = self.coef.keys().map(|x| *x).collect();
+
+        // Computing the max in the slice
+        series::max_slice(&p)
+    }
+
     //////////////////////////////////////////////////
     // Specific methods to generate coefficients
 
@@ -758,6 +778,7 @@ impl Poly {
         (-1.0_f64).powi((n - k) as i32) as i32 * res
     }
 }
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Implementing operations
 
