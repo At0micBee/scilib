@@ -497,7 +497,7 @@ pub fn orbital_speed(mass: f64, r: f64, a: f64) -> f64 {
 /// ## Definition
 /// The impact parameter for an exoplanet orbiting a star is defined as:
 /// $$
-/// b = \frac{a\cdot\cos(i)}{R_\mathrm{star}} \left( \frac{1-e^2}{1 + e\sin(\omega)} \right)
+/// b = \frac{a\cos(i)}{R_\mathrm{star}} \left( \frac{1-e^2}{1 + e\sin(\omega)} \right)
 /// $$
 /// 
 /// ## Inputs
@@ -580,6 +580,31 @@ pub fn transit_duration_full(p: f64, r_star: f64, a: f64, k: f64, b: f64, i: f64
     let top: f64 = ((1.0 + k).powi(2) - b.powi(2)).sqrt();
 
     f * (ratio * top).asin()
+}
+
+/// # Transit probability
+/// 
+/// ## Definitions
+/// The probability is computed based on the occulted fraction of the line of longitude.
+/// Allowing for grazing eclipse, we have:
+/// $$
+/// p = \frac{R_\mathrm{star} + R_\mathrm{planet}}{a} \frac{1 + e\sin(\omega)}{1 - e^2}
+/// $$
+/// 
+/// ## Inputs
+/// - `r_star`: the stellar radius ($R_\mathrm{star}$), in meters ($m$)
+/// - `r_planet`: the planetary radius ($R_\mathrm{planet}$), in meters ($m$)
+/// - `a`: semi-major axis ($a$), in meters ($m$)
+/// - `e`: eccentricity of the planet ($e$)
+/// - `w`: argument of periapsis of the orbit ($\omega$), in degrees
+/// 
+/// Returns the probability of transit.
+pub fn probability_transit(r_star: f64, r_planet: f64, a: f64, e: f64, w: f64) -> f64 {
+
+    let rad: f64 = (r_star + r_planet) / a;
+    let cor: f64 = (1.0 + e * w.to_radians().sin()) / (1.0 - e.powi(2));
+
+    rad * cor
 }
 
 /// # Hill radius
