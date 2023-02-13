@@ -497,13 +497,15 @@ pub fn orbital_speed(mass: f64, r: f64, a: f64) -> f64 {
 /// ## Definition
 /// The impact parameter for an exoplanet orbiting a star is defined as:
 /// $$
-/// b = \frac{a\cdot\cos(i)}{R_s}
+/// b = \frac{a\cdot\cos(i)}{R_\mathrm{star}} \left( \frac{1-e^2}{1 + e\sin(\omega)} \right)
 /// $$
 /// 
 /// ## Inputs
 /// - `a`: semi-major axis ($a$), in meters ($m$)
 /// - `radius_star`: the radius of the host star ($R_s$), in meters ($m$)
 /// - `i`: inclination of the planet's orbit ($i$), in degrees
+/// - `e`: eccentricity of the planet ($e$)
+/// - `w`: argument of periapsis of the orbit ($\omega$), in degrees
 /// 
 /// Returns $b$, the impact parameter of the planet.
 /// 
@@ -514,12 +516,70 @@ pub fn orbital_speed(mass: f64, r: f64, a: f64) -> f64 {
 /// let r_star: f64 = 0.834 * constant::SUN_RADIUS;
 /// let a: f64 = 0.07697 * constant::AU;
 /// let i: f64 = 88.7;
-/// let b: f64 = impact_parameter(a, r_star, i);
+/// let e: f64 = 0.0;
+/// let w: f64 = 0.0;
+/// let b: f64 = impact_parameter(a, r_star, i, e, w);
 /// 
 /// assert!((b - 0.474).abs() <= 0.025);
 /// ```
-pub fn impact_parameter(a: f64, radius_star: f64, i: f64) -> f64 {
-    i.to_radians().cos() * a / radius_star
+pub fn impact_parameter(a: f64, radius_star: f64, i: f64, e: f64, w: f64) -> f64 {
+
+    let base: f64 = i.to_radians().cos() * a / radius_star;
+    let sec: f64 = (1.0 - e.powi(2)) / (1.0 + e * w.to_degrees().sin());
+    
+    base * sec
+}
+
+///# Total transit duration
+/// 
+/// ## Definition
+/// The total duration of the transit, from the **start** of the ingress to the **end** of the egress.
+/// $$
+/// T_{\mathrm{tot}} = \frac{P}{\pi}\arcsin\left( \frac{R_\mathrm{star} \sqrt{(1+k)^2 - b^2}}{a\sin(i)} \right)
+/// $$
+/// 
+/// ## Inputs
+/// - `p`: the period of the planet ($P$), in the desired units
+/// - `r_star`: the stellar radius ($R_\mathrm{star}$), in meters ($m$)
+/// - `a`: semi-major axis ($a$), in meters ($m$)
+/// - `k`: planet to star ratio ($k$)
+/// - `b`: impact parameter of the system ($b$)
+/// - `i`: inclination of the planet's orbit ($i$), in degrees
+/// 
+/// Returns the total transit duration, in the same unit as the period.
+pub fn transit_duration_tot(p: f64, r_star: f64, a: f64, k: f64, b: f64, i: f64) -> f64 {
+
+    let f: f64 = p / PI;
+    let ratio: f64 = r_star / (a * i.to_degrees().sin());
+    let top: f64 = ((1.0 + k).powi(2) - b.powi(2)).sqrt();
+
+    f * (ratio * top).asin()
+}
+
+///# Full transit duration
+/// 
+/// ## Definition
+/// The duration of the full transit, from the **end** of the ingress to the **start** of the egress.
+/// $$
+/// T_{\mathrm{full}} = \frac{P}{\pi}\arcsin\left( \frac{R_\mathrm{star} \sqrt{(1-k)^2 - b^2}}{a\sin(i)} \right)
+/// $$
+/// 
+/// ## Inputs
+/// - `p`: the period of the planet ($P$), in the desired units
+/// - `r_star`: the stellar radius ($R_\mathrm{star}$), in meters ($m$)
+/// - `a`: semi-major axis ($a$), in meters ($m$)
+/// - `k`: planet to star ratio ($k$)
+/// - `b`: impact parameter of the system ($b$)
+/// - `i`: inclination of the planet's orbit ($i$), in degrees
+/// 
+/// Returns the full transit duration, in the same unit as the period.
+pub fn transit_duration_full(p: f64, r_star: f64, a: f64, k: f64, b: f64, i: f64) -> f64 {
+
+    let f: f64 = p / PI;
+    let ratio: f64 = r_star / (a * i.to_degrees().sin());
+    let top: f64 = ((1.0 + k).powi(2) - b.powi(2)).sqrt();
+
+    f * (ratio * top).asin()
 }
 
 /// # Hill radius
