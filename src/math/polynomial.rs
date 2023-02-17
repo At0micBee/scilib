@@ -94,9 +94,9 @@ impl Poly {
     /// let res = p.compute(2.0);
     /// assert_eq!(16.0, res);
     /// ```
-    pub fn from(pow_fac: &[(i32, f64)]) -> Self {
+    pub fn from(pow_fac: &[(usize, f64)]) -> Self {
 
-        let coef: HashMap<i32, f64> = pow_fac.iter().map(|pf| *pf).collect();
+        let coef: HashMap<i32, f64> = pow_fac.iter().map(|(p, f)| (*p as i32, *f)).collect();
 
         Self {
             coef,
@@ -108,6 +108,7 @@ impl Poly {
     // Creating special polynomials
 
     /// # Legendre polynomials
+    /// 
     /// ## Definition
     /// The [Legendre polynomials](https://en.wikipedia.org/wiki/Legendre_polynomials) are used as solution to the
     /// Legendre differential equations, which can be written as:
@@ -270,6 +271,7 @@ impl Poly {
     }
 
     /// # Bernoulli polynomials
+    /// 
     /// ## Definition
     /// The [Bernoulli polynomial](https://en.wikipedia.org/wiki/Bernoulli_polynomials) are present in a great variety
     /// of particular functions, and are closely related to the Euler polynomial (also in this crate).
@@ -329,6 +331,7 @@ impl Poly {
     }
 
     /// # Euler polynomials
+    /// 
     /// ## Definition
     /// The [Euler polynomial](https://en.wikipedia.org/wiki/Bernoulli_polynomials) are present in a great variety
     /// of particular functions, and are closely related to the Euler polynomial (also in this crate).
@@ -397,7 +400,7 @@ impl Poly {
         }
     }
 
-    /// # Rising factorial polynomial
+    /// # Rising factorial polynomials
     /// 
     /// ## Definition
     /// The [rising factorial](https://en.wikipedia.org/wiki/Falling_and_rising_factorials) is
@@ -435,7 +438,7 @@ impl Poly {
         }
     }
     
-    /// # Falling factorial polynomial
+    /// # Falling factorial polynomials
     /// 
     /// ## Definition
     /// The [falling factorial](https://en.wikipedia.org/wiki/Falling_and_rising_factorials) is
@@ -474,7 +477,7 @@ impl Poly {
         }
     }
 
-    /// # Bessel Polynomial
+    /// # Bessel Polynomials
     /// 
     /// ## Definition
     /// The [Bessel polynomials](https://en.wikipedia.org/wiki/Bessel_polynomials) are an orthogonal sequence of polynomials.
@@ -531,6 +534,36 @@ impl Poly {
             c = top as f64 / (twos * bot * kf) as f64;
 
             coef.insert(k as i32, c);
+        }
+
+        Self {
+            coef,
+            ..Self::default()
+        }
+    }
+
+    /// # Hermite polynomials
+    pub fn hermite(n: usize) -> Self {
+
+        let mut coef: HashMap<i32, f64> = HashMap::new();
+
+        let nf: usize = basic::factorial(n);
+        let mut n2m: usize;
+        let mut sign: isize = 1;
+        let mut twos: usize = 2_usize.pow(n as u32);
+        let mut mf: usize = 1;
+        let mut c: f64;
+        coef.insert(n as i32, twos as f64);
+        
+        for m in 1..=(n / 2) {
+
+            sign *= -1;
+            twos = 2_usize.pow((n - 2 * m) as u32);
+            mf *= m;
+            n2m = basic::factorial(n - 2 * m);
+            c = sign as f64 * (nf * twos) as f64 / (mf * n2m) as f64;
+
+            coef.insert((n - 2 * m) as i32, c);
         }
 
         Self {
