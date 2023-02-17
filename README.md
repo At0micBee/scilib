@@ -111,8 +111,7 @@ let leg = Poly::legendre(2, -1);                    // n=2, l=-1
 let lag = Poly::laguerre(3, 2.78);                  // n=3, l=2.78
 let ber = Poly::bernoulli(3);                       // n=3
 let eul = Poly::euler(5);                           // n=5
-let rf = Poly::factorial_rising(4);                 // n=4
-let ff = Poly::factorial_falling(3);                // n=3
+let bes = Poly::bessel(5);                          // n=5
 ```
 
 ---
