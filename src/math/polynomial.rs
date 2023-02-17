@@ -100,10 +100,7 @@ impl Poly {
 
         Self {
             coef,
-            l: None,
-            pre_f: None,
-            compute_fn: Self::compute_base,
-            compute_fnc: Self::compute_base_complex,
+            ..Self::default()
         }
     }
 
@@ -268,9 +265,7 @@ impl Poly {
         Self {
             coef,
             l: Some(alpha),
-            pre_f: None,
-            compute_fn: Self::compute_base,
-            compute_fnc: Self::compute_base_complex
+            ..Self::default()
         }
     }
 
@@ -329,10 +324,7 @@ impl Poly {
         // Returning associated struct
         Self {
             coef,
-            l: None,
-            pre_f: None,
-            compute_fn: Self::compute_base,
-            compute_fnc: Self::compute_base_complex
+            ..Self::default()
         }
     }
 
@@ -401,10 +393,7 @@ impl Poly {
         // Returning associated struct
         Self {
             coef,
-            l: None,
-            pre_f: None,
-            compute_fn: Self::compute_base,
-            compute_fnc: Self::compute_base_complex
+            ..Self::default()
         }
     }
 
@@ -442,10 +431,7 @@ impl Poly {
 
         Self {
             coef,
-            l: None,
-            pre_f: None,
-            compute_fn: Self::compute_base,
-            compute_fnc: Self::compute_base_complex
+            ..Self::default()
         }
     }
     
@@ -484,10 +470,72 @@ impl Poly {
 
         Self {
             coef,
-            l: None,
-            pre_f: None,
-            compute_fn: Self::compute_base,
-            compute_fnc: Self::compute_base_complex
+            ..Self::default()
+        }
+    }
+
+    /// # Bessel Polynomial
+    /// 
+    /// ## Definition
+    /// The [Bessel polynomials](https://en.wikipedia.org/wiki/Bessel_polynomials) are an orthogonal sequence of polynomials.
+    /// They are defined as:
+    /// $$
+    /// y_n(x) = \sum_{k=0}^{n} x^k \frac{(n+k)!}{2^k k! (n-k)!}
+    /// $$
+    /// 
+    /// The polynomials are related to the bessel functions through:
+    /// $$
+    /// y_n(x) = \sqrt{\frac{2}{x\pi}}e^{1/x}K_{n+\frac{1}{2}}\left(\frac{1}{x}\right)
+    /// $$
+    /// where $K$ is a modified Bessel function of the second kind, implemented under the `math::bessel` module.
+    /// 
+    /// ## Inputs
+    /// - `n` the order of the polynomial
+    /// 
+    /// ## Example
+    /// ```
+    /// # use scilib::math::polynomial::Poly;
+    /// # use scilib::math::bessel;
+    /// use std::f64::consts::FRAC_PI_2;
+    /// let x: f64 = 0.28;
+    /// let order: usize = 5;
+    /// 
+    /// let p = Poly::bessel(order);    // n = 5
+    /// let res = p.compute(x);
+    /// assert!((res - 30.086718976000007).abs() < 1e-8);
+    /// 
+    /// // We can also check that the results are coherent with the values in math::bessel
+    /// let fact: f64 = (1.0 / (x * FRAC_PI_2)).sqrt() * (1.0 / x).exp();
+    /// let res_b = fact * bessel::k(1.0 / x, order as f64 + 0.5);
+    /// assert!((res - res_b.re).abs() <= 1e-3);
+    /// ```
+    pub fn bessel(n: usize) -> Self {
+
+        let mut coef: HashMap<i32, f64> = HashMap::new();
+
+        // Setting up variables once
+        let mut kf: usize = 1;                      // k!
+        let mut twos: usize = 1;                    // 2^k
+        let mut top: usize = basic::factorial(n);   // (n + k)!, computing the factorial only once
+        let mut bot: usize = top;                   // (n - k)!
+        let mut c: f64;                             // The result for the coef
+        coef.insert(0, 1.0);                        // Value for 0 is always 1
+
+        // Starting iterations at 1
+        for k in 1..=n {
+
+            kf *= k;
+            top *= n + k;
+            twos *= 2;
+            bot /= n - k + 1;
+            c = top as f64 / (twos * bot * kf) as f64;
+
+            coef.insert(k as i32, c);
+        }
+
+        Self {
+            coef,
+            ..Self::default()
         }
     }
 
@@ -584,7 +632,7 @@ impl Poly {
     /// ## Example
     /// ```
     /// # use scilib::math::polynomial::Poly;
-    /// let p72 = Poly::factorial_rising(7);    // n=7, l=-2
+    /// let p72 = Poly::factorial_rising(7);    // n=7
     /// assert_eq!(p72.get_order(), 7);
     /// ```
     pub fn get_order(&self) -> i32 {
