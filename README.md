@@ -97,6 +97,7 @@ Many useful polynomials have also been implemented.
 - **Laguerre**: `L(n,l)` generalized with `n` positive integer and `l` a real number
 - **Bernoulli**: `B(n)` with `n` positive integer
 - **Euler**: `E(n)` with `n` positive integer
+- **Bessel**: `y(n)` with `n` positive integer
 - **Rising factorial**: the polynomial associated to the rising factorial function, with `n` positive integer
 - **Falling factorial**: the polynomial associated to the falling factorial function, with `n` positive integer
 
