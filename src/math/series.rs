@@ -94,14 +94,39 @@ pub fn mean(val: &[f64]) -> f64 {
     val.iter().fold(0.0, |sum, v| sum + v) / val.len() as f64
 }
 
+/// # Variance of a series
+/// 
+/// ## Definition
+/// The definition of the variance is:
+/// $$
+/// V = \frac{1}{n - 1} \sum^{n}_{i = 1} (x_i - m)^2
+/// $$
+/// Where $m$ is the mean of the series and $V$ the variance.
+/// 
+/// ## Inputs
+/// - `val`: the slice of the series to compute
+/// 
+/// ## Example
+/// ```
+/// # use scilib::math::series::variance;
+/// # use scilib::range;
+/// let x: Vec<f64> = range::linear(0, 5, 6);
+/// let v: f64 = variance(&x);
+/// assert!((v - 3.5).abs() < 1e-10);
+/// ```
+pub fn variance(val: &[f64]) -> f64 {
+    let mean: f64 = mean(val);
+    val.iter().fold(0.0, |sum, v| sum + (v - mean).powi(2)) / (val.len() as f64 - 1.0)
+}
+
 /// # Standard deviation of a series
 /// 
 /// ## Definition
-/// As for the mean we follow the mathematical definition of the standard deviation:
+/// We follow the mathematical definition of the standard deviation:
 /// $$
-/// \sigma = \sqrt{ \frac{1}{n} \sum^{n}_{i = 1} (x_i - m)^2 }
+/// \sigma = \sqrt{ \frac{1}{n} \sum^{n}_{i = 1} (x_i - m)^2 } = \sqrt{V}
 /// $$
-/// Where $m$ is the mean of the series.
+/// Where $m$ is the mean of the series and $V$ the variance.
 /// 
 /// ## Inputs
 /// - `val`: the slice of the series to compute
@@ -114,13 +139,38 @@ pub fn mean(val: &[f64]) -> f64 {
 /// # use scilib::range;
 /// let x: Vec<f64> = range::linear(0, 5, 6);
 /// let s: f64 = std_dev(&x);
-/// println!("{}", s);
-/// assert!((s - 1.707825127659933).abs() < 1e-10);
+/// assert!((s - 1.870828693386).abs() < 1e-10);
 /// ```
 pub fn std_dev(val: &[f64]) -> f64 {
+    variance(val).sqrt()
+}
 
+/// # Skewness of a series
+/// 
+/// ## Definition
+/// We follow the mathematical definition of the skewness:
+/// $$
+/// S = \frac{1}{n} \sum_{i-1}^{n} \left( \frac{x_i - m}{\sigma} \right)
+/// $$
+/// Where $m$ is the mean of the series and $\sigma$ the standard deviation.
+/// 
+/// ## Inputs
+/// - `val`: the slice of the series to compute
+/// 
+/// ## Example
+/// ```
+/// # use scilib::math::series::skewness;
+/// # use scilib::math::basic;
+/// # use scilib::range;
+/// let r: Vec<f64> = range::linear(-10, 10, 10000);
+/// let g: Vec<f64> = r.iter().map(|x| basic::gaussian(1.0, 0.0, 1.7, *x)).collect();
+/// let s: f64 = skewness(&g);
+/// assert!((s - 1.348759).abs() <= 1e-3);
+/// ```
+pub fn skewness(val: &[f64]) -> f64 {
     let mean: f64 = mean(val);
-    (val.iter().fold(0.0, |sum, v| sum + (v - mean).powi(2)) / val.len() as f64).sqrt()
+    let sigma3: f64 = std_dev(val).powi(3);
+    val.iter().fold(0.0, |sum, v| sum + (v - mean).powi(3)) / (val.len() as f64 * sigma3)
 }
 
 /// # Pearson r coefficient
