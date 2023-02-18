@@ -201,6 +201,49 @@ pub fn kurtosis(val: &[f64]) -> f64 {
     val.iter().fold(0.0, |sum, v| sum + (v - mean).powi(4)) / (val.len() as f64 * sigma4) - 3.0
 }
 
+/// # Student's t value
+/// 
+/// ## Definition
+/// Computes the difference of means between two series. The $t$ value is simply defined as:
+/// $$
+/// t = \frac{m_a - m_b}{s_D}
+/// $$
+/// where $m_a$ and $m_b$ are the means of series A and B, respectively. $s_D$ is the pooled invariance
+/// of the two series, and is defined as:
+/// $$
+/// s_D=\sqrt{\frac{\sum_{a}(x_a-m_a)^2+\sum_{b}(x_b-m_b)^2}{N_a+N_b-2}\left(\frac{1}{N_a}+\frac{1}{N_b}\right)}
+/// $$
+/// where $x_a$ and $x_b$ are the points of their respective series, and $N_a$ and $N_b$ their number of points.
+/// 
+/// ## Inputs
+/// - `val_a`: first series
+/// - `val_b`: second series
+/// 
+/// ## Example
+/// ```
+/// # use scilib::math::series::student_t;
+/// # use scilib::math::basic;
+/// # use scilib::range;
+/// let r: Vec<f64> = range::linear(-10, 10, 1000);
+/// let g: Vec<f64> = r.iter().map(|x| basic::gaussian(1.0, 0.0, 1.7, *x)).collect();
+/// let h: Vec<f64> = r.iter().map(|x| basic::gaussian(1.1, -0.2, 1.5, *x)).collect();
+/// let t = student_t(&g, &h);
+/// ```
+pub fn student_t(val_a: &[f64], val_b: &[f64]) -> f64 {
+    // First we compute the pooled variance
+    let l_a: f64 = val_a.len() as f64;
+    let l_b: f64 = val_b.len() as f64;
+    let mean_a: f64 = mean(&val_a);
+    let mean_b: f64 = mean(&val_b);
+    let sum_a: f64 = val_a.iter().fold(0.0, |sum, v| sum + (v - mean_a).powi(2));
+    let sum_b: f64 = val_b.iter().fold(0.0, |sum, v| sum + (v - mean_b).powi(2));
+    let f1: f64 = (sum_a + sum_b) / (l_a + l_b - 2.0);
+    let sd: f64 = (f1 * (1.0 / l_a + 1.0 / l_b)).sqrt();
+
+    // Computing t
+    (mean_a - mean_b) / sd
+}
+
 /// # Pearson r coefficient
 /// 
 /// ## Definition
