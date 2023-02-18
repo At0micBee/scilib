@@ -543,6 +543,31 @@ impl Poly {
     }
 
     /// # Hermite polynomials
+    /// 
+    /// ## Definitions
+    /// The [Hermite polynomials](https://en.wikipedia.org/wiki/Hermite_polynomials) are a sequence
+    /// of orthogonal polynomials, widely used in a variety of applications.
+    /// This functions generates the so called "physicist" version of the polynomials, defined as:
+    /// $$
+    /// H_n(x) = (-1)^n e^{x^2} \frac{de^{-x^2}}{dx^n}
+    /// $$
+    /// 
+    /// The polynomials coefficients are computed using the following generating function:
+    /// $$
+    /// H_n(x) = n! \sum_{m=0}^{\lfloor\frac{n}{2}\rfloor}  \frac{(-1)^m 2^{n-2m}}{m!(n-2m)!} x^{n-2m}
+    /// $$
+    /// 
+    /// ## Inputs
+    /// 
+    /// - `n` the order of the polynomial
+    /// 
+    /// ## Example
+    /// ```
+    /// # use scilib::math::polynomial::Poly;
+    /// let h = Poly::hermite(7);
+    /// let res = h.compute(1.2);
+    /// assert!((res - 904.4250624000001).abs() < 1e-8);
+    /// ```
     pub fn hermite(n: usize) -> Self {
 
         let mut coef: HashMap<i32, f64> = HashMap::new();
