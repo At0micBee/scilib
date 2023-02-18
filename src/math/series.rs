@@ -150,7 +150,7 @@ pub fn std_dev(val: &[f64]) -> f64 {
 /// ## Definition
 /// We follow the mathematical definition of the skewness:
 /// $$
-/// S = \frac{1}{n} \sum_{i-1}^{n} \left( \frac{x_i - m}{\sigma} \right)
+/// S = \frac{1}{n} \sum_{i-1}^{n} \left( \frac{x_i - m}{\sigma} \right)^3
 /// $$
 /// Where $m$ is the mean of the series and $\sigma$ the standard deviation.
 /// 
@@ -171,6 +171,34 @@ pub fn skewness(val: &[f64]) -> f64 {
     let mean: f64 = mean(val);
     let sigma3: f64 = std_dev(val).powi(3);
     val.iter().fold(0.0, |sum, v| sum + (v - mean).powi(3)) / (val.len() as f64 * sigma3)
+}
+
+/// # Kurtosis of a series
+/// 
+/// ## Definition
+/// We follow the mathematical definition of the kurtosis:
+/// $$
+/// S = \left[\frac{1}{n} \sum_{i-1}^{n} \left( \frac{x_i - m}{\sigma} \right)^4 \right] - 3
+/// $$
+/// Where $m$ is the mean of the series and $\sigma$ the standard deviation.
+/// 
+/// ## Inputs
+/// - `val`: the slice of the series to compute
+/// 
+/// ## Example
+/// ```
+/// # use scilib::math::series::kurtosis;
+/// # use scilib::math::basic;
+/// # use scilib::range;
+/// let r: Vec<f64> = range::linear(-10, 10, 10000);
+/// let g: Vec<f64> = r.iter().map(|x| basic::gaussian(1.0, 0.0, 1.7, *x)).collect();
+/// let s: f64 = kurtosis(&g);
+/// assert!((s - 0.298867).abs() <= 1e-3);
+/// ```
+pub fn kurtosis(val: &[f64]) -> f64 {
+    let mean: f64 = mean(val);
+    let sigma4: f64 = std_dev(val).powi(4);
+    val.iter().fold(0.0, |sum, v| sum + (v - mean).powi(4)) / (val.len() as f64 * sigma4) - 3.0
 }
 
 /// # Pearson r coefficient
