@@ -18,7 +18,6 @@ use num_complex::Complex64;     // Using complex numbers from the num crate
 pub struct Poly {
     coef: HashMap<i32, f64>,
     l: Option<f64>,
-    pre_f: Option<f64>,
     compute_fn: fn(&Self, f64) -> f64,
     compute_fnc: fn(&Self, Complex64) -> Complex64
 }
@@ -28,7 +27,6 @@ impl std::fmt::Debug for Poly {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         writeln!(f, "{:?}", self.coef)?;
         writeln!(f, "{:?}", self.l)?;
-        writeln!(f, "{:?}", self.pre_f)?;
 
         Ok(())
     }
@@ -44,12 +42,6 @@ impl std::fmt::Display for Poly {
             writeln!(f, "{:5} :: {}", power, factor)?;
         }
 
-        // If there is a pre-factor we show it as well
-        match self.pre_f {
-            Some(pre) => writeln!(f, "Pre factor: {}", pre)?,
-            None => ()
-        }
-
         Ok(())
     }
 }
@@ -60,7 +52,6 @@ impl Default for Poly {
         Self {
             coef: HashMap::new(),
             l: None,
-            pre_f: None,
             compute_fn: Self::compute_base,
             compute_fnc: Self::compute_base_complex,
         }
@@ -136,6 +127,12 @@ impl Poly {
     /// - `n`: the order of the Legendre polynomial
     /// - `l`: the derivative order
     /// 
+    /// /!\ IMPORTANT NOTE: when using a non-zero `l`, Legendre requires a secondary
+    /// term to be multiplied to the polynomial during computation. This added term
+    /// cannot be simplified and integrated to the base polynomial. If you need to 
+    /// use the generalized version, be careful that arithmetic operations will
+    /// be broken for it!
+    /// 
     /// By definition, we have that $n\ge0$ and $-n\le l\le n$.
     /// 
     /// Returns a `Poly` struct, corresponding to the associated Legendre polynomial.
@@ -186,7 +183,6 @@ impl Poly {
         let mut poly: Self = Self {
             coef,
             l: Some(l.abs() as f64),
-            pre_f: Some(pre_f),
             compute_fn: Self::compute_legendre,
             compute_fnc: Self::compute_legendre_complex
         };
@@ -195,7 +191,7 @@ impl Poly {
         poly.derive(l.abs());
 
         // Returning the final polynomial
-        poly
+        poly * pre_f
     }
 
     /// # Laguerre polynomials
@@ -648,7 +644,7 @@ impl Poly {
     fn compute_legendre(&self, x: f64) -> f64 {
 
         // Iterates through the values of the factors and powers
-        let pre: f64 = self.pre_f.unwrap() * (1.0 - x.powi(2)).powf(self.l.unwrap() / 2.0);
+        let pre: f64 = (1.0 - x.powi(2)).powf(self.l.unwrap() / 2.0);
         self.coef.iter().fold(0.0, |res, (p, f)| res + f * x.powi(*p)) * pre
     }
     /// # Computing for a complex value
@@ -678,7 +674,7 @@ impl Poly {
     fn compute_legendre_complex(&self, z: Complex64) -> Complex64 {
 
         // Iterates through the values of the factors and powers
-        let pre: Complex64 = self.pre_f.unwrap() * (1.0 - z.powi(2)).powf(self.l.unwrap() / 2.0);
+        let pre: Complex64 = (1.0 - z.powi(2)).powf(self.l.unwrap() / 2.0);
         self.coef.iter().fold(Complex64::default(), |res, (p, f)| res + f * z.powi(*p)) * pre
     }
 
@@ -893,9 +889,8 @@ impl std::cmp::PartialEq for Poly {
 
         let c: bool = self.coef == other.coef;
         let l: bool = self.l == other.l;
-        let p: bool = self.pre_f == other.pre_f;
 
-        c & l & p
+        c & l
     }
 }
 
@@ -925,6 +920,35 @@ impl<T: Into<f64>> std::ops::Add<T> for Poly {
     }
 }
 
+/// # Addition of Poly
+/// 
+/// ```
+/// # use scilib::math::polynomial::Poly;
+/// let p1 = Poly::from(&[(1, 2.5), (2, -1.0), (3, 1.2)]);
+/// let p2 = Poly::from(&[(0, 10.0), (1, -5.0), (3, 1.2)]);
+/// let res = p1 + p2;
+/// let expected = Poly::from(&[(0, 10.0), (1, -2.5), (2, -1.0), (3, 2.4)]);
+/// assert_eq!(res, expected);
+/// ```
+impl std::ops::Add<Self> for Poly {
+    type Output = Self;
+    fn add(self, rhs: Poly) -> Self::Output {
+
+        let mut coef = self.coef.clone();
+        for (c, f) in &rhs.coef {
+            match coef.get_mut(c) {
+                Some(v) => *v += f,
+                None => { coef.insert(*c, *f); }
+            }
+        }
+        
+        Poly {
+            coef,
+            ..self
+        }
+    }    
+}
+
 /// # Addition assigned
 /// 
 /// ```
@@ -939,6 +963,27 @@ impl<T: Into<f64>> std::ops::AddAssign<T> for Poly {
         match self.coef.get_mut(&0) {
             Some(v) => *v += rhs.into(),
             None => { self.coef.insert(0, rhs.into()); }
+        }
+    }
+}
+
+/// # Addition assigned of Poly
+/// 
+/// ```
+/// # use scilib::math::polynomial::Poly;
+/// let mut p1 = Poly::from(&[(1, 2.5), (2, -1.0), (3, 1.2)]);
+/// let p2 = Poly::from(&[(0, 10.0), (1, -5.0), (3, 1.2)]);
+/// p1 += p2;
+/// let expected = Poly::from(&[(0, 10.0), (1, -2.5), (2, -1.0), (3, 2.4)]);
+/// assert_eq!(p1, expected);
+/// ```
+impl std::ops::AddAssign<Self> for Poly {
+    fn add_assign(&mut self, rhs: Self) {
+        for (c, f) in &rhs.coef {
+            match self.coef.get_mut(c) {
+                Some(v) => *v += f,
+                None => { self.coef.insert(*c, *f); }
+            }
         }
     }
 }
@@ -969,6 +1014,35 @@ impl<T: Into<f64>> std::ops::Sub<T> for Poly {
     }
 }
 
+/// # Subtraction of Poly
+/// 
+/// ```
+/// # use scilib::math::polynomial::Poly;
+/// let p1 = Poly::from(&[(1, 2.5), (2, -1.0), (3, 1.2)]);
+/// let p2 = Poly::from(&[(0, 10.0), (1, -5.0), (3, 1.2)]);
+/// let res = p1 - p2;
+/// let expected = Poly::from(&[(0, -10.0), (1, 7.5), (2, -1.0), (3, 0.0)]);
+/// assert_eq!(res, expected);
+/// ```
+impl std::ops::Sub<Self> for Poly {
+    type Output = Self;
+    fn sub(self, rhs: Poly) -> Self::Output {
+
+        let mut coef = self.coef.clone();
+        for (c, f) in &rhs.coef {
+            match coef.get_mut(c) {
+                Some(v) => *v -= f,
+                None => { coef.insert(*c, -*f); }
+            }
+        }
+        
+        Poly {
+            coef,
+            ..self
+        }
+    }    
+}
+
 /// # Subtraction assigned
 /// 
 /// ```
@@ -983,6 +1057,27 @@ impl<T: Into<f64>> std::ops::SubAssign<T> for Poly {
         match self.coef.get_mut(&0) {
             Some(v) => *v -= rhs.into(),
             None => { self.coef.insert(0, -rhs.into()); }
+        }
+    }
+}
+
+/// # Subtraction assigned of Poly
+/// 
+/// ```
+/// # use scilib::math::polynomial::Poly;
+/// let mut p1 = Poly::from(&[(1, 2.5), (2, -1.0), (3, 1.2)]);
+/// let p2 = Poly::from(&[(0, 10.0), (1, -5.0), (3, 1.2)]);
+/// p1 -= p2;
+/// let expected = Poly::from(&[(0, -10.0), (1, 7.5), (2, -1.0), (3, 0.0)]);
+/// assert_eq!(p1, expected);
+/// ```
+impl std::ops::SubAssign<Self> for Poly {
+    fn sub_assign(&mut self, rhs: Self) {
+        for (c, f) in &rhs.coef {
+            match self.coef.get_mut(c) {
+                Some(v) => *v -= f,
+                None => { self.coef.insert(*c, -*f); }
+            }
         }
     }
 }
