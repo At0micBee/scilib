@@ -738,6 +738,69 @@ impl Poly {
         }
     }
 
+    /// # Raising polynomial to an integer power
+    /// 
+    /// ## Definition
+    /// We compute the new polynomial that corresponds to the power it is raised to. 
+    /// 
+    /// ## Inputs
+    /// - `n`: the power to raise the polynomial to
+    /// 
+    /// Returns: a new instance of `Poly`, which is the nth power of the current one.
+    /// 
+    /// ## Example
+    /// ```
+    /// # use scilib::math::polynomial::Poly;
+    /// let p = Poly::from(&[(0, 1.0), (2, 2.2), (3, -1.2)]);
+    /// let n = p.pow(3);
+    /// let n_coefs = n.get_coefs();
+    /// 
+    /// let theory = vec![
+    ///     (0, 1.0), (2, 6.6), (3, -3.6), (4, 14.52), (5, -15.84),
+    ///     (6, 14.968), (7, -17.424), (8, 9.504), (9, -1.728)
+    /// ];
+    /// let expected = Poly::from(&theory);
+    /// let expected_coefs = expected.get_coefs();
+    /// 
+    /// for (p, f) in &n_coefs {
+    ///     match expected_coefs.get(p) {
+    ///         Some(ef) => { assert!((f - ef).abs() < 1e-12) },
+    ///         None => { assert!(false) }
+    ///     }
+    /// }
+    /// 
+    /// ```
+    pub fn pow(&self, n: usize) -> Poly {
+
+        if n == 0 {
+            return Poly::from(&[(0, 1.0)]); // If n = 0
+        }
+        
+        let mut res = self.clone();         // For n = 1
+        
+        for _ in 2..=n {                    // For n >= 2
+            res *= self.clone();
+        }
+
+        res
+    }
+
+    /// # Getting the coefficients of a polynomial
+    /// 
+    /// Simply returns the HashMap of the power and associated coefficients.
+    /// 
+    /// ```
+    /// # use std::collections::HashMap;
+    /// # use scilib::math::polynomial::Poly;
+    /// let setup = vec![(0, 1.0), (2, 2.2), (3, -1.2)];
+    /// let p = Poly::from(&setup);
+    /// let expected: HashMap<i32, f64> = setup.iter().map(|(p, f)| (*p as i32, *f)).collect();
+    /// assert_eq!(p.get_coefs(), expected);
+    /// ```
+    pub fn get_coefs(&self) -> HashMap<i32, f64> {
+        self.coef.clone()
+    }
+
     /// # Computing for a real value
     /// 
     /// ## Definition
