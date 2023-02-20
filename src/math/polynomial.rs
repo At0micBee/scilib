@@ -1109,6 +1109,45 @@ impl<T: Into<f64>> std::ops::Mul<T> for Poly {
     }
 }
 
+/// # Multiplication of Poly
+/// 
+/// ```
+/// # use scilib::math::polynomial::Poly;
+/// let p1 = Poly::from(&[(0, 1.0), (1, 2.5), (3, -1.2)]);
+/// let p2 = Poly::from(&[(0, 1.0), (2, -1.0)]);
+/// let res = p1 * p2;
+/// let expected = Poly::from(&[(0, 1.0), (1, 2.5), (2, -1.0), (3, -3.7), (5, 1.2)]);
+/// assert_eq!(res, expected);
+/// ```
+impl std::ops::Mul<Self> for Poly {
+    type Output = Self;
+    fn mul(self, rhs: Poly) -> Self::Output {
+
+        let mut n_p: i32;
+        let mut n_f: f64;
+
+        let mut coef: HashMap<i32, f64> = HashMap::new();
+
+        for (p, f) in self.coef.iter() {
+
+            for (rhs_p, rhs_f) in &rhs.coef {
+                n_p = p + rhs_p;
+                n_f = f * rhs_f;
+
+                match coef.get_mut(&n_p) {
+                    Some(v) => *v += n_f,
+                    None => { coef.insert(n_p, n_f); }
+                }
+            }
+        };
+        
+        Poly {
+            coef,
+            ..self
+        }
+    }    
+}
+
 /// # Multiplication assigned
 /// 
 /// ```
