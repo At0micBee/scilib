@@ -18,6 +18,7 @@
 //! $$
 //! 
 //! This crate allows for the creation and handling of polynomials of up to degree $n$, for example:
+//! 
 //! ```
 //! use scilib::math::polynomial::Poly;
 //! let p = Poly::from(&[(0, 1.0), (1, -1.0), (2, 2.0)]);
@@ -29,7 +30,7 @@
 //! and other polynomials:
 //! 
 //! ```
-//! use scilib::math::polynomial::Poly;
+//! # use scilib::math::polynomial::Poly;
 //! let p1 = Poly::from(&[(0, 1.0), (1, -1.0), (2, 2.0)]);
 //! let p2 = Poly::from(&[(0, -2.0), (2, 1.2), (4, -0.2)]);
 //! let p3 = p1 * 3.0;
@@ -43,37 +44,28 @@
 //! To simplify the creation and use of typical polynomials, a variety of polynomials have been implemented.
 //! So far, the list is:
 //! 
-//! ### Legendre
-//! `L(n,l)` generalized with with `n` positive integer and `l` positive or negative integer such that `-n < l < n`
-//! > `Poly::legendre(4, 1)`
+//! - **Legendre**: `L(n,l)` generalized with with `n` positive integer and `l` positive or negative integer such that `-n < l < n`
+//! - **Laguerre**: `L(n,l)` generalized with `n` positive integer and `l` a real number
+//! - **Bernoulli**: `B(n)` with `n` positive integer
+//! - **Euler**: `E(n)` with `n` positive integer
+//! - **Bessel**: `y(n)` with `n` positive integer
+//! - **Hermite**: `H(n)` with `n` positive integer
+//! - **Rising factorial**: the polynomial associated to the rising factorial function, with `n` positive integer
+//! - **Falling factorial**: the polynomial associated to the falling factorial function, with `n` positive integer
 //! 
-//! ### Laguerre
-//! `L(n,l)` generalized with `n` positive integer and `l` a real number
-//! > `Poly::laguerre(7, 3.2)`
+//! For example, to create the generalized Legendre Polynomial of degree 4, with associated factor 1:
 //! 
-//! ### Bernoulli
-//! `B(n)` with `n` positive integer
-//! > `Poly::bernoulli(5)`
+//! ```
+//! # use scilib::math::polynomial::Poly;
+//! # use num_complex::Complex64;
+//! let l = Poly::legendre(4, 1);   // And you're done!
 //! 
-//! ### Euler
-//! `E(n)` with `n` positive integer
-//! > `Poly::euler(4)`
+//! // You can now use it to compute whatever you might want
+//! let res = l.compute(2.7);
 //! 
-//! ### Bessel
-//! `y(n)` with `n` positive integer
-//! > `Poly::bessel(3)`
-//! 
-//! ### Hermite
-//! `H(n)` with `n` positive integer
-//! > `Poly::hermite(10)`
-//! 
-//! ### Rising factorial
-//! The polynomial associated to the rising factorial function, with `n` positive integer
-//! > `Poly::factorial_rising(4)`
-//! 
-//! ### Falling factorial
-//! The polynomial associated to the falling factorial function, with `n` positive integer
-//! > `Poly::factorial_falling(6)`
+//! // Support for complex number using num_complex
+//! let res_c = l.compute_complex(Complex64::from(1.0, 0.2));
+//! ```
 //! 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -195,6 +187,8 @@ impl Poly {
     /// $$
     /// P_n^{-l}(x) = (-1)^l\frac{(n-l)!}{(n+l)!}P_n^l(x)
     /// $$
+    /// 
+    /// To get the "regular" Legendre polynomial, simply set `l=0` when calling the function.
     /// 
     /// ## Inputs
     /// Produces the factors and powers for nth order polynomial, where
@@ -699,6 +693,47 @@ impl Poly {
                     _ => { temp_c.insert(p - 1, f * *p as f64); }
                 }
             }
+            self.coef = temp_c;
+        }
+    }
+
+    /// # Polynomial integration
+    /// 
+    /// ## Definition
+    /// Computes the mth integration of the polynomial.
+    /// 
+    /// ## Inputs
+    /// - `m` the integration order to compute
+    ///
+    /// ## Example
+    /// ```
+    /// # use scilib::math::polynomial::Poly;
+    /// let mut p = Poly::from(&[(0, 1.0), (1, -1.0), (2, 2.0)]);
+    /// let expected = Poly::from(&[(0, 2.2), (1, 1.0), (2, -0.5), (3, 2.0 / 3.0)]);
+    /// p.integrate(1, &[2.2]);
+    /// assert_eq!(p, expected);
+    /// ```
+    pub fn integrate(&mut self, m: usize, coef: &[f64]) {
+
+        // We check if coefficients are passed
+        let n_coef: Vec<f64> = if coef.len() > 0 {
+            assert_eq!(coef.len(), m);  // If yes we check if there is the right number
+            coef.into()                 // And we return the values
+        } else {
+            vec![1.0; m]                // If not passed then ones are used
+        };
+        
+        // We loop to integrate
+        for n_f in n_coef {
+
+            let mut temp_c: HashMap<i32, f64> = HashMap::new();
+
+            for (p, f) in &self.coef {
+                temp_c.insert(p + 1, f / (p + 1) as f64);
+            }
+
+            temp_c.insert(0, n_f);
+            
             self.coef = temp_c;
         }
     }
@@ -1249,6 +1284,40 @@ impl<T: Into<f64>> std::ops::MulAssign<T> for Poly {
         for f in self.coef.values_mut() {
             *f *= rhs_conv;
         }
+    }
+}
+
+/// # Multiplication assigned of Poly
+/// 
+/// ```
+/// # use scilib::math::polynomial::Poly;
+/// let mut p1 = Poly::from(&[(0, 1.0), (1, 2.5), (3, -1.2)]);
+/// let p2 = Poly::from(&[(0, 1.0), (2, -1.0)]);
+/// p1 *= p2;
+/// let expected = Poly::from(&[(0, 1.0), (1, 2.5), (2, -1.0), (3, -3.7), (5, 1.2)]);
+/// assert_eq!(p1, expected);
+/// ```
+impl std::ops::MulAssign<Self> for Poly {
+    fn mul_assign(&mut self, rhs: Self) {
+        let mut n_p: i32;
+        let mut n_f: f64;
+
+        let mut coef: HashMap<i32, f64> = HashMap::new();
+
+        for (p, f) in self.coef.iter() {
+
+            for (rhs_p, rhs_f) in &rhs.coef {
+                n_p = p + rhs_p;
+                n_f = f * rhs_f;
+
+                match coef.get_mut(&n_p) {
+                    Some(v) => *v += n_f,
+                    None => { coef.insert(n_p, n_f); }
+                }
+            }
+        };
+
+        self.coef = coef;
     }
 }
 
