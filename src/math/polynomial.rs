@@ -1,5 +1,79 @@
 //!
-//! Classical polynomials
+//! # Polynomials
+//! 
+//! Support to create and use Polynomials in Rust. They can be create either manually or by using
+//! a function to generate one of many classical polynomial forms, such as Legendre, Laguerre, Hermite, ...
+//! 
+//! ## Definition
+//! 
+//! Polynomials are "simple" mathematical constructs that have the form:
+//! $$
+//! P_n(x) = \sum_{p=0}^{n} a_nx^n
+//! $$
+//! 
+//! Where $x^n$ is the input value raised to the nth power, and the $a_n$ are associated coefficients to
+//! each power. We can write the above example in an expanded form as:
+//! $$
+//! P_n(x) = a_0 + a_1x + a_2x^2 + ... + a_nx^n
+//! $$
+//! 
+//! This crate allows for the creation and handling of polynomials of up to degree $n$, for example:
+//! ```
+//! use scilib::math::polynomial::Poly;
+//! let p = Poly::from(&[(0, 1.0), (1, -1.0), (2, 2.0)]);
+//! ```
+//! 
+//! creates the polynomial $1 - x + 2x^2$.
+//! 
+//! Basic operations are implemented, such as additions, subtraction, multiplication, both with numbers
+//! and other polynomials:
+//! 
+//! ```
+//! use scilib::math::polynomial::Poly;
+//! let p1 = Poly::from(&[(0, 1.0), (1, -1.0), (2, 2.0)]);
+//! let p2 = Poly::from(&[(0, -2.0), (2, 1.2), (4, -0.2)]);
+//! let p3 = p1 * 3.0;
+//! let p4 = p2 / 2.0 + 1.5;
+//! let mut res = p3 * p4;
+//! res.derive(1);
+//! ```
+//! 
+//! ## Implementation of named polynomials
+//! 
+//! To simplify the creation and use of typical polynomials, a variety of polynomials have been implemented.
+//! So far, the list is:
+//! 
+//! ### Legendre
+//! `L(n,l)` generalized with with `n` positive integer and `l` positive or negative integer such that `-n < l < n`
+//! > `Poly::legendre(4, 1)`
+//! 
+//! ### Laguerre
+//! `L(n,l)` generalized with `n` positive integer and `l` a real number
+//! > `Poly::laguerre(7, 3.2)`
+//! 
+//! ### Bernoulli
+//! `B(n)` with `n` positive integer
+//! > `Poly::bernoulli(5)`
+//! 
+//! ### Euler
+//! `E(n)` with `n` positive integer
+//! > `Poly::euler(4)`
+//! 
+//! ### Bessel
+//! `y(n)` with `n` positive integer
+//! > `Poly::bessel(3)`
+//! 
+//! ### Hermite
+//! `H(n)` with `n` positive integer
+//! > `Poly::hermite(10)`
+//! 
+//! ### Rising factorial
+//! The polynomial associated to the rising factorial function, with `n` positive integer
+//! > `Poly::factorial_rising(4)`
+//! 
+//! ### Falling factorial
+//! The polynomial associated to the falling factorial function, with `n` positive integer
+//! > `Poly::factorial_falling(6)`
 //! 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -188,7 +262,7 @@ impl Poly {
         };
 
         // We derive the polynomial m times
-        poly.derive(l.abs());
+        poly.derive(l.abs() as usize);
 
         // Returning the final polynomial
         poly * pre_f
@@ -597,10 +671,22 @@ impl Poly {
     // Polynomial operations
 
     /// # Polynomial derivation
-    /// Computes the m derivative of the polynomial
+    /// 
+    /// ## Definition
+    /// Computes the mth derivative of the polynomial.
+    /// 
+    /// ## Inputs
+    /// - `m` the derivative order to compute
     ///
-    /// This is used to produce the $P_n^m(x)$ version of the polynomial.
-    fn derive(&mut self, m: i32) {
+    /// ## Example
+    /// ```
+    /// # use scilib::math::polynomial::Poly;
+    /// let mut p = Poly::from(&[(0, 1.0), (1, -1.0), (2, 2.0)]);
+    /// let expected = Poly::from(&[(0, -1.0), (1, 4.0)]);
+    /// p.derive(1);
+    /// assert_eq!(p, expected);
+    /// ```
+    pub fn derive(&mut self, m: usize) {
         
         // Looping the derivation, m times
         for _ in 1..=m {
