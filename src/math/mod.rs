@@ -10,6 +10,8 @@ pub mod basic;
 
 pub mod bessel;
 
+pub mod distribution;
+
 pub mod polynomial;
 
 pub mod series;
