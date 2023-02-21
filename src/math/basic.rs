@@ -6,17 +6,14 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-use std::f64::consts::{     // Using std lib constants
-    FRAC_2_SQRT_PI,         // 2 / sqrt(Pi)
-    TAU                     // Tau constant
+use std::f64::consts::FRAC_2_SQRT_PI;   // 2 / sqrt(Pi)
+
+use super::{                            // Using parts from the crate
+    super::constant,                    // Calling scilib constants
+    polynomial::Poly                    // Bernoulli polynomials
 };
 
-use super::{                // Using parts from the crate
-    super::constant,        // Calling scilib constants
-    polynomial::Poly        // Bernoulli polynomials
-};
-
-use num_complex::Complex64; // Using complex numbers from the num crate
+use num_complex::Complex64;             // Using complex numbers from the num crate
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -58,6 +55,83 @@ pub fn sinc(x: f64) -> f64 {
     } else {
         x.sin() / x
     }
+}
+
+/// # Hyperbolic cotangent
+/// 
+/// ## Definition
+/// The hyperbolic cotangent is defined as:
+/// $$
+/// \coth(x) = \frac{\cosh(x)}{\sinh(x)} = \frac{\exp(2x) + 1}{\exp(2x) - 1}
+/// $$ 
+/// 
+/// ## Inputs
+/// - `x`: the value at which to evaluate the function ($x$).
+/// 
+/// Returns the coth value of `x`.
+/// 
+/// ## Example
+/// ```
+/// # use scilib::math::basic::coth;
+/// let x = 0.25;
+/// let res = coth(x);
+/// assert!((res - 4.082988165073596).abs() <= 1e-15);
+/// ```
+pub fn coth(x: f64) -> f64 {
+    assert!(x != 0.0);              // Undefined for 0
+    let e: f64 = (2.0 * x).exp();
+    (e + 1.0) / (e - 1.0)
+}
+
+/// # Hyperbolic secant
+/// 
+/// ## Definition
+/// The hyperbolic secant is defined as:
+/// $$
+/// \sech(x) = \frac{1}{\cosh(x)}
+/// $$
+/// 
+/// ## Inputs
+/// - `x`: the value at which to evaluate the function ($x$).
+/// 
+/// Returns the sech value of `x`.
+/// 
+/// ## Example
+/// ```
+/// # use scilib::math::basic::sech;
+/// let x: f64 = 1.2;
+/// let res = sech(x);
+/// assert_eq!(res, 1.0 / x.cosh());
+/// assert!((res - 0.5522861542782047).abs() <= 1e-15)
+/// ```
+pub fn sech(x: f64) -> f64 {
+    1.0 / x.cosh()
+}
+
+/// # Hyperbolic cosecant
+/// 
+/// ## Definition
+/// The hyperbolic cosecant is defined as:
+/// $$
+/// \sech(x) = \frac{1}{\sinh(x)}
+/// $$
+/// 
+/// ## Inputs
+/// - `x`: the value at which to evaluate the function ($x$).
+/// 
+/// Returns the sech value of `x`.
+/// 
+/// ## Example
+/// ```
+/// # use scilib::math::basic::csch;
+/// let x: f64 = 1.2;
+/// let res = csch(x);
+/// assert_eq!(res, 1.0 / x.sinh());
+/// assert!((res - 0.6624879771943154).abs() <= 1e-15)
+/// ```
+pub fn csch(x: f64) -> f64 {
+    assert!(x != 0.0);              // Undefined for 0
+    1.0 / x.sinh()
 }
 
 /// # Binomial theorem
@@ -629,84 +703,6 @@ where T: Into<f64> + Copy, U: Into<f64> + Copy {
     let b: f64 = gamma(x.into() + y.into());
     
     t1 * t2 / b
-}
-
-/// # Sigmoid function
-/// 
-/// ## Definition
-/// The [sigmoid function](https://en.wikipedia.org/wiki/Sigmoid_function) is defined as:
-/// $$
-/// \sigma(x) = \frac{1}{1 + \exp(-x)} = 1 - \sigma(-x)
-/// $$
-/// 
-/// ## Inputs
-/// - `x`: the value at which to evaluate the function ($x$).
-/// 
-/// Returns the value of the sigmoid function.
-/// 
-/// ## Example
-/// ```
-/// # use scilib::math::basic::sigmoid;
-/// let res1: f64 = sigmoid(-1.0);
-/// let res2: f64 = sigmoid(0.0);
-/// let res_comp: f64 = sigmoid(1.0);
-/// assert!((res1 - 0.26894142136999).abs() < 1.0e-12);
-/// assert_eq!(res2, 0.5);
-/// assert_eq!(res1, 1.0 - res_comp);
-/// ```
-pub fn sigmoid(x: f64) -> f64 {
-    1.0 / (1.0 + (-x).exp())
-}
-
-/// # Gaussian function
-/// 
-/// ## Definition
-/// The [gaussian function](https://en.wikipedia.org/wiki/Gaussian_function) is defined as:
-/// $$
-/// g(x) = a\cdot\exp\left(-\frac{(b - x)^2}{2c^2}\right)
-/// $$
-/// 
-/// ## Inputs
-/// - `a`: the amplitude ($a$)
-/// - `b`: the center ($b$)
-/// - `c`: the standard deviation ($c$)
-/// - `x`: the value to evaluate ($x$).
-/// 
-/// Returns the value of the gaussian function with parameters $a$, $b$, $c$ at $x$.
-/// 
-/// ## Example
-/// ```
-/// # use scilib::math::basic::gaussian;
-/// let res1: f64 = gaussian(1.0, 2.0, 3.0, 0.0);
-/// assert_eq!(res1, 0.8007374029168081);
-/// ```
-pub fn gaussian(a: f64, b: f64, c: f64, x: f64) -> f64 {
-    a * (-(x - b).powi(2) / (2.0 * c.powi(2))).exp()
-}
-
-/// # Normalized gaussian function
-/// 
-/// ## Definition
-/// The [normalized gaussian function](https://en.wikipedia.org/wiki/Gaussian_function) is defined as:
-/// $$
-/// g(x) = \frac{1}{\sigma\sqrt{2\pi}}\cdot\exp\left( -\frac{(x - \mu)^2}{2\sigma^2} \right)
-/// $$
-/// 
-/// ## Inputs
-/// - `mu`: the expected value ($\mu$)
-/// - `sigma`: the variance ($\sigma$)
-/// - `x`: the value to evaluate ($x$)
-/// 
-/// Returns the value of the normalized gaussian function with parameters
-/// 
-/// ## Example
-/// ```
-/// # use scilib::math::basic::gaussian_normed;
-/// let res: f64 = gaussian_normed(1.0, 2.0, 3.0);
-/// assert!((res - 0.120985362259).abs() < 1e-12);
-/// ```
-pub fn gaussian_normed(mu: f64, sigma: f64, x: f64) -> f64 {
-    (1.0 / (sigma * TAU.sqrt())) * (-(x - mu).powi(2) / (2.0 * sigma.powi(2))).exp()
 }
 
 /// # Error function
