@@ -58,13 +58,13 @@
 //! ```
 //! # use scilib::math::polynomial::Poly;
 //! # use num_complex::Complex64;
-//! let l = Poly::legendre(4, 1);   // And you're done!
+//! let l = Poly::gen_legendre(4, 1);   // And you're done!
 //! 
 //! // You can now use it to compute whatever you might want
 //! let res = l.compute(2.7);
 //! 
 //! // Support for complex number using num_complex
-//! let res_c = l.compute_complex(Complex64::from(1.0, 0.2));
+//! let res_c = l.compute_complex(Complex64::new(1.0, 0.2));
 //! ```
 //! 
 
@@ -164,6 +164,89 @@ impl Poly {
     //////////////////////////////////////////////////
     // Creating special polynomials
 
+    /// # Generalized Legendre polynomials
+    /// 
+    /// ## Definition
+    /// Which can be generalized with a given derivative order $l$, following the formula:
+    /// $$
+    /// P_n^l(x) = (-1)^l (1 - x^2)^{l/2} \frac{d^l P_n(x)}{dx^l}
+    /// $$
+    ///
+    /// We can also compute the associated polynomials when $l<0$, following the convention:
+    /// $$
+    /// P_n^{-l}(x) = (-1)^l\frac{(n-l)!}{(n+l)!}P_n^l(x)
+    /// $$
+    /// 
+    /// > **IMPORTANT NOTE:** Because of the $(1-x^2)^{l/2}$ term, the create of generalized
+    /// > Legendre polynomials isn't trivial. For any odd l number, there is no way to compute
+    /// > a simple polynomials. We instead use a custom computation function, meaning that
+    /// > arithmetic can (an most likely will) be broken for any polynomials created with 
+    /// > an odd l.
+    /// 
+    /// ## Inputs
+    /// Produces the factors and powers for nth order polynomial, where
+    /// - `n`: the order of the Legendre polynomial
+    /// - `l`: the derivative order
+    ///
+    /// ## Example
+    /// ```
+    /// # use num_complex::Complex64;
+    /// # use scilib::math::polynomial::Poly;
+    /// let p71 = Poly::gen_legendre(7, 1);     // n=7, l=1
+    /// let p72 = Poly::gen_legendre(7, -2);    // n=7, l=-2
+    /// 
+    /// let x = -0.25;                          // Example real
+    /// let z = Complex64::new(-1.2, 0.2);      // Example complex
+    /// 
+    /// // Computing the results for each polynomial
+    /// let res71 = p71.compute(x);
+    /// let res72 = p72.compute_complex(z);
+    /// 
+    /// // Expected result
+    /// let expected_c = Complex64::new(-0.1297952, -0.324460533333);
+    ///
+    /// // Comparing to tabulated values
+    /// assert!((res71 - -0.681433146961).abs() < 1.0e-10);
+    /// assert!((res72 - expected_c).norm() < 1.0e-10);
+    /// ```
+    pub fn gen_legendre(n: usize, l: isize) -> Self {
+
+        // Checking that the range is good
+        assert!(l.abs() as usize <= n, "l must be between -n and n!");
+
+        // First we compute the basic Legendre
+        let mut poly = Self::legendre(n);
+
+        // If l=0, then default Legendre
+        if l == 0 {
+            return poly;
+        }
+        poly.l = Some(l.abs() as f64);
+
+        // Computing the pre-factor associated to m
+        let pre_f: f64 = if l >= 0 {
+            (-1_f64).powi(l as i32)
+        } else {
+            basic::factorial((n as isize + l) as usize) as f64 / basic::factorial((n as isize - l) as usize) as f64
+        };
+
+        // We derive the polynomial m times
+        poly.derive(l.abs() as usize);
+
+        // Returning the final polynomial
+        poly *= pre_f;
+
+        if l.abs() % 2 != 0 {
+            poly.compute_fn = Self::compute_legendre;
+            poly.compute_fnc = Self::compute_legendre_complex;
+            return poly;
+        } else {
+            let pre_poly = Poly::from(&[(0, 1.0), (2, -1.0)]);
+            return poly * pre_poly.pow(l.abs() as usize / 2);
+        }
+        
+    }
+
     /// # Legendre polynomials
     /// 
     /// ## Definition
@@ -178,28 +261,9 @@ impl Poly {
     /// P_n(x) = \frac{1}{2^n}\sum_k^{\left\lfloor\frac{n}{2}\right\rfloor}(-1)^k\binom{n}{k}\binom{2n-2k}{n}x^{n-2k}
     /// $$
     /// 
-    /// Which can be generalized with a given derivative order $l$, following the formula:
-    /// $$
-    /// P_n^l(x) = (-1)^l (1 - x^2)^{l/2} \frac{d^l P_n(x)}{dx^l}
-    /// $$
-    ///
-    /// We can also compute the associated polynomials when $l<0$, following the convention:
-    /// $$
-    /// P_n^{-l}(x) = (-1)^l\frac{(n-l)!}{(n+l)!}P_n^l(x)
-    /// $$
-    /// 
-    /// To get the "regular" Legendre polynomial, simply set `l=0` when calling the function.
-    /// 
     /// ## Inputs
     /// Produces the factors and powers for nth order polynomial, where
     /// - `n`: the order of the Legendre polynomial
-    /// - `l`: the derivative order
-    /// 
-    /// /!\ IMPORTANT NOTE: when using a non-zero `l`, Legendre requires a secondary
-    /// term to be multiplied to the polynomial during computation. This added term
-    /// cannot be simplified and integrated to the base polynomial. If you need to 
-    /// use the generalized version, be careful that arithmetic operations will
-    /// be broken for it!
     /// 
     /// By definition, we have that $n\ge0$ and $-n\le l\le n$.
     /// 
@@ -209,27 +273,14 @@ impl Poly {
     /// ```
     /// # use num_complex::Complex64;
     /// # use scilib::math::polynomial::Poly;
-    /// let p71 = Poly::legendre(7, 1);     // n=7, l=1
-    /// let p72 = Poly::legendre(7, -2);    // n=7, l=-2
+    /// let p5 = Poly::legendre(5);
+    /// let res = p5.compute(3.2);
+    /// assert!((2361.69152 - res).abs() <= 1e-10);
     /// 
-    /// let x = -0.25;                      // Example real
-    /// let z = Complex64::new(-1.2, 0.2);  // Example complex
-    /// 
-    /// // Computing the results for each polynomial
-    /// let res71 = p71.compute(x);
-    /// let res72 = p72.compute_complex(z);
-    /// 
-    /// // Expected result
-    /// let expected_c = Complex64::new(-0.1297952, -0.324460533333);
-    ///
-    /// // Comparing to tabulated values
-    /// assert!((res71 - -0.681433146961).abs() < 1.0e-10);
-    /// assert!((res72 - expected_c).norm() < 1.0e-10);
+    /// let gen5 = Poly::gen_legendre(5, 0);
+    /// assert_eq!(p5, gen5);
     /// ```
-    pub fn legendre(n: usize, l: i32) -> Self {
-
-        // Checking that the range is good
-        assert!(l >= -(n as i32) && l <= n as i32, "The derivative order l isn't valid for the given n!");
+    pub fn legendre(n: usize) -> Self {
 
         // Initializing the coefficients
         let mut coef: HashMap<i32, f64> = HashMap::new();
@@ -240,26 +291,11 @@ impl Poly {
             coef.insert((n - 2 * k) as i32, c);
         }
 
-        // Computing the pre-factor associated to m
-        let pre_f: f64 = if l >= 0 {
-            (-1_f64).powi(l)
-        } else {
-            basic::factorial((n as i32 + l) as usize) as f64 / basic::factorial((n as i32 - l) as usize) as f64
-        };
-
         // Returning associated struct
-        let mut poly: Self = Self {
+        Self {
             coef,
-            l: Some(l.abs() as f64),
-            compute_fn: Self::compute_legendre,
-            compute_fnc: Self::compute_legendre_complex
-        };
-
-        // We derive the polynomial m times
-        poly.derive(l.abs() as usize);
-
-        // Returning the final polynomial
-        poly * pre_f
+            ..Self::default()
+        }
     }
 
     /// # Laguerre polynomials
@@ -772,13 +808,9 @@ impl Poly {
     /// ```
     pub fn pow(&self, n: usize) -> Poly {
 
-        if n == 0 {
-            return Poly::from(&[(0, 1.0)]); // If n = 0
-        }
+        let mut res = Poly::from(&[(0, 1.0)]);  // Init at +1
         
-        let mut res = self.clone();         // For n = 1
-        
-        for _ in 2..=n {                    // For n >= 2
+        for _ in 1..=n {                        // For n >= 1
             res *= self.clone();
         }
 

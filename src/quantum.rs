@@ -182,12 +182,12 @@ pub fn radial_vec(n: usize, l: usize, r: &[f64]) -> Vec<f64> {
 /// let res = spherical_harmonics(2, 1, 0.2, -0.7);
 /// assert!((res.re - -0.11504928).abs() < 1.0e-8 && (res.im - 0.09690468).abs() < 1.0e-8);
 /// ```
-pub fn spherical_harmonics(l: usize, m: i32, theta: f64, phi: f64) -> Complex64 {
+pub fn spherical_harmonics(l: usize, m: isize, theta: f64, phi: f64) -> Complex64 {
 
     // We do the computation for the positive value
-    let mp: i32 = m.abs();
+    let mp: isize = m.abs();
     let cpx: Complex64 = Complex64::new(0.0, mp as f64 * phi).exp();
-    let poly = polynomial::Poly::legendre(l, mp);
+    let poly = polynomial::Poly::gen_legendre(l, mp);
 
     // We follow QM norm
     let norm: f64 = (2 * l + 1) as f64 / (4.0 * PI);
@@ -200,19 +200,19 @@ pub fn spherical_harmonics(l: usize, m: i32, theta: f64, phi: f64) -> Complex64 
 
     // Modifying the result depending on the sign of m
     if m.is_negative() {
-        res.conj() * (-1.0_f64).powi(mp)
+        res.conj() * (-1.0_f64).powi(mp as i32)
     } else {
         res
     }
 }
 
 /// # Spherical harmonics for multiple angles theta
-pub fn spherical_harmonics_theta_vec(l: usize, m: i32, theta: &[f64], phi: f64) -> Vec<Complex64> {
+pub fn spherical_harmonics_theta_vec(l: usize, m: isize, theta: &[f64], phi: f64) -> Vec<Complex64> {
 
     // We do the computation for the positive value
-    let mp: i32 = m.abs();
+    let mp: isize = m.abs();
     let cpx: Complex64 = Complex64::new(0.0, mp as f64 * phi).exp();
-    let poly = polynomial::Poly::legendre(l, mp);
+    let poly = polynomial::Poly::gen_legendre(l, mp);
 
     // We follow QM norm
     let norm: f64 = (2 * l + 1) as f64 / (4.0 * PI);
@@ -221,7 +221,7 @@ pub fn spherical_harmonics_theta_vec(l: usize, m: i32, theta: &[f64], phi: f64) 
 
     // Computation with Legendre polynomial
     // (-1.0_f64).powi(m) term for the Condon-Shortley phase
-    let pre_factor: Complex64 = (-1.0_f64).powi(m) * cpx * (norm * top / bot).sqrt();
+    let pre_factor: Complex64 = (-1.0_f64).powi(m as i32) * cpx * (norm * top / bot).sqrt();
 
     // We compute the vector at each point of the theta input
     let mut res: Vec<Complex64> = theta.iter().map(|t| {
@@ -230,7 +230,7 @@ pub fn spherical_harmonics_theta_vec(l: usize, m: i32, theta: &[f64], phi: f64) 
 
     if m.is_negative() {
         for p in res.iter_mut() {
-            *p = p.conj() * (-1.0_f64).powi(mp);
+            *p = p.conj() * (-1.0_f64).powi(mp as i32);
         }
     }
 
