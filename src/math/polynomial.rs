@@ -737,9 +737,15 @@ impl Poly {
     /// 
     /// ## Definition
     /// Computes the mth integration of the polynomial.
+    /// Integration coefficients can be passed to the function,
+    /// if an empty slice is provided, then all coefficients are 
+    /// defaulted to 1.
     /// 
     /// ## Inputs
-    /// - `m` the integration order to compute
+    /// - `m`: the integration order to compute
+    /// - `coef`: the coefficients to assign at each integration steps
+    /// 
+    /// Returns the new `Poly` instance after integrations.
     ///
     /// ## Example
     /// ```

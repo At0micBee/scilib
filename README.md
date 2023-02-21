@@ -54,20 +54,10 @@ let e = erf(c);
 Essential in many maths and physics domain, the **[bessel functions](https://en.wikipedia.org/wiki/Bessel_function)** are solutions of Bessel's differential equation. This crate provides functions for both real and complex numbers, and for integer or real function order. It covers standard Bessel functions, the spherical Bessel functions, and the Riccati-Bessel functions.
 
 All functions are implemented:
-- **J**: First kind
-- **Y**: Second Kind
-- **I**: Modified first kind
-- **K**: Modified second kind
-- **H1**: Hankel first kind
-- **H2**: Hankel second kind
-- **j**: Spherical first kind
-- **y**: Spherical second kind
-- **h1**: Spherical hankel first kind
-- **h2**: Spherical hankel second kind
-- **S**: Riccati-Bessel first kind
-- **C**: Riccati-Bessel Second kind
-- **Xi**: Riccati-Bessel Third kind
-- **Zeta**: Riccati-Bessel Fourth kind
+- Basic Bessel functions: **J**, **Y**, **I**, **K**
+- Spherical Bessel functions: **j**, **y**
+- Hankel functions (and there spherical counterparts): **H1**, **H2**, **h1**, **h2**
+- Riccati-Bessel functions: **S**, **C**, **Xi**, **Zeta**
 
 ```rust
 // Found in the math crate
@@ -80,10 +70,7 @@ let res_i = bessel::i(7.2, 2.25);               // I function; similar to J
 let res_k = bessel::k(-1.1, 0.5);               // K function; computes the limit for integer order
 let res_1 = bessel::hankel_first(2, -2);        // Hankel first kind
 let res_2 = bessel::hankel_second(1, -1.32);    // Hankel first kind
-let res_sj = bessel::sj(4.4, 2);                // Spherical first kind
-let res_sy = bessel::sy(-1.54, 3);              // Spherical second kind
-let res_s1 = bessel::sh_first(2.11, 4);         // Spherical hankel first kind
-let res_s2 = bessel::sh_second(0.253, 0);       // Spherical hankel second kind
+// And so forth...
 ```
 
 ---
@@ -93,7 +80,7 @@ let res_s2 = bessel::sh_second(0.253, 0);       // Spherical hankel second kind
 A dedicated method for polynomial is implemented in the module `math::polynomial` as `Poly`.
 Many useful polynomials have also been implemented.
 
-- **Legendre**: `L(n,l)` generalized with with `n` positive integer and `l` positive or negative integer such that `-n < l < n`
+- **Legendre**: `L(n,l)` generalized with with `n` positive integer and `l` positive or negative integer such that `-n <= l <= n`
 - **Laguerre**: `L(n,l)` generalized with `n` positive integer and `l` a real number
 - **Bernoulli**: `B(n)` with `n` positive integer
 - **Euler**: `E(n)` with `n` positive integer
@@ -106,13 +93,13 @@ Many useful polynomials have also been implemented.
 // They are found in the polynomial crate
 use scilib::math::polynomial::Poly;
 
-let p = Poly::from([(2, 1.0), (1, 2.0), (0, -1.0)]) // x² + 2x - 1
+let mut p = Poly::from([(2, 1.0), (1, 2.0), (0, -1.0)]);    // x² + 2x - 1
+p.derive(1);                                                // Derivative
 
-let leg = Poly::legendre(2, -1);                    // n=2, l=-1
-let lag = Poly::laguerre(3, 2.78);                  // n=3, l=2.78
-let ber = Poly::bernoulli(3);                       // n=3
-let eul = Poly::euler(5);                           // n=5
-let bes = Poly::bessel(5);                          // n=5
+let leg = Poly::gen_legendre(2, -1);                        // n=2, l=-1
+let mut lag = Poly::laguerre(3, 2.78);                      // n=3, l=2.78
+leg.integrate(1, &[3.2]);                                   // Integration
+let res = p * lag;                                          // Standard operations
 ```
 
 ---
