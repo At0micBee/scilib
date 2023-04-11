@@ -23,6 +23,17 @@ const PRECISION: f64 = 1.0e-12;
 /// Stieltjes gamma computation precision
 const STIELTJES_M: usize = 1_000_000;
 
+/// Coefficients to compute the ln gamma function.
+const GAMMA_COEFS: [f64; 14] = [
+    57.1562356658629235, -59.5979603554754912,
+    14.1360979747417471, -0.491913816097620199,
+    0.339946499848118887e-4, 0.465236289270485756e-4,
+    -0.983744753048795646e-4, 0.158088703224912494e-3,
+    -0.210264441724104883e-3, 0.217439618115212643e-3,
+    -0.164318106536763890e-3, 0.844182239838527433e-4,
+    -0.261908384015814087e-4, 0.368991826595316234e-5
+];
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # Sinus cardinal
@@ -530,6 +541,49 @@ where T: Into<f64> {
     }
 
     res * (-x * constant::EULER_MASCHERONI).exp() / x
+}
+
+/// # Ln(Gamma) function
+/// 
+/// # Definition
+/// Instead of computing the whole Gamma function, we can simply compute the natural log value of the function.
+/// This helps to limit overflow of the value.
+/// 
+/// Lanczos, C. “A Precision Approximation of the Gamma Function.”
+/// Journal of the Society for Industrial and Applied Mathematics: Series B, Numerical Analysis, vol. 1, 1964, pp. 86–96. JSTOR,
+/// http://www.jstor.org/stable/2949767. Accessed 11 Apr. 2023.
+/// 
+/// ## Inputs
+/// - `x`: the value to evaluate ($x$).
+/// 
+/// Returns the value of ln(gamma) function.
+/// 
+/// ## Example
+/// ```
+/// # use scilib::math::basic::gamma;
+/// # use scilib::math::basic::ln_gamma;
+/// let res_1: f64 = ln_gamma(1.2).exp();
+/// let res_2: f64 = gamma(1.2);
+/// assert!((res_1 - 0.9181687423997606).abs() < 1.0e-15);
+/// assert!((res_2 - res_1).abs() < 1.0e-5);
+/// ```
+pub fn ln_gamma(x: f64) -> f64 {
+
+    assert!(x > 0.0);                           // Only valid for x > 0
+
+    let mut inc_x: f64 = x;                     // The incremented x in the loop
+
+    let mut base: f64 = x + 5.2421875;          // Base value
+    base = (x + 0.5) * base.ln() - base;
+
+    let mut sum: f64 = 0.999999999999997092;    // Init value of the sum
+
+    for c in GAMMA_COEFS {                      // Computing the values using the consts
+        inc_x += 1.0;
+        sum += c / inc_x;
+    }
+
+    base + (2.5066282746310005 * sum / x).ln()  // Final computation
 }
 
 /// # Regularized Gamma function P
