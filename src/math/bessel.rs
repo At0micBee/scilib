@@ -431,13 +431,14 @@ pub fn jf<T, U>(x: T, order: U) -> Complex64
 pub fn y<T, U>(x: T, order: U) -> Complex64
 where T: Into<Complex64> + Copy, U: Into<f64> {
 
+    let c: Complex64 = x.into();
     let n: f64 = order.into();
 
     // If n is whole, we have to take the limit, otherwise it's direct
-    if n.fract() == 0.0 {
-        (y(x, n + DISTANCE_Y_LIM) + y(x, n - DISTANCE_Y_LIM)) / 2.0
+    if n.fract() == 0.0 && c.re != 0.0 {
+        y(c, n + DISTANCE_Y_LIM)
     } else {
-        ((n * PI).cos() * jf(x, n) - jf(x, -n)) / (n * PI).sin()
+        ((n * PI).cos() * jf(c, n) - jf(c, -n)) / (n * PI).sin()
     }
 }
 
