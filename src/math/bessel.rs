@@ -274,16 +274,15 @@ pub fn j<T: Into<Complex64>>(x: T, n: i32) -> Complex64 {
     }
 
     // Computing the terms of the infinite series
-    'convergence: loop {
+    'convergence: while counter < MAX_ITER_J {
+        
+        counter += 1;
         res += term;
 
         // If the changed compared to the final value is small we break
         if (term / res).norm() < PRECISION_CONVERGENCE {
             break 'convergence;
-        } else if counter > MAX_ITER_J {
-            break 'convergence;
         }
-        counter += 1;
 
         k += 1;                         // Incrementing value
         sg *= -1.0;                     // changing the sign of the term
@@ -369,16 +368,15 @@ pub fn jf<T, U>(x: T, order: U) -> Complex64
     }
 
     // Computing the terms of the infinite series
-    'convergence: loop {
+    'convergence: while counter < MAX_ITER_J {
+
+        counter += 1;
         res += term;
 
         // If the changed compared to the final value is small we break
         if (term / res).norm() < PRECISION_CONVERGENCE {
             break 'convergence;
-        } else if counter > MAX_ITER_J {
-            break 'convergence;
         }
-        counter += 1;
 
         k += 1.0;                       // Incrementing value
         sg *= -1.0;                     // changing the sign of the term
