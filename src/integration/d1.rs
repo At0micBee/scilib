@@ -1,8 +1,36 @@
 //!
 //! # One-dimensional integration toolkit
 //! 
+//! One dimensional data integration functions.
+//! 
+//! ## Passing data to to the integrator
+//! Integration can be done by directly passing slices with the x- and y-axis values, for example:
+//! 
+//! ```
+//! # use scilib::integration::d1::*;
+//! # use scilib::range;
+//! let x = range::linear(0, 1, 1000);
+//! let y: Vec<f64> = x.iter().map(|v| v.sin()).collect();
+//! let res = trapeze(&x, &y);
+//! assert!((res - 0.45969769413186028).abs() < 1.0e-7);
+//! ```
+//! 
+//! Integrates the value of $\sin(x)$ between 0 and 1 with 1000 subdivisions using the trapeze method.
+//! 
+//! ## Passing the function as argument
+//! Similarly, it is possible to integrate by directly passing the function (or closure):
+//! 
+//! ```
+//! # use scilib::integration::d1::*;
+//! let res = fn_simpson(|x| x.sin(), 0.0, 1.0, 1000);
+//! assert!((res - 0.45969769413186028).abs() < 1.0e-7);
+//! ```
+//! 
+//! Here, we also integrate $\sin(x)$ between 0 and 1 with 1000 subdivisions, but using the Simpson's method.
+//! 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Internals
 
 #[inline(always)]
 fn chunk_rect(a: f64, offset: f64) -> f64 {
@@ -369,7 +397,7 @@ pub fn tuple_trapeze(data: &[(f64, f64)]) -> f64 {
     })
 }
 
-/// # Simpson's rule - Data tuples
+/// # Simpson's rule - Data tuple
 /// 
 /// ## Definition
 /// Integrate one-dimensional function through the simpson rule:
