@@ -73,7 +73,7 @@ pub fn logistic_vec(mu: f64, s: f64, x: &[f64]) -> Vec<f64> {
 /// 
 /// ## Example
 /// ```
-/// # use scilib::math::basic::normal;
+/// # use scilib::math::distribution::normal;
 /// let res: f64 = normal(1.0, 2.0, 3.0);
 /// assert!((res - 0.120985362259).abs() < 1e-12);
 /// ```
@@ -99,7 +99,7 @@ pub fn normal(mu: f64, sigma: f64, x: f64) -> f64 {
 /// 
 /// ## Example
 /// ```
-/// # use scilib::math::basic::gaussian;
+/// # use scilib::math::distribution::gaussian;
 /// let res1: f64 = gaussian(1.0, 2.0, 3.0, 0.0);
 /// assert_eq!(res1, 0.8007374029168081);
 /// ```
@@ -122,7 +122,7 @@ pub fn gaussian(a: f64, b: f64, c: f64, x: f64) -> f64 {
 /// 
 /// ## Example
 /// ```
-/// # use scilib::math::basic::sigmoid;
+/// # use scilib::math::distribution::sigmoid;
 /// let res1: f64 = sigmoid(-1.0);
 /// let res2: f64 = sigmoid(0.0);
 /// let res_comp: f64 = sigmoid(1.0);
