@@ -551,7 +551,7 @@ where T: Into<f64> {
 /// 
 /// Lanczos, C. “A Precision Approximation of the Gamma Function.”
 /// Journal of the Society for Industrial and Applied Mathematics: Series B, Numerical Analysis, vol. 1, 1964, pp. 86–96. JSTOR,
-/// http://www.jstor.org/stable/2949767. Accessed 11 Apr. 2023.
+/// [http://www.jstor.org/stable/2949767](http://www.jstor.org/stable/2949767). Accessed 11 Apr. 2023.
 /// 
 /// ## Inputs
 /// - `x`: the value to evaluate ($x$).
