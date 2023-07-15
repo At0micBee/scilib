@@ -41,15 +41,27 @@ fn chunk_simp_dt(
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Passing function as argument
 
-/// # (d1) Rectangle rule - Function
-/// Integrate one-dimensional function through the rectangle rule:
-/// * `function` - Closure or function pointer matching `f(x) = y`
-/// * `lower_bound` - First limit of the integral (Fixed value)
-/// * `upper_bound` - Second limit of the integral (Fixed value)
-/// * `div` - Number of chunk evaluated: _big_ = high precision & low performances, _small_ = high performances & low precision
+/// # Rectangle rule - Function as argument
+/// 
+/// ## Definition
+/// Integration of a one-dimensional function using the left aligned rectangle rule:
+/// $$
+/// \int_a^b f(x)dx \approx \frac{b-a}{n}\sum_i^{n-1} f(x_i) 
+/// $$
+/// 
+/// ## Inputs
+/// - `function`: Closure or function pointer matching `f(x) = y`
+/// - `lower_bound`: lower bound of the integral (Fixed value)
+/// - `upper_bound`: Upper bound of the integral (Fixed value)
+/// - `div`: Number of chunk evaluated
+/// 
+/// Returns the area under the curve
 ///
-/// **CAUTION**: `div` must be greater than 1
+/// **CAUTION**: `div` must be greater than 1.
+/// A _large_ value yields high precision & low performances,
+/// while a _small_ value yields high performances & low precision
 ///
+/// ## Example
 /// ```
 /// # use scilib::integration::d1::*;
 /// # use std::f64::consts::PI;
@@ -72,15 +84,27 @@ pub fn fn_rectangle(
     })
 }
 
-/// # (d1) Trapezoidal rule - Function
-/// Integrate one-dimensional function through the trapezoidal rule:
-/// * `function` - Closure or function pointer matching `f(x) = y`
-/// * `lower_bound` - First limit of the integral (Fixed value)
-/// * `upper_bound` - Second limit of the integral (Fixed value)
-/// * `div` - Number of chunk evaluated: _big_ = high precision & low performances, _small_ = high performances & low precision
+/// # Trapezoidal rule - Function as argument
+/// 
+/// ## Definition
+/// Integration of a one-dimensional function using the trapezoidal rule:
+/// $$
+/// \int_a^b f(x)dx \approx \frac{b-a}{n}\sum_i^{n-1} \frac{f(x_i) + f(x_{i+1})}{2}
+/// $$
+/// 
+/// ## Inputs
+/// - `function`: Closure or function pointer matching `f(x) = y`
+/// - `lower_bound`: lower bound of the integral (Fixed value)
+/// - `upper_bound`: Upper bound of the integral (Fixed value)
+/// - `div`: Number of chunk evaluated
+/// 
+/// Returns the area under the curve
 ///
-/// **CAUTION**: `div` must be greater than 1
+/// **CAUTION**: `div` must be greater than 1.
+/// A _large_ value yields high precision & low performances,
+/// while a _small_ value yields high performances & low precision
 ///
+/// ## Example
 /// ```
 /// # use scilib::integration::d1::*;
 /// let res = fn_trapeze(|x| x.exp(), -2.0, 10.0, 10_000);
@@ -107,15 +131,28 @@ pub fn fn_trapeze(
     })
 }
 
-/// # (d1) Simpson's rule - Function
+/// # Simpson's rule - Function as argument
+/// 
+/// ## Definition
 /// Integrate one-dimensional function through the simpson rule:
-/// * `function` - Closure or function pointer matching `f(x) = y`
-/// * `lower_bound` - First limit of the integral (Fixed value)
-/// * `upper_bound` - Second limit of the integral (Fixed value)
-/// * `div` - Number of chunk evaluated: _big_ = high precision & low performances, _small_ = high performances & low precision
+/// $$
+/// \int_a^b f(x)dx \approx \frac{b-a}{3n}\sum_{i=1}^{n/2}
+/// \left( f(x_{2i-2}) + 4f(x_{2i-1}) + f(x_{2i}) \right)
+/// $$
+/// 
+/// ## Inputs
+/// - `function`: Closure or function pointer matching `f(x) = y`
+/// - `lower_bound`: lower bound of the integral (Fixed value)
+/// - `upper_bound`: Upper bound of the integral (Fixed value)
+/// - `div`: Number of chunk evaluated
+/// 
+/// Returns the area under the curve
 ///
-/// **CAUTION**: `div` must be an even number greater than 2
+/// **CAUTION**: `div` must be greater than 1.
+/// A _large_ value yields high precision & low performances,
+/// while a _small_ value yields high performances & low precision
 ///
+/// ## Example
 /// ```
 /// # use scilib::integration::d1::*;
 /// let res = fn_simpson(|x| x.exp(), -2.0, 10.0, 1000);
@@ -150,28 +187,31 @@ pub fn fn_simpson(
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // X and Y vectors as input
 
-/// # (d1) Rectangle rule - Data by slices
+/// # Rectangle rule - X and Y Slices
+/// 
+/// ## Definition
+/// Integration of a one-dimensional function using the left aligned rectangle rule:
+/// $$
+/// \int_a^b f(x)dx \approx \frac{b-a}{n}\sum_i^{n-1} f(x_i) 
+/// $$
+/// 
+/// ## Inputs
 /// Integrate one-dimensional function represented by data enclosed in slices through the rectangle rule:
-/// * `x` - array of x-coordinates
-/// * `y` - array of y-coordinates
+/// - `x`: array of x-coordinates
+/// - `y`: array of y-coordinates
+/// 
+/// Returns the area under the curve
 ///
-/// **CAUTION**: `x.len()` and `y.len()` must be equals
+/// **CAUTION**: `x.len()` and `y.len()` must be equal
 ///
+/// ## Example
 /// ```
 /// # use scilib::integration::d1::*;
-/// let count = 1_000;
-/// let mut x = vec![0.0; count];
-/// let mut y = vec![0.0; count];
-/// let lower_bound = -10.0;
-/// let upper_bound = 10.0;
-/// let step = (upper_bound - lower_bound) / (count - 1) as f64;
-/// for i in 0..count {
-///     let pos = lower_bound + i as f64 * step;
-///     x[i] = pos;
-///     y[i] = pos.sin();
-/// }
+/// # use scilib::range;
+/// let x = range::linear(0, 1, 1000);
+/// let y: Vec<f64> = x.iter().map(|v| v.sin()).collect();
 /// let res = rectangle(&x, &y);
-/// assert!(res.abs() < 1.0e-1);
+/// assert!((res - 0.45969769413186028).abs() < 1.0e-3);
 /// ```
 pub fn rectangle(x: &[f64], y: &[f64]) -> f64 {
 
@@ -185,28 +225,31 @@ pub fn rectangle(x: &[f64], y: &[f64]) -> f64 {
     })
 }
 
-/// # (d1) Trapezoidal rule - Data by slices
-/// Integrate one-dimensional function represented by data enclosed in slices through the trapezoidal rule:
-/// * `x` - array of x-coordinates
-/// * `y` - array of y-coordinates
+/// # Trapezoidal rule - X and Y Slices
+/// 
+/// ## Definition
+/// Integration of a one-dimensional function using the trapezoidal rule:
+/// $$
+/// \int_a^b f(x)dx \approx \frac{b-a}{n}\sum_i^{n-1} \frac{f(x_i) + f(x_{i+1})}{2}
+/// $$
+/// 
+/// ## Inputs
+/// Integrate one-dimensional function represented by data enclosed in slices through the rectangle rule:
+/// - `x`: array of x-coordinates
+/// - `y`: array of y-coordinates
+/// 
+/// Returns the area under the curve
 ///
-/// **CAUTION**: `x.len()` and `y.len()` must be equals
+/// **CAUTION**: `x.len()` and `y.len()` must be equal
 ///
+/// ## Example
 /// ```
 /// # use scilib::integration::d1::*;
-/// let count = 100;
-/// let mut x = vec![0.0; count];
-/// let mut y = vec![0.0; count];
-/// let lower_bound = -10.0;
-/// let upper_bound = 10.0;
-/// let step = (upper_bound - lower_bound) / (count - 1) as f64;
-/// for i in 0..count {
-///     let pos = lower_bound + i as f64 * step;
-///     x[i] = pos;
-///     y[i] = pos.sin();
-/// }
+/// # use scilib::range;
+/// let x = range::linear(0, 1, 1000);
+/// let y: Vec<f64> = x.iter().map(|v| v.sin()).collect();
 /// let res = trapeze(&x, &y);
-/// assert!(res.abs() < 1.0e-3);
+/// assert!((res - 0.45969769413186028).abs() < 1.0e-7);
 /// ```
 pub fn trapeze(x: &[f64], y: &[f64]) -> f64 {
 
@@ -220,28 +263,32 @@ pub fn trapeze(x: &[f64], y: &[f64]) -> f64 {
     })
 }
 
-/// # (d1) Simpson's rule - Data by slices
-/// Integrate one-dimensional function represented by data enclosed in slices through the simpson rule:
-/// * `x` - array of x-coordinates
-/// * `y` - array of y-coordinates
+/// # Simpson's rule - X and Y Slices
+/// 
+/// ## Definition
+/// Integrate one-dimensional function through the simpson rule:
+/// $$
+/// \int_a^b f(x)dx \approx \frac{b-a}{3n}\sum_{i=1}^{n/2}
+/// \left( f(x_{2i-2}) + 4f(x_{2i-1}) + f(x_{2i}) \right)
+/// $$
+/// 
+/// ## Inputs
+/// Integrate one-dimensional function represented by data enclosed in slices through the rectangle rule:
+/// - `x`: array of x-coordinates
+/// - `y`: array of y-coordinates
+/// 
+/// Returns the area under the curve
 ///
-/// **CAUTION**: `x.len()` and `y.len()` must be equals and `x.len()` must be an uneven number greater than 3
+/// **CAUTION**: `x.len()` and `y.len()` must be equal
 ///
+/// ## Example
 /// ```
 /// # use scilib::integration::d1::*;
-/// let count = 11;
-/// let mut x = vec![0.0; count];
-/// let mut y = vec![0.0; count];
-/// let lower_bound = -10.0;
-/// let upper_bound = 10.0;
-/// let step = (upper_bound - lower_bound) / (count - 1) as f64;
-/// for i in 0..count {
-///     let pos = lower_bound + i as f64 * step;
-///     x[i] = pos;
-///     y[i] = pos.sin();
-/// }
-/// let res = simpson(&x, &y);
-/// assert!(res.abs() < 1.0e-4);
+/// # use scilib::range;
+/// let x = range::linear(0, 1, 1001);
+/// let y: Vec<f64> = x.iter().map(|v| v.sin()).collect();
+/// let res = trapeze(&x, &y);
+/// assert!((res - 0.45969769413186028).abs() < 1.0e-7);
 /// ```
 pub fn simpson(x: &[f64], y: &[f64]) -> f64 {
 
@@ -258,23 +305,30 @@ pub fn simpson(x: &[f64], y: &[f64]) -> f64 {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // X and Y as tuples
 
-/// # (d1) Rectangle rule - Data by tuples
-/// Integrate one-dimensional function represented by data enclosed in tuples through the rectangle rule:
-/// * `data` - array of tuples corresponding to `x` and `y` respectively
+/// # Rectangle rule - Data tuple
+/// 
+/// ## Definition
+/// Integration of a one-dimensional function using the left aligned rectangle rule:
+/// $$
+/// \int_a^b f(x)dx \approx \frac{b-a}{n}\sum_i^{n-1} f(x_i) 
+/// $$
+/// 
+/// ## Inputs
+/// - `data`: array of tuples corresponding to `x` and `y`, respectively
 ///
+/// Returns the area under the curve
+/// 
+/// ## Example
 /// ```
 /// # use scilib::integration::d1::*;
-/// let count = 1_000;
-/// let mut data = vec![(0.0, 0.0); count];
-/// let lower_bound = -10.0;
-/// let upper_bound = 10.0;
-/// let step = (upper_bound - lower_bound) / (count - 1) as f64;
-/// for i in 0..count {
-///     let x = lower_bound + i as f64 * step;
-///     data[i] = (x, x.sin());
-/// }
+/// # use scilib::range;
+/// let x = range::linear(0, 1, 1000);
+/// let y: Vec<f64> = x.iter().map(|v| v.sin()).collect();
+/// let data: Vec<(f64, f64)> = x.into_iter().zip(y.into_iter()).map(|(a, b)| {
+///     (a, b)
+/// }).collect();
 /// let res = tuple_rectangle(&data);
-/// assert!(res.abs() < 1.0e-1);
+/// assert!((res - 0.45969769413186028).abs() < 1.0e-3);
 /// ```
 pub fn tuple_rectangle(data: &[(f64, f64)]) -> f64 {
 
@@ -283,23 +337,30 @@ pub fn tuple_rectangle(data: &[(f64, f64)]) -> f64 {
     })
 }
 
-/// # (d1) Trapezoidal rule - Data by tuples
-/// Integrate one-dimensional function represented by data enclosed in tuples through the trapezoidal rule:
-/// * `data` - array of tuples corresponding to `x` and `y` respectively
+/// # Trapezoidal rule - Data tuple
+/// 
+/// ## Definition
+/// Integration of a one-dimensional function using the trapezoidal rule:
+/// $$
+/// \int_a^b f(x)dx \approx \frac{b-a}{n}\sum_i^{n-1} \frac{f(x_i) + f(x_{i+1})}{2}
+/// $$
+/// 
+/// ## Inputs
+/// - `data`: array of tuples corresponding to `x` and `y`, respectively
 ///
+/// Returns the area under the curve
+/// 
+/// ## Example
 /// ```
 /// # use scilib::integration::d1::*;
-/// let count = 100;
-/// let mut data = vec![(0.0, 0.0); count];
-/// let lower_bound = -10.0;
-/// let upper_bound = 10.0;
-/// let step = (upper_bound - lower_bound) / (count - 1) as f64;
-/// for i in 0..count {
-///     let x = lower_bound + i as f64 * step;
-///     data[i] = (x, x.sin());
-/// }
+/// # use scilib::range;
+/// let x = range::linear(0, 1, 1000);
+/// let y: Vec<f64> = x.iter().map(|v| v.sin()).collect();
+/// let data: Vec<(f64, f64)> = x.into_iter().zip(y.into_iter()).map(|(a, b)| {
+///     (a, b)
+/// }).collect();
 /// let res = tuple_trapeze(&data);
-/// assert!(res.abs() < 1.0e-3);
+/// assert!((res - 0.45969769413186028).abs() < 1.0e-7);
 /// ```
 pub fn tuple_trapeze(data: &[(f64, f64)]) -> f64 {
 
@@ -308,25 +369,31 @@ pub fn tuple_trapeze(data: &[(f64, f64)]) -> f64 {
     })
 }
 
-/// # (d1) Simpson's rule - Data by tuples
-/// Integrate one-dimensional function represented by data enclosed in tuples through the trapezoidal rule:
-/// * `data` - array of tuples corresponding to `x` and `y` respectively
+/// # Simpson's rule - Data tuples
+/// 
+/// ## Definition
+/// Integrate one-dimensional function through the simpson rule:
+/// $$
+/// \int_a^b f(x)dx \approx \frac{b-a}{3n}\sum_{i=1}^{n/2}
+/// \left( f(x_{2i-2}) + 4f(x_{2i-1}) + f(x_{2i}) \right)
+/// $$
+/// 
+/// ## Inputs
+/// - `data`: array of tuples corresponding to `x` and `y`, respectively
 ///
-/// **CAUTION**: `data.len()` must be an uneven number greater than 3
-///
+/// Returns the area under the curve
+/// 
+/// ## Example
 /// ```
 /// # use scilib::integration::d1::*;
-/// let count = 11;
-/// let mut data = vec![(0.0, 0.0); count];
-/// let lower_bound = -10.0;
-/// let upper_bound = 10.0;
-/// let step = (upper_bound - lower_bound) / (count - 1) as f64;
-/// for i in 0..count {
-///     let x = lower_bound + i as f64 * step;
-///     data[i] = (x, x.sin());
-/// }
+/// # use scilib::range;
+/// let x = range::linear(0, 1, 1001);
+/// let y: Vec<f64> = x.iter().map(|v| v.sin()).collect();
+/// let data: Vec<(f64, f64)> = x.into_iter().zip(y.into_iter()).map(|(a, b)| {
+///     (a, b)
+/// }).collect();
 /// let res = tuple_simpson(&data);
-/// assert!(res.abs() < 1.0e-4);
+/// assert!((res - 0.45969769413186028).abs() < 1.0e-7);
 /// ```
 pub fn tuple_simpson(data: &[(f64, f64)]) -> f64 {
 
