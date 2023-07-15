@@ -1,3 +1,7 @@
+//!
+//! # One-dimensional integration toolkit
+//! 
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #[inline(always)]
@@ -35,6 +39,7 @@ fn chunk_simp_dt(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Passing function as argument
 
 /// # (d1) Rectangle rule - Function
 /// Integrate one-dimensional function through the rectangle rule:
@@ -48,10 +53,10 @@ fn chunk_simp_dt(
 /// ```
 /// # use scilib::integration::d1::*;
 /// # use std::f64::consts::PI;
-/// let res = rect_fn(|x| x.cos(), PI * 2.0, PI * 2.0 + PI / 2.0, 1000);
+/// let res = fn_rectangle(|x| x.cos(), PI * 2.0, PI * 2.0 + PI / 2.0, 1000);
 /// assert!((res - 1.0).abs() < 1.0e-3);
 /// ```
-pub fn rect_fn(
+pub fn fn_rectangle(
         function: impl Fn(f64) -> f64,
         lower_bound: f64,
         upper_bound: f64,
@@ -78,10 +83,10 @@ pub fn rect_fn(
 ///
 /// ```
 /// # use scilib::integration::d1::*;
-/// let res = trapz_fn(|x| x.exp(), -2.0, 10.0, 10_000);
+/// let res = fn_trapeze(|x| x.exp(), -2.0, 10.0, 10_000);
 /// assert!((res - 22026.3304).abs() < 1.0e-2);
 /// ```
-pub fn trapz_fn(
+pub fn fn_trapeze(
         function: impl Fn(f64) -> f64,
         lower_bound: f64,
         upper_bound: f64,
@@ -113,10 +118,10 @@ pub fn trapz_fn(
 ///
 /// ```
 /// # use scilib::integration::d1::*;
-/// let res = simp_fn(|x| x.exp(), -2.0, 10.0, 1000);
+/// let res = fn_simpson(|x| x.exp(), -2.0, 10.0, 1000);
 /// assert!((res - 22026.330459).abs() < 1.0e-4);
 /// ```
-pub fn simp_fn(
+pub fn fn_simpson(
         function: impl Fn(f64) -> f64,
         lower_bound: f64,
         upper_bound: f64,
@@ -143,90 +148,7 @@ pub fn simp_fn(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/// # (d1) Rectangle rule - Data by tuples
-/// Integrate one-dimensional function represented by data enclosed in tuples through the rectangle rule:
-/// * `data` - array of tuples corresponding to `x` and `y` respectively
-///
-/// ```
-/// # use scilib::integration::d1::*;
-/// let count = 1_000;
-/// let mut data = vec![(0.0, 0.0); count];
-/// let lower_bound = -10.0;
-/// let upper_bound = 10.0;
-/// let step = (upper_bound - lower_bound) / (count - 1) as f64;
-/// for i in 0..count {
-///     let x = lower_bound + i as f64 * step;
-///     data[i] = (x, x.sin());
-/// }
-/// let res = rect_dt_tup(&data);
-/// assert!(res.abs() < 1.0e-1);
-/// ```
-pub fn rect_dt_tup(data: &[(f64, f64)]) -> f64 {
-
-    (0..(data.len() - 1)).fold(0.0, |sum, idx| {
-        sum + chunk_rect(data[idx].1, data[idx + 1].0 - data[idx].0)
-    })
-}
-
-/// # (d1) Trapezoidal rule - Data by tuples
-/// Integrate one-dimensional function represented by data enclosed in tuples through the trapezoidal rule:
-/// * `data` - array of tuples corresponding to `x` and `y` respectively
-///
-/// ```
-/// # use scilib::integration::d1::*;
-/// let count = 100;
-/// let mut data = vec![(0.0, 0.0); count];
-/// let lower_bound = -10.0;
-/// let upper_bound = 10.0;
-/// let step = (upper_bound - lower_bound) / (count - 1) as f64;
-/// for i in 0..count {
-///     let x = lower_bound + i as f64 * step;
-///     data[i] = (x, x.sin());
-/// }
-/// let res = trapz_dt_tup(&data);
-/// assert!(res.abs() < 1.0e-3);
-/// ```
-pub fn trapz_dt_tup(data: &[(f64, f64)]) -> f64 {
-
-    (0..(data.len() - 1)).fold(0.0, |sum, idx| {
-        sum + chunk_trapz(data[idx].1, data[idx + 1].1, data[idx + 1].0 - data[idx].0)
-    })
-}
-
-/// # (d1) Simpson's rule - Data by tuples
-/// Integrate one-dimensional function represented by data enclosed in tuples through the trapezoidal rule:
-/// * `data` - array of tuples corresponding to `x` and `y` respectively
-///
-/// **CAUTION**: `data.len()` must be an uneven number greater than 3
-///
-/// ```
-/// # use scilib::integration::d1::*;
-/// let count = 11;
-/// let mut data = vec![(0.0, 0.0); count];
-/// let lower_bound = -10.0;
-/// let upper_bound = 10.0;
-/// let step = (upper_bound - lower_bound) / (count - 1) as f64;
-/// for i in 0..count {
-///     let x = lower_bound + i as f64 * step;
-///     data[i] = (x, x.sin());
-/// }
-/// let res = simp_dt_tup(&data);
-/// assert!(res.abs() < 1.0e-4);
-/// ```
-pub fn simp_dt_tup(data: &[(f64, f64)]) -> f64 {
-
-    assert!(
-        data.len() >= 3 && data.len() % 2 == 1,
-        "size of data paramater must be an uneven number greater than 3!"
-    );
-
-    (0..(data.len() - 1)).step_by(2).fold(0.0, |sum, idx| {
-        sum + chunk_simp_dt(data[idx], data[idx + 1], data[idx + 2])
-    })
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// X and Y vectors as input
 
 /// # (d1) Rectangle rule - Data by slices
 /// Integrate one-dimensional function represented by data enclosed in slices through the rectangle rule:
@@ -248,10 +170,10 @@ pub fn simp_dt_tup(data: &[(f64, f64)]) -> f64 {
 ///     x[i] = pos;
 ///     y[i] = pos.sin();
 /// }
-/// let res = rect_dt_sli(&x, &y);
+/// let res = rectangle(&x, &y);
 /// assert!(res.abs() < 1.0e-1);
 /// ```
-pub fn rect_dt_sli(x: &[f64], y: &[f64]) -> f64 {
+pub fn rectangle(x: &[f64], y: &[f64]) -> f64 {
 
     assert!(
         x.len() == y.len(),
@@ -283,10 +205,10 @@ pub fn rect_dt_sli(x: &[f64], y: &[f64]) -> f64 {
 ///     x[i] = pos;
 ///     y[i] = pos.sin();
 /// }
-/// let res = trapz_dt_sli(&x, &y);
+/// let res = trapeze(&x, &y);
 /// assert!(res.abs() < 1.0e-3);
 /// ```
-pub fn trapz_dt_sli(x: &[f64], y: &[f64]) -> f64 {
+pub fn trapeze(x: &[f64], y: &[f64]) -> f64 {
 
     assert!(
         x.len() == y.len(),
@@ -318,10 +240,10 @@ pub fn trapz_dt_sli(x: &[f64], y: &[f64]) -> f64 {
 ///     x[i] = pos;
 ///     y[i] = pos.sin();
 /// }
-/// let res = simp_dt_sli(&x, &y);
+/// let res = simpson(&x, &y);
 /// assert!(res.abs() < 1.0e-4);
 /// ```
-pub fn simp_dt_sli(x: &[f64], y: &[f64]) -> f64 {
+pub fn simpson(x: &[f64], y: &[f64]) -> f64 {
 
     assert!(
         x.len() == y.len() && x.len() >= 3 && x.len() % 2 == 1,
@@ -330,6 +252,91 @@ pub fn simp_dt_sli(x: &[f64], y: &[f64]) -> f64 {
 
     (0..(x.len() - 1)).step_by(2).fold(0.0, |sum, idx| {
         sum + chunk_simp_dt((x[idx], y[idx]), (x[idx + 1], y[idx + 1]), (x[idx + 2], y[idx + 2]))
+    })
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// X and Y as tuples
+
+/// # (d1) Rectangle rule - Data by tuples
+/// Integrate one-dimensional function represented by data enclosed in tuples through the rectangle rule:
+/// * `data` - array of tuples corresponding to `x` and `y` respectively
+///
+/// ```
+/// # use scilib::integration::d1::*;
+/// let count = 1_000;
+/// let mut data = vec![(0.0, 0.0); count];
+/// let lower_bound = -10.0;
+/// let upper_bound = 10.0;
+/// let step = (upper_bound - lower_bound) / (count - 1) as f64;
+/// for i in 0..count {
+///     let x = lower_bound + i as f64 * step;
+///     data[i] = (x, x.sin());
+/// }
+/// let res = tuple_rectangle(&data);
+/// assert!(res.abs() < 1.0e-1);
+/// ```
+pub fn tuple_rectangle(data: &[(f64, f64)]) -> f64 {
+
+    (0..(data.len() - 1)).fold(0.0, |sum, idx| {
+        sum + chunk_rect(data[idx].1, data[idx + 1].0 - data[idx].0)
+    })
+}
+
+/// # (d1) Trapezoidal rule - Data by tuples
+/// Integrate one-dimensional function represented by data enclosed in tuples through the trapezoidal rule:
+/// * `data` - array of tuples corresponding to `x` and `y` respectively
+///
+/// ```
+/// # use scilib::integration::d1::*;
+/// let count = 100;
+/// let mut data = vec![(0.0, 0.0); count];
+/// let lower_bound = -10.0;
+/// let upper_bound = 10.0;
+/// let step = (upper_bound - lower_bound) / (count - 1) as f64;
+/// for i in 0..count {
+///     let x = lower_bound + i as f64 * step;
+///     data[i] = (x, x.sin());
+/// }
+/// let res = tuple_trapeze(&data);
+/// assert!(res.abs() < 1.0e-3);
+/// ```
+pub fn tuple_trapeze(data: &[(f64, f64)]) -> f64 {
+
+    (0..(data.len() - 1)).fold(0.0, |sum, idx| {
+        sum + chunk_trapz(data[idx].1, data[idx + 1].1, data[idx + 1].0 - data[idx].0)
+    })
+}
+
+/// # (d1) Simpson's rule - Data by tuples
+/// Integrate one-dimensional function represented by data enclosed in tuples through the trapezoidal rule:
+/// * `data` - array of tuples corresponding to `x` and `y` respectively
+///
+/// **CAUTION**: `data.len()` must be an uneven number greater than 3
+///
+/// ```
+/// # use scilib::integration::d1::*;
+/// let count = 11;
+/// let mut data = vec![(0.0, 0.0); count];
+/// let lower_bound = -10.0;
+/// let upper_bound = 10.0;
+/// let step = (upper_bound - lower_bound) / (count - 1) as f64;
+/// for i in 0..count {
+///     let x = lower_bound + i as f64 * step;
+///     data[i] = (x, x.sin());
+/// }
+/// let res = tuple_simpson(&data);
+/// assert!(res.abs() < 1.0e-4);
+/// ```
+pub fn tuple_simpson(data: &[(f64, f64)]) -> f64 {
+
+    assert!(
+        data.len() >= 3 && data.len() % 2 == 1,
+        "size of data paramater must be an uneven number greater than 3!"
+    );
+
+    (0..(data.len() - 1)).step_by(2).fold(0.0, |sum, idx| {
+        sum + chunk_simp_dt(data[idx], data[idx + 1], data[idx + 2])
     })
 }
 
