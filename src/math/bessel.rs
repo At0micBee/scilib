@@ -191,6 +191,8 @@ use num_complex::Complex64; // Using complex numbers from the num crate
 /// # Precision limit for Bessel computation
 const PRECISION_CONVERGENCE: f64 = 1.0e-8;
 
+const MAX_ITER_J: usize = 200;
+
 /// # Limit when computing Bessel Y
 const DISTANCE_Y_LIM: f64 = 1e-4;
 
@@ -264,6 +266,7 @@ pub fn j<T: Into<Complex64>>(x: T, n: i32) -> Complex64 {
 
     let mut term: Complex64 = x2.powi(np) / d2;                 // The term at each step
     let mut res: Complex64 = Complex64::default();              // The result of the operation
+    let mut counter: usize = 0;
 
     // If the first term is already too small we exit directly
     if term.norm() < PRECISION_CONVERGENCE {
@@ -277,7 +280,10 @@ pub fn j<T: Into<Complex64>>(x: T, n: i32) -> Complex64 {
         // If the changed compared to the final value is small we break
         if (term / res).norm() < PRECISION_CONVERGENCE {
             break 'convergence;
+        } else if counter > MAX_ITER_J {
+            break 'convergence;
         }
+        counter += 1;
 
         k += 1;                         // Incrementing value
         sg *= -1.0;                     // changing the sign of the term
@@ -355,6 +361,7 @@ pub fn jf<T, U>(x: T, order: U) -> Complex64
 
     let mut term: Complex64 = x2.powf(n) / d2;      // The term at each step
     let mut res: Complex64 = Complex64::default();  // The result of the operation
+    let mut counter: usize = 0;
     
     // If the first term is already too small we exit directly
     if term.norm() < PRECISION_CONVERGENCE {
@@ -368,7 +375,10 @@ pub fn jf<T, U>(x: T, order: U) -> Complex64
         // If the changed compared to the final value is small we break
         if (term / res).norm() < PRECISION_CONVERGENCE {
             break 'convergence;
+        } else if counter > MAX_ITER_J {
+            break 'convergence;
         }
+        counter += 1;
 
         k += 1.0;                       // Incrementing value
         sg *= -1.0;                     // changing the sign of the term
@@ -435,7 +445,7 @@ where T: Into<Complex64> + Copy, U: Into<f64> {
     let n: f64 = order.into();
 
     // If n is whole, we have to take the limit, otherwise it's direct
-    if n.fract() == 0.0 && c.re != 0.0 {
+    if n.fract() == 0.0 {
         (y(c, n + DISTANCE_Y_LIM) + y(c, n - DISTANCE_Y_LIM)) / 2.0
     } else {
         ((n * PI).cos() * jf(c, n) - jf(c, -n)) / (n * PI).sin()
