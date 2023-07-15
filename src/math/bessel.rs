@@ -192,7 +192,7 @@ use num_complex::Complex64; // Using complex numbers from the num crate
 const PRECISION_CONVERGENCE: f64 = 1.0e-8;
 
 /// # Limit when computing Bessel Y
-const DISTANCE_Y_LIM: f64 = 0.001;
+const DISTANCE_Y_LIM: f64 = 1e-4;
 
 /// #
 const PACK: usize = 50;
@@ -436,7 +436,7 @@ where T: Into<Complex64> + Copy, U: Into<f64> {
 
     // If n is whole, we have to take the limit, otherwise it's direct
     if n.fract() == 0.0 && c.re != 0.0 {
-        y(c, n + DISTANCE_Y_LIM)
+        (y(c, n + DISTANCE_Y_LIM) + y(c, n - DISTANCE_Y_LIM)) / 2.0
     } else {
         ((n * PI).cos() * jf(c, n) - jf(c, -n)) / (n * PI).sin()
     }
