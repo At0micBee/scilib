@@ -12,6 +12,8 @@ pub mod bessel;
 
 pub mod distribution;
 
+pub mod integration;
+
 pub mod polynomial;
 
 pub mod series;
