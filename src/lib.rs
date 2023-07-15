@@ -39,6 +39,8 @@ pub mod constant;
 
 pub mod coordinate;
 
+pub mod integration;
+
 pub mod math;
 
 pub mod planck;
@@ -48,3 +50,5 @@ pub mod quantum;
 pub mod range;
 
 pub mod signal;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
