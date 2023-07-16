@@ -679,7 +679,6 @@ fn series_for_gamma(a: f64, x: f64) -> f64 {
         if term.abs() < sum.abs() * PRECISION {
             return sum * (-x + a * x.ln() - lng).exp();
         }
-
     }
     
     // We return 0.0 if we couldn't compute the value
