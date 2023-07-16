@@ -23,6 +23,15 @@ const PRECISION: f64 = 1.0e-12;
 /// Stieltjes gamma computation precision
 const STIELTJES_M: usize = 1_000_000;
 
+/// Sum initialization for ln(gamma)
+const GAMMA_INIT: f64 = 0.999999999999997092;
+
+/// Offset for the base value in ln(gamma)
+const GAMMA_BASE_OFFSET: f64 = 5.2421875;
+
+/// Offset to apply to ln(gamma)
+const GAMMA_LN_OFFSET: f64 = 2.5066282746310005;
+
 /// Coefficients to compute the ln gamma function.
 const GAMMA_COEFS: [f64; 14] = [
     57.1562356658629235, -59.5979603554754912,
@@ -573,17 +582,15 @@ pub fn ln_gamma(x: f64) -> f64 {
 
     let mut inc_x: f64 = x;                     // The incremented x in the loop
 
-    let mut base: f64 = x + 5.2421875;          // Base value
+    let mut base: f64 = x + GAMMA_BASE_OFFSET;  // Base value
     base = (x + 0.5) * base.ln() - base;
 
-    let mut sum: f64 = 0.999999999999997092;    // Init value of the sum
-
-    for c in GAMMA_COEFS {                      // Computing the values using the consts
+    let res: f64 = GAMMA_COEFS.iter().fold(GAMMA_INIT, |sum, c| {
         inc_x += 1.0;
-        sum += c / inc_x;
-    }
+        sum + c / inc_x
+    });
 
-    base + (2.5066282746310005 * sum / x).ln()  // Final computation
+    base + (GAMMA_LN_OFFSET * res / x).ln()  // Final computation
 }
 
 /// # Regularized Gamma function P
