@@ -1,5 +1,5 @@
 
-![](https://raw.githubusercontent.com/At0micBee/scilib/master/imgs/branding/Scilib.png)
+![](https://raw.githubusercontent.com/At0micBee/scilib/dev/imgs/branding/Scilib.png)
 
 ---
 
