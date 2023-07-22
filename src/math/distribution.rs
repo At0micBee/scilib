@@ -5,6 +5,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 use std::f64::consts::{
+    SQRT_2,                 // sqrt(2)
     FRAC_1_PI,              // 1 / PI
     TAU                     // Tau constant
 };
@@ -102,7 +103,7 @@ pub fn cauchy(gamma: f64, x0: f64, x: f64) -> f64 {
 /// # Cumulative function of the Cauchy distribution
 /// 
 /// ## Definition
-/// The cumulative function for Rayleigh is defined by:
+/// The cumulative function for Cauchy is defined by:
 /// $$
 /// F_\gamma(x_0, x) = \frac{1}{\pi}\arctan\left( \frac{x-x_0}{\gamma} \right) + \frac{1}{2}
 /// $$
@@ -157,52 +158,61 @@ pub fn logistic(mu: f64, s: f64, x: f64) -> f64 {
 /// # Normal function
 /// 
 /// ## Definition
-/// The [normal](https://en.wikipedia.org/wiki/Normal_distribution) is defined as:
+/// The [normal](https://en.wikipedia.org/wiki/Normal_distribution) is a continuous
+/// probability distribution. It is defined as:
 /// $$
-/// g(x) = \frac{1}{\sigma\sqrt{2\pi}}\cdot\exp\left( -\frac{(x - \mu)^2}{2\sigma^2} \right)
+/// f_\sigma(\mu, x) = \frac{1}{\sigma\sqrt{2\pi}}\cdot\exp\left( -\frac{(x - \mu)^2}{2\sigma^2} \right)
 /// $$
 /// 
 /// ## Inputs
-/// - `mu`: the expected value ($\mu$)
 /// - `sigma`: the variance ($\sigma$)
+/// - `mu`: the central value ($\mu$)
 /// - `x`: the value to evaluate ($x$)
 /// 
-/// Returns the value of the normal function with parameters
+/// Returns the density probability at a given point `x` for the `sigma`
+/// scale parameter centered on `mu`.
 /// 
 /// ## Example
 /// ```
 /// # use scilib::math::distribution::normal;
-/// let res: f64 = normal(1.0, 2.0, 3.0);
-/// assert!((res - 0.120985362259).abs() < 1e-12);
+/// let res: f64 = normal(0.5, -2.0, 0.9);
+/// assert!((res - 3.9546392812489344e-08).abs() < 1e-23);
 /// ```
-pub fn normal(mu: f64, sigma: f64, x: f64) -> f64 {
+/// 
+/// ![](https://raw.githubusercontent.com/At0micBee/scilib/dev/imgs/distribution/normal.png)
+pub fn normal(sigma: f64, mu: f64, x: f64) -> f64 {
     (-0.5 * ((x - mu) / sigma).powi(2)).exp() / (sigma * TAU.sqrt())
 }
 
-/// # Gaussian function
+/// # Cumulative function of the Normal distribution
 /// 
 /// ## Definition
-/// The [gaussian function](https://en.wikipedia.org/wiki/Gaussian_function) is defined as:
+/// The cumulative function for Normal is defined by:
 /// $$
-/// g(x) = a\cdot\exp\left(-\frac{(b - x)^2}{2c^2}\right)
+/// F_\sigma(\mu, x) = \frac{1}{2}\left( 1 + \mathrm{erf}\left( \frac{x-\mu}{\sigma\sqrt{2}} \right) \right)
 /// $$
+/// 
+/// Where $\mathrm{erf}$ is the [error function](https://en.wikipedia.org/wiki/Error_function), implemented in
+/// the `math::basic` module of this crate.
 /// 
 /// ## Inputs
-/// - `a`: the amplitude ($a$)
-/// - `b`: the center ($b$)
-/// - `c`: the standard deviation ($c$)
-/// - `x`: the value to evaluate ($x$).
+/// - `sigma`: the variance ($\sigma$)
+/// - `mu`: the central value ($\mu$)
+/// - `x`: the value to evaluate ($x$)
 /// 
-/// Returns the value of the gaussian function with parameters $a$, $b$, $c$ at $x$.
+/// Returns the density probability at a given point `x` for the `sigma`
+/// scale parameter centered on `mu`.
 /// 
 /// ## Example
 /// ```
-/// # use scilib::math::distribution::gaussian;
-/// let res1: f64 = gaussian(1.0, 2.0, 3.0, 0.0);
-/// assert_eq!(res1, 0.8007374029168081);
+/// # use scilib::math::distribution::normal_cumulative;
+/// let res: f64 = normal_cumulative(0.5, -2.0, 0.9);
+/// assert!((res - 0.9999999966842541).abs() < 1e-11);
 /// ```
-pub fn gaussian(a: f64, b: f64, c: f64, x: f64) -> f64 {
-    a * (-(x - b).powi(2) / (2.0 * c.powi(2))).exp()
+/// 
+/// ![](https://raw.githubusercontent.com/At0micBee/scilib/dev/imgs/distribution/normal_cumulative.png)
+pub fn normal_cumulative(sigma: f64, mu: f64, x: f64) -> f64 {
+    0.5 * (1.0 + basic::erf((x - mu) / (sigma * SQRT_2)).re)
 }
 
 /// # Sigmoid function
