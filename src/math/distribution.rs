@@ -9,25 +9,22 @@ use std::f64::consts::{
     TAU                     // Tau constant
 };
 
-use super::{
-    basic,                  // Using the basic functions
-    series                  // Using the series tools
-};          
-
+use super::basic;           // Using the basic functions
+          
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # Rayleigh distribution
 /// 
 /// ## Definition
 /// The [Rayleigh distribution](https://en.wikipedia.org/wiki/Rayleigh_distribution) is a continuous
-/// probability distribution for any $x>=0$. It is defined as:
+/// probability distribution for any $x\ge0$. It is defined as:
 /// $$
 /// f_\sigma(x) = \frac{x}{\sigma^2} \exp\left( -\frac{x^2}{2\sigma^2} \right)
 /// $$
 /// 
 /// ## Inputs
 /// - `sigma`: the scale parameter of the distribution ($\sigma$)
-/// - `x`: the value at which to evaluate the function ($x$).
+/// - `x`: the value at which to evaluate the function, must be $\ge0$ ($x$).
 /// 
 /// Returns the density probability at a given point `x` for the `sigma`
 /// scale parameter.
@@ -38,37 +35,116 @@ use super::{
 /// let res = rayleigh(0.5, 0.9);
 /// assert!((res - 0.7124353167010128).abs() < 1e-15);
 /// ```
+/// 
+/// ![](https://raw.githubusercontent.com/At0micBee/scilib/dev/imgs/distribution/rayleigh.png)
 pub fn rayleigh(sigma: f64, x: f64) -> f64 {
     assert!(x >= 0.0);  // Rayleigh needs to be positive
     x * ( -0.5 * (x / sigma).powi(2) ).exp() / sigma.powi(2)
 }
 
-/* pub fn rayleigh_vec(sigma: f64, x: &[f64]) -> Vec<f64> {
-    assert!(series::min_slice(x) >= 0.0);           // Rayleigh needs to be positive
-    let frac_1_sigma2: f64 = 1.0 * sigma.powi(2);   // Pre-computing the factor
+/// # Cumulative function of the Rayleigh distribution
+/// 
+/// ## Definition
+/// The cumulative function for Rayleigh is defined by:
+/// $$
+/// F_\sigma(x) = 1 - \exp\left(-\frac{x^2}{2\sigma^2}\right)
+/// $$
+/// 
+/// ## Inputs
+/// - `sigma`: the scale parameter of the distribution ($\sigma$)
+/// - `x`: the value at which to evaluate the function, must be $\ge0$ ($x$).
+/// 
+/// Returns the cumulative density probability at a given point `x` for the `sigma`
+/// scale parameter.
+/// 
+/// ## Example
+/// ```
+/// # use scilib::math::distribution::rayleigh_cumulative;
+/// let res = rayleigh_cumulative(0.5, 0.9);
+/// assert!((res - 0.8021013009163853).abs() < 1e-15);
+/// ```
+/// 
+/// ![](https://raw.githubusercontent.com/At0micBee/scilib/dev/imgs/distribution/rayleigh_cumulative.png)
+pub fn rayleigh_cumulative(sigma: f64, x: f64) -> f64 {
+    assert!(x >= 0.0);  // Rayleigh needs to be positive
+    1.0 - (-0.5 * (x / sigma).powi(2)).exp()
+}
 
-    x.iter().map(|v| v * frac_1_sigma2 * (-v.powi(2) * frac_1_sigma2 / 2.0)).collect()
-} */
-
+/// # Cauchy distribution
+/// 
+/// ## Definition
+/// The [Cauchy distribution](https://en.wikipedia.org/wiki/Cauchy_distribution) is a continuous
+/// probability distribution. It is defined as:
+/// $$
+/// f_\gamma(x_0, x) = \frac{\gamma}{\pi} \frac{1}{(x-x_0)^2 + \gamma^2}
+/// $$
+/// 
+/// ## Inputs
+/// - `gamma`: the scale parameter, HWHM ($\gamma$).
+/// - `x0`: the location of the peak ($x_0$).
+/// - `x`: the point at which to evaluate the function.
+/// 
+/// Returns the density probability at a given point `x` for the `gamma`
+/// scale parameter centered on `x0`.
+/// 
+/// ## Example
+/// ```
+/// use scilib::math::distribution::cauchy;
+/// let res = cauchy(0.5, -2.0, 0.9);
+/// assert!((res - 0.018378168948255814).abs() < 1e-15)
+/// ```
+/// 
+/// ![](https://raw.githubusercontent.com/At0micBee/scilib/dev/imgs/distribution/cauchy.png)
 pub fn cauchy(gamma: f64, x0: f64, x: f64) -> f64 {
     FRAC_1_PI * gamma / ((x - x0).powi(2) + gamma.powi(2))
 }
 
-/* pub fn cauchy_vec(gamma: f64, x0: f64, x: &[f64]) -> Vec<f64> {
-    let pi_gamma: f64 = FRAC_1_PI * gamma;
-    let gamma2: f64 = gamma.powi(2);
-    x.iter().map(|v| pi_gamma / ((v - x0).powi(2) + gamma2)).collect()
-} */
+/// # Cumulative function of the Cauchy distribution
+/// 
+/// ## Definition
+/// The cumulative function for Rayleigh is defined by:
+/// $$
+/// F_\gamma(x_0, x) = \frac{1}{\pi}\arctan\left( \frac{x-x_0}{\gamma} \right) + \frac{1}{2}
+/// $$
+/// 
+/// ## Inputs
+/// - `gamma`: the scale parameter, HWHM ($\gamma$).
+/// - `x0`: the location of the peak ($x_0$).
+/// - `x`: the point at which to evaluate the function.
+/// 
+/// Returns the cumulative density probability at a given point `x` for the `gamma`
+/// scale parameter centered on `x0`.
+/// 
+/// ## Example
+/// ```
+/// use scilib::math::distribution::cauchy_cumulative;
+/// let res = cauchy_cumulative(0.5, -2.0, 0.9);
+/// assert!((res - 0.9456532942677374).abs() < 1e-15)
+/// ```
+/// 
+/// ![](https://raw.githubusercontent.com/At0micBee/scilib/dev/imgs/distribution/cauchy_cumulative.png)
+pub fn cauchy_cumulative(gamma: f64, x0: f64, x: f64) -> f64 {
+    ((x - x0) / gamma).atan() * FRAC_1_PI + 0.5
+}
 
+/// # Laplace distribution
+/// 
+/// ## Definition
+/// 
+/// ## Inputs
+/// 
+/// ## Example
 pub fn laplace(b: f64, mu: f64, x: f64) -> f64 {
     (-(x - mu).abs() / b).exp() / (2.0 * b)
 }
 
-/* pub fn laplace_vec(b: f64, mu: f64, x: &[f64]) -> Vec<f64> {
-    let frac_1_b: f64 = 1.0 / b;
-    x.iter().map(|v| frac_1_b * (-(v - mu).abs() * frac_1_b).exp() / 2.0).collect()
-} */
-
+/// # Logistic distribution
+/// 
+/// ## Definition
+/// 
+/// ## Inputs
+/// 
+/// ## Example
 pub fn logistic(mu: f64, s: f64, x: f64) -> f64 {
     basic::sech((x - mu) / (2.0 * s)).powi(2) / (4.0 * s)
 }
