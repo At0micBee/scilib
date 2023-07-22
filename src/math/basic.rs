@@ -154,6 +154,32 @@ pub fn csch(x: f64) -> f64 {
     1.0 / x.sinh()
 }
 
+/// # Gaussian function
+/// 
+/// ## Definition
+/// The [gaussian function](https://en.wikipedia.org/wiki/Gaussian_function) is a function defined as:
+/// $$
+/// g(x) = a\cdot\exp\left(-\frac{(b - x)^2}{2c^2}\right)
+/// $$
+/// 
+/// ## Inputs
+/// - `a`: the amplitude ($a$)
+/// - `b`: the center ($b$)
+/// - `c`: the standard deviation ($c$)
+/// - `x`: the value to evaluate ($x$).
+/// 
+/// Returns the value of the gaussian function with parameters $a$, $b$, $c$ at $x$.
+/// 
+/// ## Example
+/// ```
+/// # use scilib::math::basic::gaussian;
+/// let res1: f64 = gaussian(1.0, 2.0, 3.0, 0.0);
+/// assert_eq!(res1, 0.8007374029168081);
+/// ```
+pub fn gaussian(a: f64, b: f64, c: f64, x: f64) -> f64 {
+    a * (-(x - b).powi(2) / (2.0 * c.powi(2))).exp()
+}
+
 /// # Binomial theorem
 /// 
 /// ## Definition
