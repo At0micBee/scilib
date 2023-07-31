@@ -160,15 +160,17 @@ impl Radec {
     /// ```
     pub fn separation(&self, other: &Self) -> f64 {
 
-        // Difference in right ascension
-        let da: f64 = self.ra - other.ra;
+        // Computing all the sinus and cosines
+        let (di_sin, di_cos): (f64, f64) = (self.ra - other.ra).sin_cos();
+        let (sd_sin, sd_cos): (f64, f64) = self.dec.sin_cos();
+        let (od_sin, od_cos): (f64, f64) = other.dec.sin_cos();
 
         //Computing the two top terms
-        let t1: f64 = (other.dec.cos() * da.sin()).powi(2);
-        let t2: f64 = (self.dec.cos() * other.dec.sin() - self.dec.sin() * other.dec.cos() * da.cos()).powi(2);
+        let t1: f64 = (od_cos * di_sin).powi(2);
+        let t2: f64 = (sd_cos * od_sin - sd_sin * od_cos * di_cos).powi(2);
 
         // Computing the bottom term
-        let b: f64 = self.dec.sin() * other.dec.sin() + self.dec.cos() * other.dec.cos() * da.cos();
+        let b: f64 = sd_sin * od_sin + sd_cos * od_cos * di_cos;
 
         let res: f64 = ((t1 + t2).sqrt() / b).atan();
 
