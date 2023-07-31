@@ -131,7 +131,7 @@ pub fn cauchy_cumulative(gamma: f64, x0: f64, x: f64) -> f64 {
 /// # Laplace distribution
 /// 
 /// ## Definition
-/// The [Laplace distribution](https://en.wikipedia.org/wiki/Cauchy_distribution) is a continuous
+/// The [Laplace distribution](https://en.wikipedia.org/wiki/Laplace_distribution) is a continuous
 /// probability distribution. It is defined as:
 /// $$
 /// f_b(\mu, x) = \frac{1}{2b}\exp\left( -\frac{\lvert x -\mu \rvert}{b} \right)
@@ -190,18 +190,59 @@ pub fn laplace_cumulative(b: f64, mu: f64, x: f64) -> f64 {
 /// # Logistic distribution
 /// 
 /// ## Definition
+/// The [Logistic distribution](https://en.wikipedia.org/wiki/Logistic_distribution) is a continuous
+/// probability distribution. It is defined as:
+/// $$
+/// f_s(\mu, x) = \frac{1}{4s}\mathrm{sech}^2\left( \frac{x - \mu}{2s} \right)
+/// $$
 /// 
 /// ## Inputs
+/// - `s`: the scale parameter of the distribution ($s$).
+/// - `mu`: the location of the peak ($\mu$).
+/// - `x`: the point at which to evaluate the function.
+/// 
+/// Returns the density probability at a given point `x` for the `s`
+/// scale parameter centered on `\mu`.
 /// 
 /// ## Example
-pub fn logistic(mu: f64, s: f64, x: f64) -> f64 {
+/// ```
+/// use scilib::math::distribution::logistic;
+/// let res = logistic(0.5, -2.0, 0.9);
+/// assert!((res - 0.006018610975198314).abs() < 1e-15)
+/// ```
+/// 
+/// ![](https://raw.githubusercontent.com/At0micBee/scilib/dev/imgs/distribution/logistic.png)
+pub fn logistic(s: f64, mu: f64, x: f64) -> f64 {
     basic::sech((x - mu) / (2.0 * s)).powi(2) / (4.0 * s)
 }
 
-/* pub fn logistic_vec(mu: f64, s: f64, x: &[f64]) -> Vec<f64> {
-    let frac_1_s2: f64 = 1.0 / (2.0 * s);
-    x.iter().map(|v| frac_1_s2 * basic::sech(frac_1_s2 * (v - mu)).powi(2) / 2.0 ).collect()
-} */
+/// # Cumulative function of the Logistic distribution
+/// 
+/// ## Definition
+/// The cumulative function for Logistic is defined by:
+/// $$
+/// F_s(\mu, x) = \frac{1}{2} + \frac{1}{2}\tanh\left( \frac{x - \mu}{2s} \right)
+/// $$
+/// 
+/// ## Inputs
+/// - `s`: the scale parameter of the distribution ($s$).
+/// - `mu`: the location of the peak ($\mu$).
+/// - `x`: the point at which to evaluate the function.
+/// 
+/// Returns the cumulative density probability at a given point `x` for the `s`
+/// scale parameter centered on `\mu`.
+/// 
+/// ## Example
+/// ```
+/// use scilib::math::distribution::logistic_cumulative;
+/// let res = logistic_cumulative(0.5, -2.0, 0.9);
+/// assert!((res - 0.9969815836752915).abs() < 1e-15)
+/// ```
+/// 
+/// ![](https://raw.githubusercontent.com/At0micBee/scilib/dev/imgs/distribution/logistic_cumulative.png)
+pub fn logistic_cumulative(s: f64, mu: f64, x: f64) -> f64 {
+    0.5 + 0.5 * ((x - mu) / (2.0 * s)).tanh()
+}
 
 /// # Normal function
 /// 
