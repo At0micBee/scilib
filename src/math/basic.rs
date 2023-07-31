@@ -123,7 +123,7 @@ pub fn coth(x: f64) -> f64 {
 /// ## Definition
 /// The hyperbolic secant is defined as:
 /// $$
-/// \sech(x) = \frac{1}{\cosh(x)}
+/// \mathrm{sech}(x) = \frac{1}{\cosh(x)}
 /// $$
 /// 
 /// ## Inputs
@@ -137,7 +137,7 @@ pub fn coth(x: f64) -> f64 {
 /// let x: f64 = 1.2;
 /// let res = sech(x);
 /// assert_eq!(res, 1.0 / x.cosh());
-/// assert!((res - 0.5522861542782047).abs() <= 1e-15);
+/// assert!((res - 0.552286154278204747).abs() <= 1e-15);
 /// assert_eq!(sech(0.0), 1.0);
 /// ```
 pub fn sech(x: f64) -> f64 {
