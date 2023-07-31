@@ -199,7 +199,7 @@ pub fn laplace(b: f64, mu: f64, x: f64) -> f64 {
 /// ![](https://raw.githubusercontent.com/At0micBee/scilib/dev/imgs/distribution/laplace_cumulative.png)
 pub fn laplace_cumulative(b: f64, mu: f64, x: f64) -> f64 {
     assert!(b > 0.0, "The diversity `b` must be greater than zero!");
-    0.5 + 0.5 * (x - mu).signum() * (1.0 - (-(x - mu).abs() / b).exp())
+    0.5 + 0.5 * (1.0 - (-(x - mu).abs() / b).exp()).copysign(x - mu)
 }
 
 /// # Logistic distribution
