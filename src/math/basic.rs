@@ -183,6 +183,33 @@ pub fn gaussian(a: f64, b: f64, c: f64, x: f64) -> f64 {
     a * (-(x - b).powi(2) / (2.0 * c.powi(2))).exp()
 }
 
+/// # Sigmoid function
+/// 
+/// ## Definition
+/// The [sigmoid function](https://en.wikipedia.org/wiki/Sigmoid_function) is defined as:
+/// $$
+/// \sigma(x) = \frac{1}{1 + \exp(-x)} = 1 - \sigma(-x)
+/// $$
+/// 
+/// ## Inputs
+/// - `x`: the value at which to evaluate the function ($x$).
+/// 
+/// Returns the value of the sigmoid function.
+/// 
+/// ## Example
+/// ```
+/// # use scilib::math::basic::sigmoid;
+/// let res1: f64 = sigmoid(-1.0);
+/// let res2: f64 = sigmoid(0.0);
+/// let res_comp: f64 = sigmoid(1.0);
+/// assert!((res1 - 0.26894142136999).abs() < 1.0e-12);
+/// assert_eq!(res2, 0.5);
+/// assert_eq!(res1, 1.0 - res_comp);
+/// ```
+pub fn sigmoid(x: f64) -> f64 {
+    1.0 / (1.0 + (-x).exp())
+}
+
 /// # Binomial theorem
 /// 
 /// ## Definition
