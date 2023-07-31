@@ -93,9 +93,10 @@ where T: Into<f64>, U: Into<f64>, V: Into<f64> {
     let start_f: f64 = start.into();
     let stop_f: f64 = stop.into();
     let base_f: f64 = base.into();
+    let sg: f64 = start_f.signum();
 
     // If the scale includes 0.0, it doesn't work
-    if start_f == 0.0 || stop_f == 0.0 || start_f.signum() != stop_f.signum() {
+    if start_f == 0.0 || stop_f == 0.0 || sg != stop_f.signum() {
         return vec![];
     }
 
@@ -103,7 +104,6 @@ where T: Into<f64>, U: Into<f64>, V: Into<f64> {
         return vec![start_f];
     }
 
-    let sg: f64 = start_f.signum();
     let start_l: f64 = start_f.abs().log(base_f);
     let stop_l: f64 = stop_f.abs().log(base_f);
 
