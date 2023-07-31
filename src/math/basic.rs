@@ -873,10 +873,18 @@ pub fn erfi(val: Complex64) -> Complex64 {
 /// assert_eq!(l5, vec![1, 5, 10, 10, 5, 1]);
 /// ```
 pub fn pascal_triangle(n: usize) -> Vec<usize> {
-    let mut res: Vec<usize> = Vec::with_capacity(n);
 
-    for k in 0..=n {
+    // Vec with the right amount of space
+    let mut res: Vec<usize> = Vec::with_capacity(n + 1);
+
+    // We compute the first half
+    for k in 0..=(n / 2) {
         res.push(binomial(n, k));
+    }
+
+    // Then we mirror the values
+    for k in (1 + n / 2)..=n {
+        res.push(res[n - k]);
     }
 
     res
