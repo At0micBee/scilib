@@ -104,10 +104,16 @@ pub fn sinc(x: f64) -> f64 {
 /// # use scilib::math::basic::coth;
 /// let x = 0.25;
 /// let res = coth(x);
-/// assert!((res - 4.082988165073596).abs() <= 1e-15);
+/// assert!((res - 4.082988165073596568).abs() <= 1e-15);
+/// 
+/// // Works for values close to zero
+/// let sub: f64 = 1.0e-308;
+/// assert!(sub.is_subnormal());
+/// assert_eq!(coth(f64::MIN_POSITIVE), f64::INFINITY);
+/// assert_eq!(coth(sub), f64::INFINITY);
 /// ```
 pub fn coth(x: f64) -> f64 {
-    assert!(x != 0.0);              // Undefined for 0
+    assert!(x != 0.0, "`coth` is undefined for 0!");    // Undefined for 0
     let e: f64 = (2.0 * x).exp();
     (e + 1.0) / (e - 1.0)
 }
