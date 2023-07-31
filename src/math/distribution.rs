@@ -39,7 +39,7 @@ use super::basic;           // Using the basic functions
 /// 
 /// ![](https://raw.githubusercontent.com/At0micBee/scilib/dev/imgs/distribution/rayleigh.png)
 pub fn rayleigh(sigma: f64, x: f64) -> f64 {
-    assert!(x >= 0.0);  // Rayleigh needs to be positive
+    assert!(x >= 0.0, "Rayleigh distribution exists only for positive `x`!");   // Rayleigh needs to be positive
     x * ( -0.5 * (x / sigma).powi(2) ).exp() / sigma.powi(2)
 }
 
@@ -67,7 +67,7 @@ pub fn rayleigh(sigma: f64, x: f64) -> f64 {
 /// 
 /// ![](https://raw.githubusercontent.com/At0micBee/scilib/dev/imgs/distribution/rayleigh_cumulative.png)
 pub fn rayleigh_cumulative(sigma: f64, x: f64) -> f64 {
-    assert!(x >= 0.0);  // Rayleigh needs to be positive
+    assert!(x >= 0.0, "Rayleigh distribution exists only for positive `x`!");   // Rayleigh needs to be positive
     1.0 - (-0.5 * (x / sigma).powi(2)).exp()
 }
 
@@ -131,12 +131,60 @@ pub fn cauchy_cumulative(gamma: f64, x0: f64, x: f64) -> f64 {
 /// # Laplace distribution
 /// 
 /// ## Definition
+/// The [Laplace distribution](https://en.wikipedia.org/wiki/Cauchy_distribution) is a continuous
+/// probability distribution. It is defined as:
+/// $$
+/// f_b(\mu, x) = \frac{1}{2b}\exp\left( -\frac{\lvert x -\mu \rvert}{b} \right)
+/// $$
 /// 
 /// ## Inputs
+/// - `b`: the diversity of the distribution ($b$).
+/// - `mu`: the location of the peak ($\mu$).
+/// - `x`: the point at which to evaluate the function.
+/// 
+/// Returns the density probability at a given point `x` for the `b`
+/// diversity parameter centered on `\mu`.
 /// 
 /// ## Example
+/// ```
+/// use scilib::math::distribution::laplace;
+/// let res = laplace(0.5, -2.0, 0.9);
+/// assert!((res - 0.0030275547453758153).abs() < 1e-15)
+/// ```
+/// 
+/// ![](https://raw.githubusercontent.com/At0micBee/scilib/dev/imgs/distribution/laplace.png)
 pub fn laplace(b: f64, mu: f64, x: f64) -> f64 {
+    assert!(b > 0.0, "The diversity `b` must be greater than zero!");
     (-(x - mu).abs() / b).exp() / (2.0 * b)
+}
+
+/// # Cumulative function of the Laplace distribution
+/// 
+/// ## Definition
+/// The cumulative function for Laplace is defined by:
+/// $$
+/// F_b(\mu, x) = \frac{1}{2} + \frac{\mathrm{sgn}(x-\mu)}{2} \left( 1 - \exp\left( -\frac{\lvert x -\mu \rvert}{b} \right) \right)
+/// $$
+/// 
+/// ## Inputs
+/// - `b`: the diversity of the distribution ($b$).
+/// - `mu`: the location of the peak ($\mu$).
+/// - `x`: the point at which to evaluate the function.
+/// 
+/// Returns the cumulative density probability at a given point `x` for the `b`
+/// diversity parameter centered on `\mu`.
+/// 
+/// ## Example
+/// ```
+/// use scilib::math::distribution::laplace_cumulative;
+/// let res = laplace_cumulative(0.5, -2.0, 0.9);
+/// assert!((res - 0.9984862226273121).abs() < 1e-15)
+/// ```
+/// 
+/// ![](https://raw.githubusercontent.com/At0micBee/scilib/dev/imgs/distribution/laplace_cumulative.png)
+pub fn laplace_cumulative(b: f64, mu: f64, x: f64) -> f64 {
+    assert!(b > 0.0, "The diversity `b` must be greater than zero!");
+    0.5 + 0.5 * (x - mu).signum() * (1.0 - (-(x - mu).abs() / b).exp())
 }
 
 /// # Logistic distribution
