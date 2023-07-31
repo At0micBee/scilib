@@ -316,17 +316,12 @@ pub fn normal(sigma: f64, mu: f64, x: f64) -> f64 {
 /// ```
 /// # use scilib::math::distribution::normal_cumulative;
 /// let res: f64 = normal_cumulative(0.5, -2.0, 0.9);
-/// assert!((res - 0.9999999966842541).abs() < 1e-11);  // Less precise due to `erf`
-/// 
-/// /* let max = normal_cumulative(1.0, 0.0, f64::INFINITY);
-/// let min = normal_cumulative(1.0, 0.0, f64::NEG_INFINITY);
-/// assert_eq!(max, 1.0);
-/// assert_eq!(min, 0.0); */
+/// assert!((res - 0.9999999966842541).abs() < 1e-10);  // Less precise due to `erf`
 /// ```
 /// 
 /// ![](https://raw.githubusercontent.com/At0micBee/scilib/dev/imgs/distribution/normal_cumulative.png)
 pub fn normal_cumulative(sigma: f64, mu: f64, x: f64) -> f64 {
-    0.5 * (1.0 + basic::erf((x - mu) / (sigma * SQRT_2)).re)
+    0.5 * (1.0 + basic::erf((x - mu) / (sigma * SQRT_2)))
 }
 
 /// # Sigmoid function

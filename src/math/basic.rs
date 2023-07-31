@@ -802,11 +802,6 @@ where T: Into<f64> + Copy, U: Into<f64> + Copy {
 /// \mathrm{erf}(z) = \frac{2}{\sqrt{\pi}}\int_{0}^{z}\exp(-t^2)dt
 /// $$
 /// 
-/// We define the error function for complex number.
-/// 
-/// WARNING: the erf function will soon become f64 only, moving the erf function for complex as a
-/// complex function directly.
-/// 
 /// ## Inputs
 /// - `val`: the point at which to evaluate the function ($z$)
 /// 
@@ -814,50 +809,48 @@ where T: Into<f64> + Copy, U: Into<f64> + Copy {
 /// 
 /// ## Example
 /// ```
-/// # use num_complex::Complex64;
 /// # use scilib::math::basic::erf;
-/// let r = erf(2.1);
-/// let c = erf(Complex64::new(-0.1, 0.7));
-/// assert!((r.re - 0.997021).abs() < 1.0e-5);
-/// assert!((c.re - -0.18297754).abs() < 1.0e-5 && (c.im - 0.92747498).abs() < 1.0e-5);
+/// let zero = erf(0.0);
+/// let v1 = erf(-0.5);
+/// let v2 = erf(2.1);
+/// let large = erf(f64::INFINITY);
+/// assert_eq!(zero, 0.0);
+/// assert!((v1 - -0.520499877813046537).abs() < 1e-12);
+/// assert!((v2 - 0.997020533343667014).abs() < 1e-12);
+/// assert_eq!(large, 1.0);
 /// ```
-pub fn erf<T>(val: T) -> Complex64
-where T: Into<Complex64> {
+pub fn erf(x: f64) -> f64 {
 
-    let x: Complex64 = val.into();
-    
-    // If the term is too small we exit
-    if x.norm() < PRECISION {
-        return 0.0.into();
+    if x.abs() > 4.86431 {                      // Empirical limit of the series
+        return x.signum();                      // Returning -1.0 or 1.0, depending on sign
     }
 
-    let mut n: f64 = 0.0;                   // Index of iteration
-    let mut d1: f64 = 1.0;                  // First div
-    let mut d2: f64;                        // Second div
-    let mut sg: f64 = 1.0;                  // Sign of the term
-    
-    let mut term: Complex64 = x;            // Term at each iter
-    let mut res: Complex64 = 0.0.into();    // Result
-    let mut counter: usize = 0;
+    let squared: f64 = - x.powi(2);             // x^2
+    let mut term: f64;                          // The term for accumulation in the sum
+    let mut sum: f64 = x;                       // The sum
+    let mut prod: f64;                          // The product
+    let mut n = 0;                              // Iteration counter
 
-    'convergence: while counter < MAX_ITER {
+    'convergence: while n < MAX_ITER {
 
-        counter += 1;
-        res += term;
+        n += 1;                                 // Incrementing counter
+        prod = 1.0;                             // Resetting product
+        term = x / (2 * n + 1) as f64;          // Product for current n
 
-        // We exit when convergence reaches the precision
-        if (term / res).norm() < PRECISION {
-            break 'convergence;
+        for k in 1..=n {
+            prod *= squared / k as f64;         // Computing the product
         }
 
-        n += 1.0;
-        sg *= -1.0;
-        d1 *= n;
-        d2 = 2.0 * n + 1.0;
-        term = sg * x.powf(d2) / (d1 * d2);
-    }
+        term *= prod;                           // Updating term
+        sum += term;                            // Updating sum
 
-    FRAC_2_SQRT_PI * res
+        // If the term has reached the given precision, we break
+        if (term / sum).abs() < PRECISION {
+            break 'convergence;
+        }
+    }
+    
+    FRAC_2_SQRT_PI * sum                        // Multiplying with the constant
 }
 
 /// # Complementary error function
@@ -875,15 +868,53 @@ where T: Into<Complex64> {
 /// 
 /// ## Example
 /// ```
-/// # use num_complex::Complex64;
 /// # use scilib::math::basic::erfc;
-/// let c = Complex64::new(1.25, 0.3);
-/// let res = erfc(c);
-/// assert!((res.re - 0.0505570).abs() < 1.0e-5 && (res.im - -0.0663174).abs() < 1.0e-5);
+/// let one = erfc(0.0);
+/// let v1 = erfc(-0.5);
+/// let v2 = erfc(2.1);
+/// let large = erfc(f64::INFINITY);
+/// assert_eq!(one, 1.0);
+/// assert!((v1 - 1.520499877813046537).abs() < 1e-12);
+/// assert!((v2 - 0.002979466656332985).abs() < 1e-12);
+/// assert_eq!(large, 0.0);
 /// ```
-pub fn erfc<T>(val: T) -> Complex64
-where T: Into<Complex64> {
-    Complex64::new(1.0, 0.0) - erf(val)
+pub fn erfc(x: f64) -> f64 {
+    1.0 - erf(x)
+}
+
+pub fn erf_complex(x: Complex64) -> Complex64 {
+
+    let squared: Complex64 = - x.powi(2);             // x^2
+    let mut term: Complex64;                          // The term for accumulation in the sum
+    let mut sum: Complex64 = x;                       // The sum
+    let mut prod: Complex64;                          // The product
+    let mut n = 0;                                     // Iteration counter
+
+    'convergence: while n < MAX_ITER {
+
+        n += 1;                                 // Incrementing counter
+        prod = Complex64::new(1.0, 0.0);                             // Resetting product
+        term = x / (2 * n + 1) as f64;          // Product for current n
+
+        for k in 1..=n {
+            prod *= squared / k as f64;         // Computing the product
+        }
+
+        term *= prod;                           // Updating term
+        sum += term;                            // Updating sum
+
+        // If the term has reached the given precision, we break
+        if (term / sum).norm() < PRECISION {
+            break 'convergence;
+        }
+    }
+    
+    FRAC_2_SQRT_PI * sum                        // Multiplying with the constant
+}
+
+
+pub fn erfc_complex<T>(val: Complex64) -> Complex64 {
+    Complex64::new(1.0, 0.0) - erf_complex(val)
 }
 
 /// # Imaginary error function
@@ -907,9 +938,8 @@ where T: Into<Complex64> {
 /// let res = erfi(c);
 /// assert!((res.re - 0.02349883).abs() < 1.0e-5 && (res.im - -0.88201955).abs() < 1.0e-5);
 /// ```
-pub fn erfi<T>(val: T) -> Complex64
-where T: Into<Complex64> {
-    -Complex64::i() * erf(Complex64::i() * val.into())
+pub fn erfi<T>(val: Complex64) -> Complex64 {
+    -Complex64::i() * erf_complex(Complex64::i() * val)
 }
 
 /// # Exponential integral
