@@ -382,7 +382,7 @@ pub fn jf<T, U>(x: T, order: U) -> Complex64
         sg *= -1.0;                     // changing the sign of the term
         d1 *= k;                        // Next value in the n! term
         d2 *= n + k;                    // Next value in the gamma(n+k+1) term
-        term = sg * x2.powf(n + 2.0 * k) / (d1 * d2);
+        term = sg * x2.powf(k.mul_add(2.0, n)) / (d1 * d2);
     }
 
     res
@@ -515,7 +515,7 @@ where T: Into<Complex64>, U: Into<f64> + Copy {
         k += 1.0;                       // Incrementing value
         d1 *= k;                        // Next value in the n! term
         d2 *= n + k;                    // Next value in the gamma(n+k+1) term
-        term = x2.powf(n + 2.0 * k) / (d1 * d2);
+        term = x2.powf(k.mul_add(2.0, n)) / (d1 * d2);
     }
 
     res
