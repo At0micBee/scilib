@@ -23,6 +23,9 @@ const PRECISION: f64 = 1.0e-12;
 /// Stieltjes gamma computation precision
 const STIELTJES_M: usize = 1_000_000;
 
+/// Maximum iteration count for convergence
+const MAX_ITER: usize = 200;
+
 /// Sum initialization for ln(gamma)
 const GAMMA_INIT: f64 = 0.999999999999997092;
 
@@ -822,6 +825,11 @@ pub fn erf<T>(val: T) -> Complex64
 where T: Into<Complex64> {
 
     let x: Complex64 = val.into();
+    
+    // If the term is too small we exit
+    if x.norm() < PRECISION {
+        return 0.0.into();
+    }
 
     let mut n: f64 = 0.0;                   // Index of iteration
     let mut d1: f64 = 1.0;                  // First div
@@ -830,13 +838,11 @@ where T: Into<Complex64> {
     
     let mut term: Complex64 = x;            // Term at each iter
     let mut res: Complex64 = 0.0.into();    // Result
+    let mut counter: usize = 0;
 
-    // If the term is too small we exit
-    if term.norm() < PRECISION {
-        return res;
-    }
+    'convergence: while counter < MAX_ITER {
 
-    'convergence: loop {
+        counter += 1;
         res += term;
 
         // We exit when convergence reaches the precision
