@@ -938,7 +938,7 @@ pub fn erfc_complex<T>(val: Complex64) -> Complex64 {
 /// let res = erfi(c);
 /// assert!((res.re - 0.02349883).abs() < 1.0e-5 && (res.im - -0.88201955).abs() < 1.0e-5);
 /// ```
-pub fn erfi<T>(val: Complex64) -> Complex64 {
+pub fn erfi(val: Complex64) -> Complex64 {
     -Complex64::i() * erf_complex(Complex64::i() * val)
 }
 
