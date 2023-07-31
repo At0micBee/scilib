@@ -11,7 +11,7 @@ use std::f64::consts::{
 };
 
 use super::basic;           // Using the basic functions
-          
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # Rayleigh distribution
@@ -34,7 +34,7 @@ use super::basic;           // Using the basic functions
 /// ```
 /// # use scilib::math::distribution::rayleigh;
 /// let res = rayleigh(0.5, 0.9);
-/// assert!((res - 0.7124353167010128).abs() < 1e-15);
+/// assert!((res - 0.7124353167010128).abs() < f64::EPSILON);
 /// ```
 /// 
 /// ![](https://raw.githubusercontent.com/At0micBee/scilib/dev/imgs/distribution/rayleigh.png)
@@ -62,7 +62,12 @@ pub fn rayleigh(sigma: f64, x: f64) -> f64 {
 /// ```
 /// # use scilib::math::distribution::rayleigh_cumulative;
 /// let res = rayleigh_cumulative(0.5, 0.9);
-/// assert!((res - 0.8021013009163853).abs() < 1e-15);
+/// assert!((res - 0.8021013009163853).abs() < f64::EPSILON);
+/// 
+/// let max = rayleigh_cumulative(1.0, f64::INFINITY);
+/// let min = rayleigh_cumulative(1.0, 0.0);
+/// assert_eq!(max, 1.0);
+/// assert_eq!(min, 0.0);
 /// ```
 /// 
 /// ![](https://raw.githubusercontent.com/At0micBee/scilib/dev/imgs/distribution/rayleigh_cumulative.png)
@@ -92,7 +97,7 @@ pub fn rayleigh_cumulative(sigma: f64, x: f64) -> f64 {
 /// ```
 /// use scilib::math::distribution::cauchy;
 /// let res = cauchy(0.5, -2.0, 0.9);
-/// assert!((res - 0.018378168948255814).abs() < 1e-15)
+/// assert!((res - 0.018378168948255814).abs() < f64::EPSILON)
 /// ```
 /// 
 /// ![](https://raw.githubusercontent.com/At0micBee/scilib/dev/imgs/distribution/cauchy.png)
@@ -120,7 +125,12 @@ pub fn cauchy(gamma: f64, x0: f64, x: f64) -> f64 {
 /// ```
 /// use scilib::math::distribution::cauchy_cumulative;
 /// let res = cauchy_cumulative(0.5, -2.0, 0.9);
-/// assert!((res - 0.9456532942677374).abs() < 1e-15)
+/// assert!((res - 0.9456532942677374).abs() < f64::EPSILON);
+/// 
+/// let max = cauchy_cumulative(1.0, 0.0, f64::INFINITY);
+/// let min = cauchy_cumulative(1.0, 0.0, f64::NEG_INFINITY);
+/// assert_eq!(max, 1.0);
+/// assert_eq!(min, 0.0);
 /// ```
 /// 
 /// ![](https://raw.githubusercontent.com/At0micBee/scilib/dev/imgs/distribution/cauchy_cumulative.png)
@@ -149,7 +159,7 @@ pub fn cauchy_cumulative(gamma: f64, x0: f64, x: f64) -> f64 {
 /// ```
 /// use scilib::math::distribution::laplace;
 /// let res = laplace(0.5, -2.0, 0.9);
-/// assert!((res - 0.0030275547453758153).abs() < 1e-15)
+/// assert!((res - 0.0030275547453758153).abs() < f64::EPSILON)
 /// ```
 /// 
 /// ![](https://raw.githubusercontent.com/At0micBee/scilib/dev/imgs/distribution/laplace.png)
@@ -178,7 +188,12 @@ pub fn laplace(b: f64, mu: f64, x: f64) -> f64 {
 /// ```
 /// use scilib::math::distribution::laplace_cumulative;
 /// let res = laplace_cumulative(0.5, -2.0, 0.9);
-/// assert!((res - 0.9984862226273121).abs() < 1e-15)
+/// assert!((res - 0.9984862226273121).abs() < f64::EPSILON);
+/// 
+/// let max = laplace_cumulative(1.0, 0.0, f64::INFINITY);
+/// let min = laplace_cumulative(1.0, 0.0, f64::NEG_INFINITY);
+/// assert_eq!(max, 1.0);
+/// assert_eq!(min, 0.0);
 /// ```
 /// 
 /// ![](https://raw.githubusercontent.com/At0micBee/scilib/dev/imgs/distribution/laplace_cumulative.png)
@@ -208,7 +223,7 @@ pub fn laplace_cumulative(b: f64, mu: f64, x: f64) -> f64 {
 /// ```
 /// use scilib::math::distribution::logistic;
 /// let res = logistic(0.5, -2.0, 0.9);
-/// assert!((res - 0.006018610975198314).abs() < 1e-15)
+/// assert!((res - 0.006018610975198314).abs() < f64::EPSILON)
 /// ```
 /// 
 /// ![](https://raw.githubusercontent.com/At0micBee/scilib/dev/imgs/distribution/logistic.png)
@@ -236,7 +251,12 @@ pub fn logistic(s: f64, mu: f64, x: f64) -> f64 {
 /// ```
 /// use scilib::math::distribution::logistic_cumulative;
 /// let res = logistic_cumulative(0.5, -2.0, 0.9);
-/// assert!((res - 0.9969815836752915).abs() < 1e-15)
+/// assert!((res - 0.9969815836752915).abs() < f64::EPSILON);
+/// 
+/// let max = logistic_cumulative(1.0, 0.0, f64::INFINITY);
+/// let min = logistic_cumulative(1.0, 0.0, f64::NEG_INFINITY);
+/// assert_eq!(max, 1.0);
+/// assert_eq!(min, 0.0);
 /// ```
 /// 
 /// ![](https://raw.githubusercontent.com/At0micBee/scilib/dev/imgs/distribution/logistic_cumulative.png)
@@ -265,7 +285,7 @@ pub fn logistic_cumulative(s: f64, mu: f64, x: f64) -> f64 {
 /// ```
 /// # use scilib::math::distribution::normal;
 /// let res: f64 = normal(0.5, -2.0, 0.9);
-/// assert!((res - 3.9546392812489344e-08).abs() < 1e-23);
+/// assert!((res - 3.9546392812489344e-08).abs() < f64::EPSILON);
 /// ```
 /// 
 /// ![](https://raw.githubusercontent.com/At0micBee/scilib/dev/imgs/distribution/normal.png)
@@ -296,7 +316,12 @@ pub fn normal(sigma: f64, mu: f64, x: f64) -> f64 {
 /// ```
 /// # use scilib::math::distribution::normal_cumulative;
 /// let res: f64 = normal_cumulative(0.5, -2.0, 0.9);
-/// assert!((res - 0.9999999966842541).abs() < 1e-11);
+/// assert!((res - 0.9999999966842541).abs() < 1e-11);  // Less precise due to `erf`
+/// 
+/// /* let max = normal_cumulative(1.0, 0.0, f64::INFINITY);
+/// let min = normal_cumulative(1.0, 0.0, f64::NEG_INFINITY);
+/// assert_eq!(max, 1.0);
+/// assert_eq!(min, 0.0); */
 /// ```
 /// 
 /// ![](https://raw.githubusercontent.com/At0micBee/scilib/dev/imgs/distribution/normal_cumulative.png)
