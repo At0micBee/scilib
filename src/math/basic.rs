@@ -137,10 +137,11 @@ pub fn coth(x: f64) -> f64 {
 /// let x: f64 = 1.2;
 /// let res = sech(x);
 /// assert_eq!(res, 1.0 / x.cosh());
-/// assert!((res - 0.5522861542782047).abs() <= 1e-15)
+/// assert!((res - 0.5522861542782047).abs() <= 1e-15);
+/// assert_eq!(sech(0.0), 1.0);
 /// ```
 pub fn sech(x: f64) -> f64 {
-    1.0 / x.cosh()
+    x.cosh().recip()
 }
 
 /// # Hyperbolic cosecant
