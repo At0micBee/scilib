@@ -70,13 +70,19 @@ const GAMMA_COEFS: [f64; 14] = [
 /// 
 /// // Comparing to tabulated values
 /// assert_eq!(x, 1.0);
-/// assert!((y - 0.776699238306) < 1.0e-12);
+/// assert!((y - 0.776699238306021958) < f64::EPSILON);
+/// 
+/// // Works for values close to zero
+/// let sub: f64 = 1.0e-308;
+/// assert!(sub.is_subnormal());
+/// assert_eq!(sinc(f64::MIN_POSITIVE), 1.0);
+/// assert_eq!(sinc(sub), 1.0);
 /// ```
 pub fn sinc(x: f64) -> f64 {
-    if x == 0.0 {
-        1.0
-    } else {
+    if x != 0.0 {
         x.sin() / x
+    } else {
+        1.0
     }
 }
 
