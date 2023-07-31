@@ -149,25 +149,25 @@ pub fn sech(x: f64) -> f64 {
 /// ## Definition
 /// The hyperbolic cosecant is defined as:
 /// $$
-/// \sech(x) = \frac{1}{\sinh(x)}
+/// \mathrm{csch}(x) = \frac{1}{\sinh(x)}
 /// $$
 /// 
 /// ## Inputs
 /// - `x`: the value at which to evaluate the function ($x$).
 /// 
-/// Returns the sech value of `x`.
+/// Returns the csch value of `x`.
 /// 
 /// ## Example
 /// ```
 /// # use scilib::math::basic::csch;
-/// let x: f64 = 1.2;
+/// let x: f64 = -1.2;
 /// let res = csch(x);
 /// assert_eq!(res, 1.0 / x.sinh());
-/// assert!((res - 0.6624879771943154).abs() <= 1e-15)
+/// assert!((res - -0.662487977194315480).abs() <= 1e-15);
 /// ```
 pub fn csch(x: f64) -> f64 {
-    assert!(x != 0.0);              // Undefined for 0
-    1.0 / x.sinh()
+    assert!(x != 0.0, "`csch` is undefined for 0!");    // Undefined for 0
+    x.sinh().recip()
 }
 
 /// # Gaussian function
