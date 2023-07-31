@@ -321,7 +321,7 @@ pub fn simpson(x: &[f64], y: &[f64]) -> f64 {
 
     assert!(
         x.len() == y.len() && x.len() >= 3 && x.len() % 2 == 1,
-        "`x.len()` and `y.len()` must be equals and `x.len()` must be an uneven number greater than 3!"
+        "`x.len()` and `y.len()` must be equals, and be an odd number greater than 3!"
     );
 
     (0..(x.len() - 1)).step_by(2).fold(0.0, |sum, idx| {
@@ -426,7 +426,7 @@ pub fn tuple_simpson(data: &[(f64, f64)]) -> f64 {
 
     assert!(
         data.len() >= 3 && data.len() % 2 == 1,
-        "size of data paramater must be an uneven number greater than 3!"
+        "size of data parameter must be an uneven number greater than 3!"
     );
 
     (0..(data.len() - 1)).step_by(2).fold(0.0, |sum, idx| {
