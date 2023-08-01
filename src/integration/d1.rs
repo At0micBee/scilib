@@ -49,7 +49,7 @@ fn chunk_simp(
         p2: (f64 /*a2*/, f64 /*b2*/),
     ) -> f64 {
 
-    (p2.0 - p0.0) / 6.0 * (p0.1 + 4.0 * p1 + p2.1)
+    p1.mul_add(4.0, p0.1 + p2.1) * (p2.0 - p0.0) / 6.0
 }
 
 #[inline(always)]
@@ -61,8 +61,12 @@ fn chunk_simp_dt(
 
     let h0 = p1.0 - p0.0;
     let h1 = p2.0 - p1.0;
-    
-    (h0 + h1) / 6.0 * ((2.0 - h1 / h0) * p0.1 + (h0 + h1).powi(2) / (h0 * h1) * p1.1 + (2.0 - h0 / h1) * p2.1)
+
+    (h0 + h1) * (
+        (2.0 - h1 / h0) * p0.1 
+        + (h0 + h1).powi(2) * p1.1 / (h0 * h1)
+        + (2.0 - h0 / h1) * p2.1
+    ) / 6.0
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,7 +111,7 @@ pub fn fn_rectangle(
     let step = (upper_bound - lower_bound) / div as f64;
     
     (0..div).fold(0.0, |sum, idx| {
-        sum + chunk_rect(function(step * (idx as f64) + lower_bound), step)
+        sum + chunk_rect(function( step.mul_add(idx as f64, lower_bound) ), step)
     })
 }
 
@@ -151,7 +155,7 @@ pub fn fn_trapeze(
     let mut upper: f64 = lower;
 
     (0..div).fold(0.0, |mut sum, idx| {
-        upper = function(step * (idx as f64 + 1.0) + lower_bound);
+        upper = function(step.mul_add(idx as f64 + 1.0, lower_bound));
         sum += chunk_trapz(lower, upper, step);
         lower = upper;
         sum
@@ -183,7 +187,7 @@ pub fn fn_trapeze(
 /// ```
 /// # use scilib::integration::d1::*;
 /// let res = fn_simpson(|x| x.exp(), -2.0, 10.0, 1000);
-/// assert!((res - 22026.330459).abs() < 1.0e-4);
+/// assert!((res - 22026.330459).abs() < 1.0e-5);
 /// ```
 pub fn fn_simpson(
         function: impl Fn(f64) -> f64,
@@ -203,7 +207,7 @@ pub fn fn_simpson(
     let mut curr_pos: f64 = 0.0;
 
     (0..div).step_by(2).fold(0.0, |mut sum, idx| {
-        curr_pos = lower_bound + (idx + 2) as f64 * step;
+        curr_pos = step.mul_add((idx + 2) as f64, lower_bound);
         p2 = (curr_pos, function(curr_pos));
         sum += chunk_simp(p0, function((p0.0 + p2.0) / 2.0), p2);
         p0 = p2;
