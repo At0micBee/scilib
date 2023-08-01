@@ -19,10 +19,11 @@
 //! 
 //! ```rust
 //! # use num_complex::Complex64;
-//! # use scilib::math::bessel::{ j, jf };
+//! # use scilib::math::bessel::{ j_n, j_nu };
+//! let f: f64 = 1.1;
 //! let c = Complex64::new(-0.75, 3.0);
-//! let res_i = j(c, 1);                // Faster for integer order
-//! let res_f = jf(c, 1.5);             // Would also work with 1.0
+//! let res_i = j_n(1, f);                  // Faster for integer order
+//! let res_f = j_nu(1.5, c);               // Would also work with 1.0
 //! ```
 //! 
 //! ## Second kind: $Y_n$
@@ -191,7 +192,7 @@ use num_complex::Complex64; // Using complex numbers from the num crate
 /// # Precision limit for Bessel computation
 const PRECISION_CONVERGENCE: f64 = 1.0e-8;
 
-const MAX_ITER_J: usize = 200;
+const MAX_ITER_J: i32 = 200;
 
 /// # Limit when computing Bessel Y
 const DISTANCE_Y_LIM: f64 = 1e-4;
@@ -201,104 +202,100 @@ const PACK: usize = 50;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/// # $J$ Bessel function, integer index
+/// # $J_n$ Bessel function (integer order)
 /// 
 /// ## Definition
-/// The $J$ Bessel represent the first kind of Bessel function, and are solution to Bessel differential equation,
+/// The $J_n$ Bessel represent the first kind of Bessel function, and are solution to Bessel differential equation,
 /// and is defined as follows:
 /// $$
-/// J_\alpha(x) = \sum_{m=0}^{\infty}\frac{(-1)^m}{m!\Gamma(m+\alpha+1)}\left( \frac{x}{2} \right)^{2p+\alpha}
+/// J_n(x) = \sum_{k=0}^{\infty}\frac{(-1)^k}{k!(k+n)!}\left( \frac{x}{2} \right)^{2k+n}
 /// $$
+/// For any integer order `n`. Since for any real input, an integer order will also yield a real output,
+/// this function is defined only for `f64`. For a complex input, see the `j_nu` function.
 /// 
 /// The bessel function depend on an infinite sum of terms; which we can't have.
 /// The criterion chosen here is check each new term impacts the results significantly enough.
 /// The default value selected in the program is defined by `const PRECISION_CONVERGENCE: f64 = 1.0e-8;`.
+/// There is additionally a max limit on iteration, to avoid potential infinite loops in critical
+/// values of the functions.
 ///
 /// ## Inputs
-/// - `x`: the value to evaluate ($x$)
 /// - `n`: the order of the function ($n$)
+/// - `x`: the value to evaluate ($x$)
 /// 
-/// Returns the value of the $n^{th}$ order of the Bessel $J$ function at $x$.
+/// Returns the value of the $n^{th}$ order of the Bessel $J_n$ function at $x$.
 /// 
 /// ## Example
 /// ```
-/// # use num_complex::Complex64;
-/// # use scilib::math::bessel::j;
+/// # use scilib::math::bessel::j_n;
 /// // Computing some example values
-/// let res_00: Complex64 = j(0.0, 0);
-/// let res_01: Complex64 = j(1.0, 0);
-/// let res_10: Complex64 = j(0.0, 1);
-/// let res_11: Complex64 = j(1.0, 1);
-/// let res_20: Complex64 = j(0.0, 2);
-/// let res_21: Complex64 = j(1.0, 2);
-/// let res: Complex64 = j(5.2, 7);
+/// let res_00 = j_n(0, 0.0);
+/// let res_01 = j_n(0, 1.0);
+/// let res_10 = j_n(1, 0.0);
+/// let res_11 = j_n(1, 1.0);
+/// let res_20 = j_n(2, 0.0);
+/// let res_21 = j_n(2, 1.0);
+/// let res = j_n(7, 5.2);
 /// 
 /// // Comparing to tabulated data
-/// assert_eq!(res_00, 1.0.into());
-/// assert!((res_01.re - 0.7651976865).abs() < 1.0e-8);
-/// assert_eq!(res_10, 0.0.into());
-/// assert!((res_11.re - 0.44005058).abs() < 1.0e-8);
-/// assert_eq!(res_20, 0.0.into());
-/// assert!((res_21.re - 0.11490348).abs() < 1.0e-8);
-/// assert!((res.re - 0.06544728).abs() < 1.0e-8);
+/// assert_eq!(res_00, 1.0);
+/// assert!((res_01 - 0.7651976865).abs() < 1.0e-8);
+/// assert_eq!(res_10, 0.0);
+/// assert!((res_11 - 0.44005058).abs() < 1.0e-8);
+/// assert_eq!(res_20, 0.0);
+/// assert!((res_21 - 0.11490348).abs() < 1.0e-8);
+/// assert!((res - 0.06544728).abs() < 1.0e-8);
 /// 
 /// // The function also handles negative orders
-/// let pos1: Complex64 = j(3.2, 3);
-/// let neg1: Complex64 = j(3.2, -3);
-/// let pos2: Complex64 = j(2.45, 6);
-/// let neg2: Complex64 = j(2.45, -6);
+/// let pos1 = j_n(3, 3.2);
+/// let neg1 = j_n(-3, 3.2);
+/// let pos2 = j_n(6, 2.45);
+/// let neg2 = j_n(-6, 2.45);
 /// 
 /// assert!(pos1 == -neg1);
 /// assert!(pos2 == neg2);
-/// 
-/// // The input is treated as complex
-/// let c: Complex64 = Complex64::new(1.0, 2.5);
-/// let res: Complex64 = j(c, 2);
 /// ```
-pub fn j<T: Into<Complex64>>(x: T, n: i32) -> Complex64 {
+pub fn j_n(n: i32, x: f64) -> f64 {
 
     let np: i32 = n.abs();                                      // Getting the positive value of n
-    let x2: Complex64 = x.into() / 2.0;                         // Halving x
+    let x2: f64 = x / 2.0;                                      // Halving x
     let mut k: i32 = 0;                                         // Order counter
     let mut d1: f64 = 1.0;                                      // First div
     let mut d2: f64 = basic::factorial(np as usize) as f64;     // Second div
-    let mut sg: f64 = 1.0;                                      // Sign of the term
 
-    let mut term: Complex64 = x2.powi(np) / d2;                 // The term at each step
-    let mut res: Complex64 = Complex64::default();              // The result of the operation
-    let mut counter: usize = 0;
+    let mut term: f64 = x2.powi(np) / d2;                       // The term at each step
+    let mut sum: f64 = f64::default();                          // The result of the operation
 
     // If the first term is already too small we exit directly
-    if term.norm() < PRECISION_CONVERGENCE {
-        return res;
+    if term.abs() < PRECISION_CONVERGENCE {
+        return sum;
     }
 
     // Computing the terms of the infinite series
-    'convergence: while counter < MAX_ITER_J {
-        
-        counter += 1;
-        res += term;
+    'convergence: while k < MAX_ITER_J {
+
+        sum += term;                                            // Updating the sum
 
         // If the changed compared to the final value is small we break
-        if (term / res).norm() < PRECISION_CONVERGENCE {
+        if (term / sum).abs() < PRECISION_CONVERGENCE {
             break 'convergence;
         }
 
-        k += 1;                         // Incrementing value
-        sg *= -1.0;                     // changing the sign of the term
-        d1 *= k as f64;                 // Next value in the n! term
-        d2 *= (np + k) as f64;          // Next value in the (n+k)! term
-        term = sg * x2.powi(np + 2 * k) / (d1 * d2);
+        k += 1;                                                 // Incrementing value, and flipping sign
+        d1 *= -k as f64;                                        // Next value in the n! term
+        d2 *= (np + k) as f64;                                  // Next value in the (n+k)! term
+        term = x2.powi(np + 2 * k) / (d1 * d2);                 // Updating the sum term
     }
 
-    if n.is_negative() {
-        (-1.0_f64).powi(np) * res
+    // If n < 0 and is odd, we need to multiply by -1
+    if n.is_negative() && np.rem_euclid(2) == 1 {
+        -1.0 * sum
     } else {
-        res
+        sum
     }
 }
 
-/// # $J$ Bessel function, real index
+/// # $J_nu$ Bessel function (real order)
 /// 
 /// ## Definition
 /// $$
@@ -307,52 +304,47 @@ pub fn j<T: Into<Complex64>>(x: T, n: i32) -> Complex64 {
 /// 
 /// Similar to the other J Bessel method, but this one allows the use of a real (float) index, rather
 /// than an integer. This method is more costly to use than the other, and thus isn't recommended for
-/// integer orders. The function tries to prevent this by trying to fall back on the integer order version
-/// when possible, but could fail in edge cases.
+/// integer orders. Since non-integer order can yield complex values, the input and output of the
+/// function are defined as so.
 ///
 /// ## Inputs
-/// - `x`: the value to evaluate ($x$)
 /// - `order`: order of the function ($\alpha$)
+/// - `x`: the value to evaluate ($x$)
 /// 
 /// Returns the value of the real order of the Bessel $J$ function at $x$.
 /// 
 /// ## Example
 /// ```
 /// # use num_complex::Complex64;
-/// # use scilib::math::bessel::{ j, jf };
+/// # use scilib::math::bessel::{ j_n, j_nu };
 /// // This method allows the computation of real index for J
-/// let res_pos: Complex64 = jf(1.0, 2.5);
-/// let res_neg: Complex64 = jf(2.4, -1.75);
+/// let res_pos: Complex64 = j_nu(2.5, 1.0.into());
+/// let res_neg: Complex64 = j_nu(-1.75, 2.4.into());
 /// assert!((res_pos.re - 0.04949681).abs() < 1.0e-4);
 /// assert!((res_neg.re - 0.11990699).abs() < 1.0e-4);
 /// 
 /// // We can also check that the results are coherent with integers
-/// let res_i: Complex64 = j(0.75, 2);
-/// let res_r: Complex64 = jf(0.75, 2);
-/// assert!((res_i.re - res_r.re).abs() < 1.0e-4);
+/// let res_i: f64 = j_n(2, 0.75);
+/// let res_r: Complex64 = j_nu(2.0, 0.75.into());
+/// assert!((res_i - res_r.re).abs() < 1.0e-4);
 /// 
 /// // Because results are Complex, negative numbers are allowed
-/// let neg: Complex64 = jf(-0.75, 2.3);
+/// let neg: Complex64 = j_nu(2.3, (-0.75).into());
 /// let expected: Complex64 = Complex64::new(0.0219887007, 0.030264850);
 /// 
 /// assert!((neg.re - expected.re).abs() < 1.0e-5 && (neg.im - expected.im).abs() < 1.0e-5);
 /// 
 /// // As for j, we can also use Complex numbers
 /// let c: Complex64 = Complex64::new(1.2, 0.5);
-/// let res: Complex64 = jf(c, 1.5);
+/// let res: Complex64 = j_nu(1.5, c);
 /// 
 /// assert!((res.re - 0.3124202913).abs() < 1.0e-5 && (res.im - 0.1578998151) < 1.0e-5);
 /// ```
-pub fn jf<T, U>(x: T, order: U) -> Complex64
-    where T: Into<Complex64>, U: Into<f64> {
+pub fn j_nu(nu: f64, x: Complex64) -> Complex64 {
 
-    let n: f64 = order.into();
-    // If the number passed in whole, we fall back on the other method instead
-    if n.fract() == 0.0 {
-        return j(x, n as i32);
-    }
+    let n: f64 = nu.into();
 
-    let x2: Complex64 = x.into() / 2.0;             // Halving x
+    let x2: Complex64 = x / 2.0;                    // Halving x
     let mut k: f64 = 0.0;                           // Order counter
     let mut d1: f64 = 1.0;                          // First div
     let mut d2: f64 = basic::gamma(n + 1.0);        // Second div
@@ -360,10 +352,10 @@ pub fn jf<T, U>(x: T, order: U) -> Complex64
 
     let mut term: Complex64 = x2.powf(n) / d2;      // The term at each step
     let mut res: Complex64 = Complex64::default();  // The result of the operation
-    let mut counter: usize = 0;
+    let mut counter: i32 = 0;
     
     // If the first term is already too small we exit directly
-    if term.norm() < PRECISION_CONVERGENCE {
+    if (term / res).norm() < PRECISION_CONVERGENCE {
         return res;
     }
 
@@ -446,7 +438,7 @@ where T: Into<Complex64> + Copy, U: Into<f64> {
     if n.fract() == 0.0 {
         (y(c, n + DISTANCE_Y_LIM) + y(c, n - DISTANCE_Y_LIM)) / 2.0
     } else {
-        ((n * PI).cos() * jf(c, n) - jf(c, -n)) / (n * PI).sin()
+        ((n * PI).cos() * j_nu(n, c) - j_nu(-n, c)) / (n * PI).sin()
     }
 }
 
@@ -470,7 +462,7 @@ where T: Into<Complex64> + Copy, U: Into<f64> {
 /// ## Example
 /// ```
 /// # use num_complex::Complex64;
-/// # use scilib::math::bessel::{i, jf};
+/// # use scilib::math::bessel::{i, j_nu};
 /// let res = i(1.2, 0);
 /// assert!((res.re - 1.39373).abs() < 1.0e-4 && res.im == 0.0);
 /// 
@@ -481,7 +473,7 @@ where T: Into<Complex64> + Copy, U: Into<f64> {
 /// // We can check that the values are coherent
 /// let val = Complex64::new(3.2, -1.1);
 /// let resi = i(val, 1.2);
-/// let conf = jf(Complex64::i() * val, 1.2) * Complex64::i().powf(-1.2);
+/// let conf = j_nu(1.2, Complex64::i() * val) * Complex64::i().powf(-1.2);
 /// assert!((resi.re - conf.re).abs() < 1.0e-14);
 /// assert!((resi.im - conf.im).abs() < 1.0e-14);
 /// ```
@@ -593,7 +585,7 @@ pub fn hankel_first<T, U>(x: T, order: U) -> Complex64
 where T: Into<Complex64> + Copy, U: Into<f64> {
 
     let n: f64 = order.into();
-    let res_j = jf(x, n);
+    let res_j = j_nu(n, x.into());
     let res_y = Complex64::i() * y(x, n);
 
     res_j + res_y
@@ -628,7 +620,7 @@ pub fn hankel_second<T, U>(x: T, order: U) -> Complex64
 where T: Into<Complex64> + Copy, U: Into<f64> {
     
     let n: f64 = order.into();
-    let res_j = jf(x, n);
+    let res_j = j_nu(n, x.into());
     let res_y = Complex64::i() * y(x, n);
 
     res_j - res_y
@@ -660,7 +652,7 @@ where T: Into<Complex64> + Copy, U: Into<f64> {
 pub fn sj<T>(z: T, n: usize) -> Complex64 
 where T: Into<Complex64> {
     let x: Complex64  = z.into();
-    (FRAC_PI_2 / x).sqrt() * jf(x, n as f64 + 0.5)
+    (FRAC_PI_2 / x).sqrt() * j_nu(n as f64 + 0.5, x)
 }
 
 fn sj_upward_recurrence<T>(z: T, n: usize) -> Vec<Complex64> 
@@ -997,10 +989,10 @@ where T: Into<Complex64> {
 /// ```
 /// # use std::f64::consts::FRAC_PI_2;
 /// # use num_complex::Complex64;
-/// # use scilib::math::bessel::{ jf, riccati_s };
+/// # use scilib::math::bessel::{ j_nu, riccati_s };
 /// let val: Complex64 = Complex64::new(2.0, -1.1);
 /// let res: Complex64 = riccati_s(val, 3);
-/// let reference: Complex64 = jf(val, 3.5) * (FRAC_PI_2 * val).sqrt();
+/// let reference: Complex64 = j_nu(3.5, val) * (FRAC_PI_2 * val).sqrt();
 /// 
 /// // We can compare the results to a known value
 /// assert!((res.re - -0.0417973).abs() < 1.0e-5);
@@ -1011,7 +1003,7 @@ pub fn riccati_s<T>(x: T, n: usize) -> Complex64
 where T: Into<Complex64>{
 
     let z: Complex64 = x.into();
-    (FRAC_PI_2 * z).sqrt() * jf(z, n as f64 + 0.5)
+    (FRAC_PI_2 * z).sqrt() * j_nu(n as f64 + 0.5, z)
 }
 
 /// # Riccati-Bessel function $C_n$
