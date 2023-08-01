@@ -36,8 +36,8 @@
 //! # use num_complex::Complex64;
 //! # use scilib::math::bessel::y;
 //! let c = Complex64::new(2.0, -1.2);
-//! let res_f = y(c, 1.5);              // Not a problem
-//! let res_i = y(c, 1);                // The function takes the limit in this case
+//! let res_f = y(1.5, c);              // Not a problem
+//! let res_i = y(1.0, c);                // The function takes the limit in this case
 //! ```
 //! 
 //! ## Modified first kind: $I_n$
@@ -47,9 +47,9 @@
 //! 
 //! ```rust
 //! # use num_complex::Complex64;
-//! # use scilib::math::bessel::i;
+//! # use scilib::math::bessel::i_nu;
 //! let c = Complex64::new(0.2, 1.0);
-//! let res = i(c, -1.2);
+//! let res = i_nu(-1.2, c);
 //! ```
 //! 
 //! ## Modified second kind: $K_n$
@@ -61,7 +61,7 @@
 //! # use num_complex::Complex64;
 //! # use scilib::math::bessel::k;
 //! let c = Complex64::new(0.0, 7.0);
-//! let res = k(c, 0);
+//! let res = k(0.0, c);
 //! ```
 //! 
 //! ## Hankel functions: $H_n^{(1)}$ and $H_n^{(2)}$
@@ -70,10 +70,10 @@
 //! 
 //! ```rust
 //! # use num_complex::Complex64;
-//! # use scilib::math::bessel::{ hankel_first, hankel_second };
+//! # use scilib::math::bessel::{ h1_nu, h2_nu };
 //! let c = Complex64::new(-0.3, 1.52);
-//! let res_1 = hankel_first(c, -2.3);
-//! let res_2 = hankel_second(c, -2.3);
+//! let res_1 = h1_nu(-2.3, c);
+//! let res_2 = h2_nu(-2.3, c);
 //! ```
 //! 
 //! # Spherical Bessel functions
@@ -90,9 +90,9 @@
 //! 
 //! ```rust
 //! # use num_complex::Complex64;
-//! # use scilib::math::bessel::{ sj, sj_array };
+//! # use scilib::math::bessel::{ sj_nu, sj_array };
 //! let c = Complex64::new(1.44, 2.22);
-//! let res = sj(c, 2);         // Computes the single term
+//! let res = sj_nu(2.0, c);         // Computes the single term
 //! let res_a = sj_array(c, 2); // Computes all term up to 2
 //! ```
 //! 
@@ -101,9 +101,9 @@
 //! 
 //! ```rust
 //! # use num_complex::Complex64;
-//! # use scilib::math::bessel::{ sy, sy_array };
+//! # use scilib::math::bessel::{ sy_nu, sy_array };
 //! let c = Complex64::new(2.53, -0.33);
-//! let res = sy(c, 2);         // Computes the single term
+//! let res = sy_nu(2.0, c);         // Computes the single term
 //! let res_a = sy_array(c, 5); // Computes all term up to 5
 //! ```
 //! 
@@ -112,9 +112,9 @@
 //! 
 //! ```rust
 //! # use num_complex::Complex64;
-//! # use scilib::math::bessel::{ sh_first, sh_first_array };
+//! # use scilib::math::bessel::{ sh1_nu, sh_first_array };
 //! let c = Complex64::new(0.2253, 4.25);
-//! let res = sh_first(c, 2);           // Computes the single term
+//! let res = sh1_nu(2.0, c);           // Computes the single term
 //! let res_a = sh_first_array(c, 4);   // Computes all term up to 5
 //! ```
 //! 
@@ -123,9 +123,9 @@
 //! 
 //! ```rust
 //! # use num_complex::Complex64;
-//! # use scilib::math::bessel::{ sh_second, sh_second_array };
+//! # use scilib::math::bessel::{ sh2_nu, sh_second_array };
 //! let c = Complex64::new(-5.2, -0.356);
-//! let res = sh_second(c, 2);          // Computes the single term
+//! let res = sh2_nu(2.0, c);          // Computes the single term
 //! let res_a = sh_second_array(c, 7);  // Computes all term up to 7
 //! ```
 //! 
@@ -143,7 +143,7 @@
 //! # use num_complex::Complex64;
 //! # use scilib::math::bessel::riccati_s;
 //! let c = Complex64::new(0.3, 1.22);
-//! let res = riccati_s(c, 2);
+//! let res = riccati_s(2, c);
 //! ```
 //! 
 //! ## Second kind: $C_n$
@@ -153,7 +153,7 @@
 //! # use num_complex::Complex64;
 //! # use scilib::math::bessel::riccati_c;
 //! let c = Complex64::new(-4.2, 2.13);
-//! let res = riccati_c(c, 5);
+//! let res = riccati_c(5, c);
 //! ```
 //! 
 //! ## Third kind: $\xi_n$
@@ -163,7 +163,7 @@
 //! # use num_complex::Complex64;
 //! # use scilib::math::bessel::riccati_xi;
 //! let c = Complex64::new(2.5, -0.25);
-//! let res = riccati_xi(c, 4);
+//! let res = riccati_xi(4, c);
 //! ```
 //! 
 //! ## Fourth kind: $\zeta_n$
@@ -173,7 +173,7 @@
 //! # use num_complex::Complex64;
 //! # use scilib::math::bessel::riccati_zeta;
 //! let c = Complex64::new(-1.1, 8.2);
-//! let res = riccati_zeta(c, 3);
+//! let res = riccati_zeta(3, c);
 //! ```
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -714,7 +714,7 @@ where T: Into<Complex64> {
 /// 
 /// // We can also confirm the coherence of the results:
 /// let val = Complex64::new(3.2, -1.1);
-/// let resj = sj(val, 3);
+/// let resj = sj_nu(3.0, val);
 /// let resa = sj_array(val, 3);
 /// assert!((resj.re - resa[3].re).abs() < 1.0e-6);
 /// assert!((resj.im - resa[3].im).abs() < 1.0e-6);
@@ -808,7 +808,7 @@ pub fn sy_nu(n: f64, z: Complex64) -> Complex64 {
 /// 
 /// // We can also confirm the coherence of the results:
 /// let val = Complex64::new(3.2, -1.1);
-/// let resj = sy(val, 3);
+/// let resj = sy_nu(3.0, val);
 /// let resa = sy_array(val, 3);
 /// assert!((resj.re - resa[3].re).abs() < 1.0e-6);
 /// assert!((resj.im - resa[3].im).abs() < 1.0e-6);
@@ -883,7 +883,7 @@ pub fn sh1_nu(nu: f64, z: Complex64) -> Complex64 {
 /// 
 /// // We can also confirm the coherence of the results:
 /// let val = Complex64::new(3.2, -1.1);
-/// let resj = sh_first(val, 3);
+/// let resj = sh1_nu(3.0, val);
 /// let resa = sh_first_array(val, 3);
 /// assert!((resj.re - resa[3].re).abs() <= 1.0e-5);
 /// assert!((resj.im - resa[3].im).abs() <= 1.0e-6);
@@ -947,7 +947,7 @@ pub fn sh2_nu(nu: f64, z: Complex64) -> Complex64 {
 /// 
 /// // We can also confirm the coherence of the results:
 /// let val = Complex64::new(3.2, -1.1);
-/// let resj = sh_second(val, 3);
+/// let resj = sh2_nu(3.0, val);
 /// let resa = sh_second_array(val, 3);
 /// assert!((resj.re - resa[3].re).abs() < 1.0e-6);
 /// assert!((resj.im - resa[3].im).abs() < 1.0e-6);
