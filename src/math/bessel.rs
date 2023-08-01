@@ -968,7 +968,7 @@ where T: Into<Complex64> {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/* 
+
 /// # Riccati-Bessel function $S_n$
 /// ## Definition
 /// The $S_n$ Riccati-Bessel function is defined as:
@@ -987,7 +987,7 @@ where T: Into<Complex64> {
 /// # use num_complex::Complex64;
 /// # use scilib::math::bessel::{ j_nu, riccati_s };
 /// let val: Complex64 = Complex64::new(2.0, -1.1);
-/// let res: Complex64 = riccati_s(val, 3);
+/// let res: Complex64 = riccati_s(3, val);
 /// let reference: Complex64 = j_nu(3.5, val) * (FRAC_PI_2 * val).sqrt();
 /// 
 /// // We can compare the results to a known value
@@ -995,10 +995,7 @@ where T: Into<Complex64> {
 /// assert!((res.im - -0.218255).abs() < 1.0e-5);
 /// assert_eq!(res, reference);
 /// ```
-pub fn riccati_s<T>(x: T, n: usize) -> Complex64
-where T: Into<Complex64>{
-
-    let z: Complex64 = x.into();
+pub fn riccati_s(n: usize, z: Complex64) -> Complex64 {
     (FRAC_PI_2 * z).sqrt() * j_nu(n as f64 + 0.5, z)
 }
 
@@ -1020,19 +1017,16 @@ where T: Into<Complex64>{
 /// # use num_complex::Complex64;
 /// # use scilib::math::bessel::{ y, riccati_c };
 /// let val: Complex64 = Complex64::new(-2.0, 1.2);
-/// let res: Complex64 = riccati_c(val, 3);
-/// let reference: Complex64 = y(val, 3.5) * -(FRAC_PI_2 * val).sqrt();
+/// let res: Complex64 = riccati_c(3, val);
+/// let reference: Complex64 = y(3.5, val) * -(FRAC_PI_2 * val).sqrt();
 /// 
 /// // We can compare the results to a known value
 /// assert!((res.re - -0.8647593488).abs() <= 1.0e-5);
 /// assert!((res.im - -1.19070243).abs() <= 1.0e-5);
 /// assert_eq!(res, reference);
 /// ```
-pub fn riccati_c<T>(x: T, n: usize) -> Complex64
-where T: Into<Complex64>{
-    
-    let z: Complex64 = x.into();
-    -(FRAC_PI_2 * z).sqrt() * y(z, n as f64 + 0.5)
+pub fn riccati_c(n: usize, z: Complex64) -> Complex64 {
+    -(FRAC_PI_2 * z).sqrt() * y(n as f64 + 0.5, z)
 }
 
 /// # Riccati-Bessel function $\xi_n$
@@ -1051,21 +1045,18 @@ where T: Into<Complex64>{
 /// ```
 /// # use std::f64::consts::FRAC_PI_2;
 /// # use num_complex::Complex64;
-/// # use scilib::math::bessel::{ hankel_first, riccati_xi };
+/// # use scilib::math::bessel::{ h1_nu, riccati_xi };
 /// let val: Complex64 = Complex64::new(1.25, 2.2);
-/// let res: Complex64 = riccati_xi(val, 2);
-/// let reference: Complex64 = hankel_first(val, 2.5) * (FRAC_PI_2 * val).sqrt();
+/// let res: Complex64 = riccati_xi(2, val);
+/// let reference: Complex64 = h1_nu(2.5, val) * (FRAC_PI_2 * val).sqrt();
 /// 
 /// // We can compare the results to a known value
 /// assert!((res.re - -0.273294).abs() <= 1.0e-5);
 /// assert!((res.im - -0.0245767).abs() <= 1.0e-5);
 /// assert_eq!(res, reference);
 /// ```
-pub fn riccati_xi<T>(x: T, n: isize) -> Complex64
-where T: Into<Complex64>{
-    
-    let z: Complex64 = x.into();
-    (FRAC_PI_2 * z).sqrt() * hankel_first(z, n as f64 + 0.5)
+pub fn riccati_xi(n: isize, z: Complex64) -> Complex64 {
+    (FRAC_PI_2 * z).sqrt() * h1_nu(n as f64 + 0.5, z)
 }
 
 /// # Riccati-Bessel function $\zeta_n$
@@ -1084,23 +1075,18 @@ where T: Into<Complex64>{
 /// ```
 /// # use std::f64::consts::FRAC_PI_2;
 /// # use num_complex::Complex64;
-/// # use scilib::math::bessel::{ hankel_second, riccati_zeta };
+/// # use scilib::math::bessel::{ h2_nu, riccati_zeta };
 /// let val: Complex64 = Complex64::new(1.25, 2.2);
-/// let res: Complex64 = riccati_zeta(val, -2);
-/// let reference: Complex64 = hankel_second(val, -1.5) * (FRAC_PI_2 * val).sqrt();
+/// let res: Complex64 = riccati_zeta(-2, val);
+/// let reference: Complex64 = h2_nu(-1.5, val) * (FRAC_PI_2 * val).sqrt();
 /// 
 /// // We can compare the results to a known value
-/// println!("{}", res);
 /// assert!((res.re - -6.17727).abs() <= 1.0e-5);
 /// assert!((res.im - -0.195811).abs() <= 1.0e-5);
 /// assert_eq!(res, reference);
 /// ```
-pub fn riccati_zeta<T>(x: T, n: isize) -> Complex64
-where T: Into<Complex64>{
-    
-    let z: Complex64 = x.into();
-    (FRAC_PI_2 * z).sqrt() * hankel_second(z, n as f64 + 0.5)
+pub fn riccati_zeta(n: isize, z: Complex64) -> Complex64 {
+    (FRAC_PI_2 * z).sqrt() * h2_nu(n as f64 + 0.5, z)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
- */
