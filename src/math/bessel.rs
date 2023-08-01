@@ -575,23 +575,19 @@ pub fn k(nu: f64, z: Complex64) -> Complex64 {
 /// ## Example
 /// ```
 /// # use num_complex::Complex64;
-/// # use scilib::math::bessel::hankel_first_nu;
+/// # use scilib::math::bessel::h1_nu;
 /// let c1 = Complex64::new(-1.1, 2.3);
-/// let r1 = hankel_first_nu(1.0, c1);
+/// let r1 = h1_nu(1.0, c1);
 /// assert!((r1.re - -0.011202683694).abs() < 1.0e-5);
 /// assert!((r1.im - 0.055194689304).abs() < 1.0e-5);
 /// 
 /// let c2 = Complex64::new(5.2, -3.0);
-/// let r2 = hankel_first_nu(-2.35, c2);
+/// let r2 = h1_nu(-2.35, c2);
 /// assert!((r2.re - -4.280947776983).abs() < 1.0e-5);
 /// assert!((r2.im - 3.212350280920).abs() < 1.0e-5);
 /// ```
-pub fn hankel_first_nu(nu: f64, z: Complex64) -> Complex64 {
-
-    let res_j = j_nu(nu, z);
-    let res_y = Complex64::i() * y(nu, z);
-
-    res_j + res_y
+pub fn h1_nu(nu: f64, z: Complex64) -> Complex64 {
+    j_nu(nu, z) + Complex64::i() * y(nu, z)
 }
 
 /// # Second Hankel function: $H^{(2)}$
@@ -611,22 +607,19 @@ pub fn hankel_first_nu(nu: f64, z: Complex64) -> Complex64 {
 /// ## Example
 /// ```
 /// # use num_complex::Complex64;
-/// # use scilib::math::bessel::hankel_second_nu;
+/// # use scilib::math::bessel::h2_nu;
 /// let c1 = Complex64::new(-1.1, 2.3);
-/// let r1 = hankel_second_nu(1.0, c1);
+/// let r1 = h2_nu(1.0, c1);
 /// assert!((r1.re - -3.544212072638).abs() < 1.0e-5);
 /// assert!((r1.im - 2.298353924176).abs() < 1.0e-5);
 /// 
 /// let c2 = Complex64::new(5.2, -3.0);
-/// let r2 = hankel_second_nu(-2.35, c2);
+/// let r2 = h2_nu(-2.35, c2);
 /// assert!((r2.re - -0.006818448986).abs() < 1.0e-5);
 /// assert!((r2.im - -0.019369789719).abs() < 1.0e-5);
-pub fn hankel_second_nu(nu: f64, z: Complex64) -> Complex64 {
-    
-    let res_j = j_nu(nu, z);
-    let res_y = Complex64::i() * y(nu, z);
-
-    res_j - res_y
+/// ```
+pub fn h2_nu(nu: f64, z: Complex64) -> Complex64 {
+    j_nu(nu, z) - Complex64::i() * y(nu, z)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -764,7 +757,7 @@ where T: Into<Complex64> {
     jn
 }
 
-/* /// # Second spherical Bessel function: $y$
+/// # Second spherical Bessel function: $y$
 /// 
 /// ## Definition
 /// We follow the definition based on the $Y$ Bessel functions:
@@ -781,13 +774,14 @@ where T: Into<Complex64> {
 /// ## Example
 /// ```
 /// # use num_complex::Complex64;
-/// # use scilib::math::bessel::*;
-/// let res = sy(Complex64::new(13.0, 5.0), 3);
-/// assert!((res.re - 4.322629120777188).abs() < 1e-8 && (res.im - 1.6104674841102558) < 1e-8);
+/// # use scilib::math::bessel::sy_nu;
+/// let res = sy_nu(3.0, Complex64::new(13.0, 5.0));
+/// assert!((res.re - 4.322629120777188).abs() < 1e-8);
+/// assert!((res.im - 1.6104674841102558) < 1e-8);
 /// ```
 pub fn sy_nu(n: f64, z: Complex64) -> Complex64 {
     (FRAC_PI_2 / z).sqrt() * y(n + 0.5, z)
-} */
+}
 
 /// # Second spherical Bessel function (array): y
 /// 
@@ -846,7 +840,7 @@ where T: Into<Complex64> {
     yn
 }
 
-/* /// # First spherical Hankel function: $h^{(1)}$
+/// # First spherical Hankel function: $h^{(1)}$
 /// 
 /// ## Definition
 /// The first spherical hankel function is defined as:
@@ -862,15 +856,14 @@ where T: Into<Complex64> {
 /// # Example
 /// ```
 /// # use num_complex::Complex64;
-/// # use scilib::math::bessel::*;
-/// let res = sh_first(Complex64::new(2.5, 0.2), 3);
-/// assert!((res.re - -0.056229554655).abs() < 1e-8);
-/// assert!((res.im - -0.750570918335).abs() < 1e-8);
+/// # use scilib::math::bessel::sh1_nu;
+/// let res = sh1_nu(3.0, Complex64::new(2.5, 0.2));
+/// assert!((res.re - -0.056229554655).abs() < 1e-5);
+/// assert!((res.im - -0.750570918335).abs() < 1e-5);
 /// ```
-pub fn sh_first(nu: f64, z: Complex64) -> Complex64 {
-    let x: Complex64 = z.into();
-    sj_nu(n, z) + Complex64::i() * sy(x, n)
-} */
+pub fn sh1_nu(nu: f64, z: Complex64) -> Complex64 {
+    sj_nu(nu, z) + Complex64::i() * sy_nu(nu, z)
+}
 
 /// # First spherical Hankel function (array): $h^{(1)}$
 /// 
@@ -910,7 +903,7 @@ where T: Into<Complex64> {
     sh_first
 }
 
-/* /// # Second spherical Hankel function: $h^{(2)}$
+/// # Second spherical Hankel function: $h^{(2)}$
 /// 
 /// ## Definition
 /// The second spherical hankel function is defined as:
@@ -927,15 +920,14 @@ where T: Into<Complex64> {
 /// ## Example
 /// ```
 /// # use num_complex::Complex64;
-/// # use scilib::math::bessel::*;
-/// let res = sh_second(Complex64::new(13.0, 5.0), 3);
-/// assert!((res.re - 3.22144998903028).abs() < 1e-8 && (res.im + 8.645011398687984).abs() < 1e-8);
+/// # use scilib::math::bessel::sh2_nu;
+/// let res = sh2_nu(3.0, Complex64::new(13.0, 5.0));
+/// assert!((res.re - 3.22144998903028).abs() < 1e-8);
+/// assert!((res.im + 8.645011398687984).abs() < 1e-8);
 /// ```
-pub fn sh_second<T>(z: T, n: usize) -> Complex64 
-where T: Into<Complex64> {
-    let x: Complex64 = z.into();
-    sj_nu(x, n) - Complex64::i() * sy(x, n)
-} */
+pub fn sh2_nu(nu: f64, z: Complex64) -> Complex64 {
+    sj_nu(nu, z) - Complex64::i() * sy_nu(nu, z)
+}
 
 /// # Second spherical Hankel function (array): $h^{(2)}$
 /// 
