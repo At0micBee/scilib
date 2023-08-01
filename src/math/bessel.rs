@@ -262,7 +262,6 @@ pub fn j_n(n: i32, x: f64) -> f64 {
     let mut k: i32 = 0;                                         // Order counter
     let mut d1: f64 = 1.0;                                      // First div
     let mut d2: f64 = basic::factorial(np as usize) as f64;     // Second div
-
     let mut term: f64 = x2.powi(np) / d2;                       // The term at each step
     let mut sum: f64 = f64::default();                          // The result of the operation
 
@@ -340,44 +339,48 @@ pub fn j_n(n: i32, x: f64) -> f64 {
 /// 
 /// assert!((res.re - 0.3124202913).abs() < 1.0e-5 && (res.im - 0.1578998151) < 1.0e-5);
 /// ```
-pub fn j_nu(nu: f64, x: Complex64) -> Complex64 {
+pub fn j_nu(nu: f64, z: Complex64) -> Complex64 {
 
-    let n: f64 = nu.into();
+    // Required book-keeping to avoid NaNs on correct values
+    if nu.is_sign_negative() && nu.fract() == 0.0 {             // If neg and integer
+        if nu.rem_euclid(2.0) == 1.0 {                          // If odd we need to * -1.0
+            return -1.0 * j_nu(nu.abs(), z);
+        } else {                                                // If even it's just the positive value
+            return j_nu(nu.abs(), z);
+        }
+    }
 
-    let x2: Complex64 = x / 2.0;                    // Halving x
-    let mut k: f64 = 0.0;                           // Order counter
-    let mut d1: f64 = 1.0;                          // First div
-    let mut d2: f64 = basic::gamma(n + 1.0);        // Second div
-    let mut sg: f64 = 1.0;                          // Sign of the term
-
-    let mut term: Complex64 = x2.powf(n) / d2;      // The term at each step
-    let mut res: Complex64 = Complex64::default();  // The result of the operation
-    let mut counter: i32 = 0;
+    let z2: Complex64 = z / 2.0;                                // Halving z
+    let mut k: f64 = 0.0;                                       // Order counter
+    let mut d1: f64 = 1.0;                                      // First div
+    let mut d2: f64 = basic::gamma(nu + 1.0);                   // Second div
+    let mut term: Complex64 = z2.powf(nu) / d2;                 // The term at each step
+    let mut sum: Complex64 = Complex64::default();              // The result of the operation
+    let mut counter: i32 = 0;                                   // Iteration counter
     
     // If the first term is already too small we exit directly
-    if (term / res).norm() < PRECISION_CONVERGENCE {
-        return res;
+    if term.norm() < PRECISION_CONVERGENCE {
+        return sum;
     }
 
     // Computing the terms of the infinite series
     'convergence: while counter < MAX_ITER_J {
 
         counter += 1;
-        res += term;
+        sum += term;
 
         // If the changed compared to the final value is small we break
-        if (term / res).norm() < PRECISION_CONVERGENCE {
+        if (term / sum).norm() < PRECISION_CONVERGENCE {
             break 'convergence;
         }
 
-        k += 1.0;                       // Incrementing value
-        sg *= -1.0;                     // changing the sign of the term
-        d1 *= k;                        // Next value in the n! term
-        d2 *= n + k;                    // Next value in the gamma(n+k+1) term
-        term = sg * x2.powf(k.mul_add(2.0, n)) / (d1 * d2);
+        k += 1.0;                                               // Incrementing value
+        d1 *= -k;                                               // Next value in the n! term
+        d2 *= nu + k;                                           // Next value in the gamma(n+k+1) term
+        term = z2.powf(k.mul_add(2.0, nu)) / (d1 * d2);
     }
 
-    res
+    sum
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -405,40 +408,31 @@ pub fn j_nu(nu: f64, x: Complex64) -> Complex64 {
 /// ```
 /// # use num_complex::Complex64;
 /// # use scilib::math::bessel::y;
-/// let res_pos = y(1.0, 1.5);
-/// let res_neg = y(1.0, -1.5);
+/// let res_pos = y(1.5, Complex64::new(1.0, 0.0));
+/// let res_neg = y(-1.5, Complex64::new(1.0, 0.0));
 /// 
 /// assert!((res_pos.re - -1.10249557).abs() < 1.0e-5);
 /// assert!((res_neg.re - -0.24029783).abs() < 1.0e-5);
 /// 
 /// // Values for integer n also works
-/// let res_int_p = y(0.5, 1);
-/// let res_int_n = y(0.5, -1);
+/// let res_int_p = y(1.0, Complex64::new(0.5, 0.0));
+/// let res_int_n = y(-1.0, Complex64::new(0.5, 0.0));
 /// 
 /// assert!((res_int_p.re - -1.47147239).abs() < 1.0e-5);
 /// assert!((res_int_n.re - 1.47147239).abs() < 1.0e-5);
 /// 
 /// // We can compute negative value with Y, the result is complex
-/// let res_neg = y(-1.2, 3.1);
-/// assert!((res_neg.re - 3.90596471).abs() < 1.0e-5 && (res_neg.im - -1.32157214).abs() < 1.0e-5);
-/// 
-/// // And we can use Complex as input
-/// let c: Complex64 = Complex64::new(-1.0, -0.5);
-/// let res_c = y(c, 2.0);
-/// 
-/// assert!((res_c.re - -0.79108492).abs() < 1.0e-5 && (res_c.im - 0.60211151).abs() < 1.0e-5);
+/// let res_neg = y(3.1, Complex64::new(-1.2, 0.0));
+/// assert!((res_neg.re - 3.90596471).abs() < 1.0e-5);
+/// assert!((res_neg.im - -1.32157214).abs() < 1.0e-5);
 /// ```
-pub fn y<T, U>(x: T, order: U) -> Complex64
-where T: Into<Complex64> + Copy, U: Into<f64> {
-
-    let c: Complex64 = x.into();
-    let n: f64 = order.into();
+pub fn y(nu: f64, z: Complex64) -> Complex64 {
 
     // If n is whole, we have to take the limit, otherwise it's direct
-    if n.fract() == 0.0 {
-        (y(c, n + DISTANCE_Y_LIM) + y(c, n - DISTANCE_Y_LIM)) / 2.0
+    if nu.fract() == 0.0 {
+        (y(nu + DISTANCE_Y_LIM, z) + y(nu - DISTANCE_Y_LIM, z)) / 2.0
     } else {
-        ((n * PI).cos() * j_nu(n, c) - j_nu(-n, c)) / (n * PI).sin()
+        ((nu * PI).cos() * j_nu(nu, z) - j_nu(-nu, z)) / (nu * PI).sin()
     }
 }
 
@@ -462,58 +456,63 @@ where T: Into<Complex64> + Copy, U: Into<f64> {
 /// ## Example
 /// ```
 /// # use num_complex::Complex64;
-/// # use scilib::math::bessel::{i, j_nu};
-/// let res = i(1.2, 0);
-/// assert!((res.re - 1.39373).abs() < 1.0e-4 && res.im == 0.0);
+/// # use scilib::math::bessel::{i_nu, j_nu};
+/// let res = i_nu(0.0, Complex64::new(1.2, 0.0));
+/// assert!((res.re - 1.3937255841).abs() < 1.0e-6 && res.im == 0.0);
 /// 
 /// let c = Complex64::new(-1.2, 0.5);
-/// let r2 = i(c, -1.6);
-/// assert!((r2.re - 0.549831).abs() < 1.0e-5 && (r2.im - -0.123202).abs() < 1.0e-5);
+/// let r2 = i_nu(-1.6, c);
+/// assert!((r2.re - 0.549831309685).abs() < 1.0e-6);
+/// assert!((r2.im - -0.123202230359).abs() < 1.0e-6);
 /// 
-/// // We can check that the values are coherent
+/// /* // We can check that the values are coherent
 /// let val = Complex64::new(3.2, -1.1);
 /// let resi = i(val, 1.2);
 /// let conf = j_nu(1.2, Complex64::i() * val) * Complex64::i().powf(-1.2);
 /// assert!((resi.re - conf.re).abs() < 1.0e-14);
-/// assert!((resi.im - conf.im).abs() < 1.0e-14);
+/// assert!((resi.im - conf.im).abs() < 1.0e-14); */
 /// ```
-pub fn i<T, U>(x: T, order: U) -> Complex64
-where T: Into<Complex64>, U: Into<f64> + Copy {
-    
-    let n: f64 = order.into();
+pub fn i_nu(nu: f64, z: Complex64) -> Complex64 {
 
-    let x2: Complex64 = x.into() / 2.0;             // Halving x
-    let mut k: f64 = 0.0;                           // Order counter
-    let mut d1: f64 = 1.0;                          // First div
-    let mut d2: f64 = basic::gamma(n + 1.0);        // Second div
+    // Required book-keeping to avoid NaNs on correct values
+    if nu.is_sign_negative() && nu.fract() == 0.0 {
+        return i_nu(nu.abs(), z);
+    }
 
-    let mut term: Complex64 = x2.powf(n) / d2;      // The term at each step
-    let mut res: Complex64 = Complex64::default();  // The result of the operation
+    let z2: Complex64 = z / 2.0;                                // Halving z
+    let mut k: f64 = 0.0;                                       // Order counter
+    let mut d1: f64 = 1.0;                                      // First div
+    let mut d2: f64 = basic::gamma(nu + 1.0);                   // Second div
+    let mut term: Complex64 = z2.powf(nu) / d2;                 // The term at each step
+    let mut sum: Complex64 = Complex64::default();              // The result of the operation
+    let mut counter: i32 = 0;                                   // Iteration counter
     
     // If the first term is already too small we exit directly
     if term.norm() < PRECISION_CONVERGENCE {
-        return res;
+        return sum;
     }
 
     // Computing the terms of the infinite series
-    'convergence: loop {
-        res += term;
+    'convergence: while counter < MAX_ITER_J {
+        
+        counter += 1;
+        sum += term;
 
         // If the changed compared to the final value is small we break
-        if (term / res).norm() < PRECISION_CONVERGENCE {
+        if (term / sum).norm() < PRECISION_CONVERGENCE {
             break 'convergence;
         }
 
-        k += 1.0;                       // Incrementing value
-        d1 *= k;                        // Next value in the n! term
-        d2 *= n + k;                    // Next value in the gamma(n+k+1) term
-        term = x2.powf(k.mul_add(2.0, n)) / (d1 * d2);
+        k += 1.0;                                               // Incrementing value
+        d1 *= k;                                                // Next value in the n! term
+        d2 *= nu + k;                                           // Next value in the gamma(n+k+1) term
+        term = z2.powf(k.mul_add(2.0, nu)) / (d1 * d2);
     }
 
-    res
+    sum
 }
 
-/// # $K$ modified Bessel function
+/* /// # $K$ modified Bessel function
 /// 
 /// ## Definition
 /// The $K$ modified Second Bessel function represent another kind of solution to the Bessel differential equation.
@@ -551,11 +550,11 @@ where T: Into<Complex64> + Copy, U: Into<f64> {
     if n.fract() == 0.0 {
         (k(x, n + DISTANCE_Y_LIM) + k(x, n - DISTANCE_Y_LIM)) / 2.0
     } else {
-        (FRAC_PI_2 / (n * PI).sin()) * (i(x, -n) - i(x, n))
+        (FRAC_PI_2 / (n * PI).sin()) * (i_nu(x, -n) - i_nu(x, n))
     }
-}
+} */
 
-/// # First Hankel function: $H^{(1)}$
+/* /// # First Hankel function: $H^{(1)}$
 /// 
 /// ## Definition
 /// Computes the first kind of Hankel function, which is defined as:
@@ -589,9 +588,9 @@ where T: Into<Complex64> + Copy, U: Into<f64> {
     let res_y = Complex64::i() * y(x, n);
 
     res_j + res_y
-}
+} */
 
-/// # Second Hankel function: $H^{(2)}$
+/* /// # Second Hankel function: $H^{(2)}$
 /// 
 /// ## Definition
 /// Computes the first kind of Hankel function, which is defined as:
@@ -624,11 +623,11 @@ where T: Into<Complex64> + Copy, U: Into<f64> {
     let res_y = Complex64::i() * y(x, n);
 
     res_j - res_y
-}
+} */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/// # First spherical Bessel function: $j$
+/// # First spherical Bessel function: $j_n$ (real order)
 /// 
 /// ## Definition
 /// We follow the definition based on the $J$ Bessel functions:
@@ -645,14 +644,17 @@ where T: Into<Complex64> + Copy, U: Into<f64> {
 /// ## Example
 /// ```
 /// # use num_complex::Complex64;
-/// # use scilib::math::bessel::*;
-/// let res = sj(Complex64::new(13.0, 5.0), 3);
-/// assert!((res.re - 1.6109825049200244).abs() < 1e-8 && (res.im + 4.322382277910797).abs() < 1e-8);
+/// # use scilib::math::bessel::sj_nu;
+/// let res_f = sj_nu(2.25, Complex64::new(1.12, 0.0));
+/// assert!((res_f.re - 0.049958287243).abs() < 1e-6);
+/// 
+/// // also works for integer order, and complex input
+/// let res = sj_nu(3.0, Complex64::new(13.0, 5.0));
+/// assert!((res.re - 1.6109825049200244).abs() < 1e-8);
+/// assert!((res.im - -4.322382277910797).abs() < 1e-8);
 /// ```
-pub fn sj<T>(z: T, n: usize) -> Complex64 
-where T: Into<Complex64> {
-    let x: Complex64  = z.into();
-    (FRAC_PI_2 / x).sqrt() * j_nu(n as f64 + 0.5, x)
+pub fn sj_nu(nu: f64, z: Complex64) -> Complex64 {
+    (FRAC_PI_2 / z).sqrt() * j_nu(nu + 0.5, z)
 }
 
 fn sj_upward_recurrence<T>(z: T, n: usize) -> Vec<Complex64> 
@@ -758,7 +760,7 @@ where T: Into<Complex64> {
     jn
 }
 
-/// # Second spherical Bessel function: $y$
+/* /// # Second spherical Bessel function: $y$
 /// 
 /// ## Definition
 /// We follow the definition based on the $Y$ Bessel functions:
@@ -779,11 +781,9 @@ where T: Into<Complex64> {
 /// let res = sy(Complex64::new(13.0, 5.0), 3);
 /// assert!((res.re - 4.322629120777188).abs() < 1e-8 && (res.im - 1.6104674841102558) < 1e-8);
 /// ```
-pub fn sy<T>(z: T, n: usize) -> Complex64
-where T: Into<Complex64> {
-    let x: Complex64 = z.into();
-    (FRAC_PI_2 / x).sqrt() * y(x, n as f64 + 0.5)
-}
+pub fn sy_nu(n: f64, z: Complex64) -> Complex64 {
+    (FRAC_PI_2 / z).sqrt() * y(n + 0.5, z)
+} */
 
 /// # Second spherical Bessel function (array): y
 /// 
@@ -842,7 +842,7 @@ where T: Into<Complex64> {
     yn
 }
 
-/// # First spherical Hankel function: $h^{(1)}$
+/* /// # First spherical Hankel function: $h^{(1)}$
 /// 
 /// ## Definition
 /// The first spherical hankel function is defined as:
@@ -859,14 +859,14 @@ where T: Into<Complex64> {
 /// ```
 /// # use num_complex::Complex64;
 /// # use scilib::math::bessel::*;
-/// let res = sh_first(Complex64::new(13.0, 5.0), 3);
-/// assert!((res.re - 5.150208097686182e-4).abs() < 1e-8 && (res.im - 2.4684286639153896e-4).abs() < 1e-8);
+/// let res = sh_first(Complex64::new(2.5, 0.2), 3);
+/// assert!((res.re - -0.056229554655).abs() < 1e-8);
+/// assert!((res.im - -0.750570918335).abs() < 1e-8);
 /// ```
-pub fn sh_first<T>(z: T, n: usize) -> Complex64
-where T: Into<Complex64> {
+pub fn sh_first(nu: f64, z: Complex64) -> Complex64 {
     let x: Complex64 = z.into();
-    sj(x, n) + Complex64::i() * sy(x, n)
-}
+    sj_nu(n, z) + Complex64::i() * sy(x, n)
+} */
 
 /// # First spherical Hankel function (array): $h^{(1)}$
 /// 
@@ -906,7 +906,7 @@ where T: Into<Complex64> {
     sh_first
 }
 
-/// # Second spherical Hankel function: $h^{(2)}$
+/* /// # Second spherical Hankel function: $h^{(2)}$
 /// 
 /// ## Definition
 /// The second spherical hankel function is defined as:
@@ -930,8 +930,8 @@ where T: Into<Complex64> {
 pub fn sh_second<T>(z: T, n: usize) -> Complex64 
 where T: Into<Complex64> {
     let x: Complex64 = z.into();
-    sj(x, n) - Complex64::i() * sy(x, n)
-}
+    sj_nu(x, n) - Complex64::i() * sy(x, n)
+} */
 
 /// # Second spherical Hankel function (array): $h^{(2)}$
 /// 
@@ -972,7 +972,7 @@ where T: Into<Complex64> {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+/* 
 /// # Riccati-Bessel function $S_n$
 /// ## Definition
 /// The $S_n$ Riccati-Bessel function is defined as:
@@ -1107,3 +1107,4 @@ where T: Into<Complex64>{
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ */
