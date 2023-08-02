@@ -26,26 +26,6 @@ const STIELTJES_M: usize = 1_000_000;
 /// Maximum iteration count for convergence
 const MAX_ITER: usize = 200;
 
-/// Sum initialization for ln(gamma)
-const GAMMA_INIT: f64 = 0.999999999999997092;
-
-/// Offset for the base value in ln(gamma)
-const GAMMA_BASE_OFFSET: f64 = 5.2421875;
-
-/// Offset to apply to ln(gamma)
-const GAMMA_LN_OFFSET: f64 = 2.5066282746310005;
-
-/// Coefficients to compute the ln gamma function.
-const GAMMA_COEFS: [f64; 14] = [
-    57.1562356658629235, -59.5979603554754912,
-    14.1360979747417471, -0.491913816097620199,
-    0.339946499848118887e-4, 0.465236289270485756e-4,
-    -0.983744753048795646e-4, 0.158088703224912494e-3,
-    -0.210264441724104883e-3, 0.217439618115212643e-3,
-    -0.164318106536763890e-3, 0.844182239838527433e-4,
-    -0.261908384015814087e-4, 0.368991826595316234e-5
-];
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// # Sinus cardinal
@@ -585,81 +565,29 @@ pub fn li(s: f64, z: Complex64) -> Complex64 {
 /// # use scilib::math::basic::gamma;
 /// let res_1: f64 = gamma(2.3);
 /// let res_2: f64 = gamma(-0.45);
-/// assert!((res_1 - 1.16671190).abs() < 1.0e-5);
+/// assert!((res_1 - 1.166711905198160345).abs() < 1.0e-5);
 /// assert!((res_2 - -3.591387).abs() < 1.0e-5);
 /// ```
-pub fn gamma<T>(value: T) -> f64
-where T: Into<f64> {
+pub fn gamma(x: f64) -> f64 {
 
-    let x: f64 = value.into();
-
-    let mut n: f64 = 1.0;      // Order counter
-
-    // The values of each term and the result
-    let mut term: f64 = x.exp() / (1.0 + x);
-    let mut res: f64 = 1.0;
-
-    // If the first term is already too small we exit directly
-    if (term - 1.0).abs() < PRECISION {
-        return res;
-    }
+    let mut n: usize = 0;                                       // Order counter
+    let mut acc: f64 = 1.0;                                     // Accumulation term
+    let mut term: f64;                                          // Term of each iteration
 
     // Computing the terms of the infinite series
     'convergence: loop {
-        res *= term;
+
+        n += 1;                                                 // Incrementing counter
+        term = (x / n as f64).exp() / (1.0 + x / n as f64);     // Computing term
+        acc *= term;                                            // Accumulating
 
         //If the changes become too small, we stop
-        if (term - 1.0).abs() < PRECISION {
+        if ((term - 1.0) / acc).abs() < PRECISION {
             break 'convergence;
         }
-
-        // Updating the values
-        n += 1.0;
-        term = (x / n).exp() / (1.0 + x / n);
     }
 
-    res * (-x * constant::EULER_MASCHERONI).exp() / x
-}
-
-/// # Ln(Gamma) function
-/// 
-/// # Definition
-/// Instead of computing the whole Gamma function, we can simply compute the natural log value of the function.
-/// This helps to limit overflow of the value.
-/// 
-/// Lanczos, C. “A Precision Approximation of the Gamma Function.”
-/// Journal of the Society for Industrial and Applied Mathematics: Series B, Numerical Analysis, vol. 1, 1964, pp. 86–96. JSTOR,
-/// [http://www.jstor.org/stable/2949767](http://www.jstor.org/stable/2949767). Accessed 11 Apr. 2023.
-/// 
-/// ## Inputs
-/// - `x`: the value to evaluate ($x$).
-/// 
-/// Returns the value of ln(gamma) function.
-/// 
-/// ## Example
-/// ```
-/// # use scilib::math::basic::gamma;
-/// # use scilib::math::basic::ln_gamma;
-/// let res_1: f64 = ln_gamma(1.2).exp();
-/// let res_2: f64 = gamma(1.2);
-/// assert!((res_1 - 0.9181687423997606).abs() < 1.0e-15);
-/// assert!((res_2 - res_1).abs() < 1.0e-5);
-/// ```
-pub fn ln_gamma(x: f64) -> f64 {
-
-    assert!(x > 0.0);                           // Only valid for x > 0
-
-    let mut inc_x: f64 = x;                     // The incremented x in the loop
-
-    let mut base: f64 = x + GAMMA_BASE_OFFSET;  // Base value
-    base = (x + 0.5) * base.ln() - base;
-
-    let res: f64 = GAMMA_COEFS.iter().fold(GAMMA_INIT, |sum, c| {
-        inc_x += 1.0;
-        sum + c / inc_x
-    });
-
-    base + (GAMMA_LN_OFFSET * res / x).ln()  // Final computation
+    acc * (-x * constant::EULER_MASCHERONI).exp() / x
 }
 
 /// # Euler Beta function
@@ -685,20 +613,14 @@ pub fn ln_gamma(x: f64) -> f64 {
 /// ## Example
 /// ```
 /// # use scilib::math::basic::beta;
-/// let res: f64 = beta(1, 1.1);
-/// let comp1: f64 = beta(3, 2);
-/// let comp2: f64 = beta(2, 3);
+/// let res: f64 = beta(1.0, 1.1);
+/// let comp1: f64 = beta(3.0, 2.0);
+/// let comp2: f64 = beta(2.0, 3.0);
 /// assert!((res - 0.909090).abs() < 1.0e-5);
 /// assert_eq!(comp1, comp2);
 /// ```
-pub fn beta<T, U>(x: T, y: U) -> f64
-where T: Into<f64> + Copy, U: Into<f64> + Copy {
-
-    let t1: f64 = gamma(x);
-    let t2: f64 = gamma(y);
-    let b: f64 = gamma(x.into() + y.into());
-    
-    t1 * t2 / b
+pub fn beta(x: f64, y: f64) -> f64 {
+    gamma(x) * gamma(y) / gamma(x + y)
 }
 
 /// # Error function
