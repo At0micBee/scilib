@@ -10,6 +10,7 @@ use std::f64::consts::FRAC_2_SQRT_PI;   // 2 / sqrt(Pi)
 
 use super::{                            // Using parts from the crate
     super::constant,                    // Calling scilib constants
+    super::integration::d1,
     polynomial::Poly                    // Bernoulli polynomials
 };
 
@@ -25,6 +26,22 @@ const STIELTJES_M: usize = 1_000_000;
 
 /// Maximum iteration count for convergence
 const MAX_ITER: usize = 200;
+
+const PRIMES: [f64; 200] = [
+    2.0, 3.0, 5.0, 7.0, 11.0, 13.0, 17.0, 19.0, 23.0, 29.0, 31.0, 37.0, 41.0, 43.0, 47.0, 53.0, 59.0, 61.0, 67.0, 71.0,
+    73.0, 79.0, 83.0, 89.0, 97.0, 101.0, 103.0, 107.0, 109.0, 113.0, 127.0, 131.0, 137.0, 139.0, 149.0, 151.0, 157.0,
+    163.0, 167.0, 173.0, 179.0, 181.0, 191.0, 193.0, 197.0, 199.0, 211.0, 223.0, 227.0, 229.0, 233.0, 239.0, 241.0,
+    251.0, 257.0, 263.0, 269.0, 271.0, 277.0, 281.0, 283.0, 293.0, 307.0, 311.0, 313.0, 317.0, 331.0, 337.0, 347.0,
+    349.0, 353.0, 359.0, 367.0, 373.0, 379.0, 383.0, 389.0, 397.0, 401.0, 409.0, 419.0, 421.0, 431.0, 433.0, 439.0,
+    443.0, 449.0, 457.0, 461.0, 463.0, 467.0, 479.0, 487.0, 491.0, 499.0, 503.0, 509.0, 521.0, 523.0, 541.0, 547.0,
+    557.0, 563.0, 569.0, 571.0, 577.0, 587.0, 593.0, 599.0, 601.0, 607.0, 613.0, 617.0, 619.0, 631.0, 641.0, 643.0,
+    647.0, 653.0, 659.0, 661.0, 673.0, 677.0, 683.0, 691.0, 701.0, 709.0, 719.0, 727.0, 733.0, 739.0, 743.0, 751.0,
+    757.0, 761.0, 769.0, 773.0, 787.0, 797.0, 809.0, 811.0, 821.0, 823.0, 827.0, 829.0, 839.0, 853.0, 857.0, 859.0,
+    863.0, 877.0, 881.0, 883.0, 887.0, 907.0, 911.0, 919.0, 929.0, 937.0, 941.0, 947.0, 953.0, 967.0, 971.0, 977.0,
+    983.0, 991.0, 997.0, 1009.0, 1013.0, 1019.0, 1021.0, 1031.0, 1033.0, 1039.0, 1049.0, 1051.0, 1061.0, 1063.0, 1069.0,
+    1087.0, 1091.0, 1093.0, 1097.0, 1103.0, 1109.0, 1117.0, 1123.0, 1129.0, 1151.0, 1153.0, 1163.0, 1171.0, 1181.0,
+    1187.0, 1193.0, 1201.0, 1213.0, 1217.0, 1223.0
+];
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -295,7 +312,7 @@ pub fn binomial_reduced(n: f64, r: usize) -> f64 {
 /// ```
 pub fn factorial<T>(n: T) -> usize
 where T: Into<usize> {
-    (1..=n.into()).fold(1, |res, val| res * val)
+    (1..=n.into()).product()
 }
 
 /// # Rising factorial
@@ -438,47 +455,6 @@ pub fn stieltjes(n: usize, a: Complex64) -> Complex64 {
 
     for k in 0..STIELTJES_M {
         res += (a + k as f64).ln().powi(n as i32) / (a + k as f64);
-    }
-
-    res
-}
-
-/// # Hurwitz Zeta function
-/// 
-/// WARNING: still under development, results cannot be guarantee.
-pub fn zeta<T, U>(s: T, a: U) -> Complex64
-where T: Into<f64>, U: Into<Complex64> {
-
-    // Conversions
-    let a_c: Complex64 = a.into();
-    let s_f: f64 = s.into();
-
-    // If a is negative and even, we use Bernoulli
-    if s_f == 0.0 || (s_f.is_sign_negative() && s_f % 2.0 == 0.0) {
-        let ber: Poly = Poly::bernoulli(-s_f as usize + 1);
-        return -ber.compute_complex(a_c) / (-s_f + 1.0);
-    }
-
-    let mut res: Complex64 = Complex64::new(1.0 / (s_f - 1.0), 0.0);
-
-    let mut n: usize = 0;
-    let mut sign: f64 = -1.0;
-    let mut div: f64;
-    let mut term: Complex64;
-
-    'convergence: loop {
-
-        if n >= 15 {
-            break 'convergence;
-        }
-
-        sign *= -1.0;
-        div = factorial(n) as f64;
-        term = stieltjes(n, a_c);
-
-        res += sign * term * (s_f - 1.0).powi(n as i32) / div;
-
-        n += 1;
     }
 
     res
