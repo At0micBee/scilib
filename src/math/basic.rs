@@ -10,7 +10,6 @@ use std::f64::consts::FRAC_2_SQRT_PI;   // 2 / sqrt(Pi)
 
 use super::{                            // Using parts from the crate
     super::constant,                    // Calling scilib constants
-    super::integration::d1,
     polynomial::Poly                    // Bernoulli polynomials
 };
 
@@ -21,27 +20,8 @@ use num_complex::Complex64;             // Using complex numbers from the num cr
 /// Precision used for convergence
 const PRECISION: f64 = 1.0e-12;
 
-/// Stieltjes gamma computation precision
-const STIELTJES_M: usize = 1_000_000;
-
 /// Maximum iteration count for convergence
 const MAX_ITER: usize = 200;
-
-const PRIMES: [f64; 200] = [
-    2.0, 3.0, 5.0, 7.0, 11.0, 13.0, 17.0, 19.0, 23.0, 29.0, 31.0, 37.0, 41.0, 43.0, 47.0, 53.0, 59.0, 61.0, 67.0, 71.0,
-    73.0, 79.0, 83.0, 89.0, 97.0, 101.0, 103.0, 107.0, 109.0, 113.0, 127.0, 131.0, 137.0, 139.0, 149.0, 151.0, 157.0,
-    163.0, 167.0, 173.0, 179.0, 181.0, 191.0, 193.0, 197.0, 199.0, 211.0, 223.0, 227.0, 229.0, 233.0, 239.0, 241.0,
-    251.0, 257.0, 263.0, 269.0, 271.0, 277.0, 281.0, 283.0, 293.0, 307.0, 311.0, 313.0, 317.0, 331.0, 337.0, 347.0,
-    349.0, 353.0, 359.0, 367.0, 373.0, 379.0, 383.0, 389.0, 397.0, 401.0, 409.0, 419.0, 421.0, 431.0, 433.0, 439.0,
-    443.0, 449.0, 457.0, 461.0, 463.0, 467.0, 479.0, 487.0, 491.0, 499.0, 503.0, 509.0, 521.0, 523.0, 541.0, 547.0,
-    557.0, 563.0, 569.0, 571.0, 577.0, 587.0, 593.0, 599.0, 601.0, 607.0, 613.0, 617.0, 619.0, 631.0, 641.0, 643.0,
-    647.0, 653.0, 659.0, 661.0, 673.0, 677.0, 683.0, 691.0, 701.0, 709.0, 719.0, 727.0, 733.0, 739.0, 743.0, 751.0,
-    757.0, 761.0, 769.0, 773.0, 787.0, 797.0, 809.0, 811.0, 821.0, 823.0, 827.0, 829.0, 839.0, 853.0, 857.0, 859.0,
-    863.0, 877.0, 881.0, 883.0, 887.0, 907.0, 911.0, 919.0, 929.0, 937.0, 941.0, 947.0, 953.0, 967.0, 971.0, 977.0,
-    983.0, 991.0, 997.0, 1009.0, 1013.0, 1019.0, 1021.0, 1031.0, 1033.0, 1039.0, 1049.0, 1051.0, 1061.0, 1063.0, 1069.0,
-    1087.0, 1091.0, 1093.0, 1097.0, 1103.0, 1109.0, 1117.0, 1123.0, 1129.0, 1151.0, 1153.0, 1163.0, 1171.0, 1181.0,
-    1187.0, 1193.0, 1201.0, 1213.0, 1217.0, 1223.0
-];
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -425,39 +405,6 @@ pub fn falling_factorial<T, U>(x: T, k: U) -> f64
 where T: Into<f64>, U: Into<usize> {
     let z: f64 = x.into();
     (0..k.into()).fold(1.0, |res, val| res * (z - val as f64))
-}
-
-/// # Stieltjes Gamma function
-/// 
-/// ## Definition
-/// Based on the Stieltjes coefficients, the [Stieltjes gamma function](https://en.wikipedia.org/wiki/Stieltjes_constants)
-/// computes associated values, based on the formula:
-/// $$
-/// \gamma_n(x) = \lim_{m \to \infty} \sum_{k=0}^m \left( \frac{\ln(k+x)^n}{k+x} - \frac{\ln(m+x)^{n+1}}{n+1} \right)
-/// $$
-/// 
-/// ## Inputs
-/// - `n`: the order of the Stieltjes function to use.
-/// - `a`: the value at which to compute the function.
-/// 
-/// Returns the value of Gamma_n(a). At the moment, the results are only valid for the first few
-/// orders, as the computation is very expansive. To get the basic Stieltjes coefficient, set `a=1`.
-/// 
-/// ## Example
-/// ```
-/// # use scilib::math::basic::stieltjes;
-/// let res1 = stieltjes(0, 1.0.into());
-/// assert!((res1.re - 0.577215664).abs() <= 1e-6);
-/// ```
-pub fn stieltjes(n: usize, a: Complex64) -> Complex64 {
-
-    let mut res: Complex64 = - (a + STIELTJES_M as f64).ln().powi(n as i32 + 1) / (n as f64 + 1.0);
-
-    for k in 0..STIELTJES_M {
-        res += (a + k as f64).ln().powi(n as i32) / (a + k as f64);
-    }
-
-    res
 }
 
 /// # Polylogarithm
