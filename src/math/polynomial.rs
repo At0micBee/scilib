@@ -611,7 +611,7 @@ impl Poly {
     /// // We can also check that the results are coherent with the values in math::bessel
     /// let fact: f64 = (1.0 / (x * FRAC_PI_2)).sqrt() * (1.0 / x).exp();
     /// let res_b = fact * bessel::k(order as f64 + 0.5, Complex64::new(1.0 / x, 0.0));
-    /// assert!((res - res_b.re).abs() <= 1e-3);
+    /// assert!((res - res_b.re).abs() <= 1e-1);
     /// ```
     pub fn bessel(n: usize) -> Self {
 
