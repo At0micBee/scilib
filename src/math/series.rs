@@ -159,11 +159,12 @@ pub fn std_dev(val: &[f64]) -> f64 {
 /// 
 /// ## Example
 /// ```
+/// # use scilib::math::basic;
 /// # use scilib::math::series::skewness;
 /// # use scilib::math::distribution;
 /// # use scilib::range;
 /// let r: Vec<f64> = range::linear(-10, 10, 10000);
-/// let g: Vec<f64> = r.iter().map(|x| distribution::gaussian(1.0, 0.0, 1.7, *x)).collect();
+/// let g: Vec<f64> = r.iter().map(|x| basic::gaussian(1.0, 0.0, 1.7, *x)).collect();
 /// let s: f64 = skewness(&g);
 /// assert!((s - 1.348759).abs() <= 1e-3);
 /// ```
@@ -187,11 +188,12 @@ pub fn skewness(val: &[f64]) -> f64 {
 /// 
 /// ## Example
 /// ```
+/// # use scilib::math::basic;
 /// # use scilib::math::series::kurtosis;
 /// # use scilib::math::distribution;
 /// # use scilib::range;
 /// let r: Vec<f64> = range::linear(-10, 10, 10000);
-/// let g: Vec<f64> = r.iter().map(|x| distribution::gaussian(1.0, 0.0, 1.7, *x)).collect();
+/// let g: Vec<f64> = r.iter().map(|x| basic::gaussian(1.0, 0.0, 1.7, *x)).collect();
 /// let s: f64 = kurtosis(&g);
 /// assert!((s - 0.298867).abs() <= 1e-3);
 /// ```
@@ -221,12 +223,13 @@ pub fn kurtosis(val: &[f64]) -> f64 {
 /// 
 /// ## Example
 /// ```
+/// # use scilib::math::basic;
 /// # use scilib::math::series::student_t;
 /// # use scilib::math::distribution;
 /// # use scilib::range;
 /// let r: Vec<f64> = range::linear(-10, 10, 1000);
-/// let g: Vec<f64> = r.iter().map(|x| distribution::gaussian(1.0, 0.0, 1.7, *x)).collect();
-/// let h: Vec<f64> = r.iter().map(|x| distribution::gaussian(1.1, -0.2, 1.5, *x)).collect();
+/// let g: Vec<f64> = r.iter().map(|x| basic::gaussian(1.0, 0.0, 1.7, *x)).collect();
+/// let h: Vec<f64> = r.iter().map(|x| basic::gaussian(1.1, -0.2, 1.5, *x)).collect();
 /// let t = student_t(&g, &h);
 /// ```
 pub fn student_t(val_a: &[f64], val_b: &[f64]) -> f64 {

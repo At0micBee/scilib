@@ -32,7 +32,7 @@ pub fn frequency(temperature: f64, nu: f64) -> f64 {
 
     let factor: f64 = 2.0 * nu.powi(3) * cst::H / cst::C.powi(2);
 
-    factor / ((cst::H * nu / (cst::K_B * temperature)).exp() - 1.0)
+    factor / (cst::H * nu / (cst::K_B * temperature)).exp_m1()
 }
 
 /// # Frequency Planck's law (spectrum)
@@ -63,7 +63,7 @@ pub fn frequency_vec(temperature: f64, nu: &[f64]) -> Vec<f64> {
     let factor: f64 = 2.0 * cst::H / cst::C.powi(2);
     let pre: f64 = cst::H / (cst::K_B * temperature);
 
-    nu.iter().map(|val| factor * val.powi(3) / ((pre * val).exp() - 1.0) ).collect()
+    nu.iter().map(|val| factor * val.powi(3) / (pre * val).exp_m1() ).collect()
 }
 
 /// # Wavelength Planck's law
@@ -90,7 +90,7 @@ pub fn wavelength(temperature: f64, lambda: f64) -> f64 {
 
     let factor: f64 = 2.0 * cst::H * cst::C.powi(2) / lambda.powi(5);
 
-    factor / ((cst::H * cst::C / (lambda * cst::K_B * temperature)).exp() - 1.0)
+    factor / (cst::H * cst::C / (lambda * cst::K_B * temperature)).exp_m1()
 }
 
 /// # Wavelength Planck's law (spectrum)
@@ -120,7 +120,7 @@ pub fn wavelength_vec(temperature: f64, lambda: &[f64]) -> Vec<f64> {
     let factor: f64 = 2.0 * cst::H * cst::C.powi(2);
     let pre: f64 = cst::H * cst::C / (cst::K_B * temperature);
 
-    lambda.iter().map(|val| factor / (val.powi(5) * ( (pre / val).exp() - 1.0 )) ).collect()
+    lambda.iter().map(|val| factor / (val.powi(5) * (pre / val).exp_m1()) ).collect()
 }
 
 /// # Wavenumber Planck's law
@@ -142,7 +142,7 @@ pub fn wavenumber(temperature: f64, number: f64) -> f64 {
 
     let factor: f64 = 2.0 * cst::H * cst::C.powi(2) * number.powi(3);
 
-    factor / ((cst::H * cst::C * number / (cst::K_B * temperature)).exp() - 1.0)
+    factor / (cst::H * cst::C * number / (cst::K_B * temperature)).exp_m1()
 }
 
 /// # Wavenumber Planck's law (spectrum)
@@ -165,7 +165,7 @@ pub fn wavenumber_vec(temperature: f64, number: &[f64]) -> Vec<f64> {
     let factor: f64 = 2.0 * cst::H * cst::C.powi(2);
     let pre: f64 = cst::H * cst::C / (cst::K_B * temperature);
 
-    number.iter().map(|val| factor * val.powi(3) / ( (pre * val).exp() - 1.0) ).collect()
+    number.iter().map(|val| factor * val.powi(3) / (pre * val).exp_m1() ).collect()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

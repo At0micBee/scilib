@@ -68,13 +68,13 @@ impl Cartesian {
     /// ```
     /// # use scilib::coordinate::cartesian::Cartesian;
     /// let m = Cartesian { x: 0.0, y: 0.0, z: 0.0 };
-    /// let n = Cartesian::new();
+    /// let n = Cartesian::origin();
     /// let d = Cartesian::default();
     /// 
     /// assert_eq!(m, n);
     /// assert_eq!(n, d);
     /// ```
-    pub const fn new() -> Self {
+    pub const fn origin() -> Self {
         Self {
             x: 0.0,
             y: 0.0,
@@ -139,6 +139,23 @@ impl Cartesian {
         (self.x.powi(2) + self.y.powi(2) + self.z.powi(2)).sqrt()
     }
 
+    /// # Distance squared between two points
+    /// 
+    /// Computes the square of the distance between two points. As the distance is the L2 norm,
+    /// it requires taking the square root of the sum of the squared difference of each term.
+    /// Computing the distance squared is therefore more efficient, as it simply skips computing
+    /// the square root followed by the the squaring operation.
+    /// 
+    /// ```
+    /// # use scilib::coordinate::cartesian::Cartesian;
+    /// let f = Cartesian::from(1.0, 2, 0.5);
+    /// let p = Cartesian::from(2, -1, 3.5);
+    /// assert!((f.distance_square(p) - 19.0).abs() < 1.0e-15);
+    /// ```
+    pub fn distance_square(self, rhs: Self) -> f64 {
+        (rhs.x - self.x).powi(2) + (rhs.y - self.y).powi(2) + (rhs.z - self.z).powi(2)
+    }
+
     /// # Distance between two points
     /// 
     /// Computes the distance between two points in space.
@@ -147,12 +164,10 @@ impl Cartesian {
     /// # use scilib::coordinate::cartesian::Cartesian;
     /// let f = Cartesian::from(1.0, 2, 0.5);
     /// let p = Cartesian::from(2, -1, 3.5);
-    /// 
     /// assert!((f.distance(p) - 4.358898943540674).abs() < 1.0e-15);
     /// ```
-    pub fn distance(self, other: Self) -> f64 {
-        let dist: Self = other - self;
-        (dist.x.powi(2) + dist.y.powi(2) + dist.z.powi(2)).sqrt()
+    pub fn distance(self, rhs: Self) -> f64 {
+        self.distance_square(rhs).sqrt()
     }
 
     /// # Coordinate rotation
@@ -170,33 +185,32 @@ impl Cartesian {
     /// 
     /// // Setting a point in y=0, and rotating it 90° trigonometry-wise
     /// let f = Cartesian::from(0, 1, 0);
-    /// let res = f.rotate(FRAC_PI_2, 0, 0);
+    /// let res = f.rotate(FRAC_PI_2, 0.0, 0.0);
     /// 
     /// assert_eq!(res.x, -1.0);
-    /// assert!((res.y - 0.0).abs() < 1.0e-15);
+    /// assert!((res.y - 0.0).abs() < f64::EPSILON);
     /// assert_eq!(res.z, 0.0);
     /// ```
-    pub fn rotate<T, U, V>(&self, yaw: T, pitch: U, roll: V) -> Self
-    where T: Into<f64>, U: Into<f64>, V: Into<f64> {
+    pub fn rotate(&self, yaw: f64, pitch: f64, roll: f64) -> Self {
 
-        let y: f64 = yaw.into();
-        let p: f64 = pitch.into();
-        let r: f64 = roll.into();
+        let (y_sin, y_cos): (f64, f64) = yaw.sin_cos();
+        let (p_sin, p_cos): (f64, f64) = pitch.sin_cos();
+        let (r_sin, r_cos): (f64, f64) = roll.sin_cos();
 
         // First row of the matrix
-        let a11: f64 = y.cos() * p.cos();
-        let a12: f64 = y.cos() * p.sin() * r.sin() - y.sin() * r.cos();
-        let a13: f64 = y.cos() * p.sin() * r.cos() + y.sin() * r.sin();
+        let a11: f64 = y_cos * p_cos;
+        let a12: f64 = y_cos * p_sin * r_sin - y_sin * r_cos;
+        let a13: f64 = y_cos * p_sin * r_cos + y_sin * r_sin;
 
         // Second row
-        let a21: f64 = y.sin() * p.cos();
-        let a22: f64 = y.sin() * p.sin() * r.sin() + y.cos() * r.cos();
-        let a23: f64 = y.sin() * p.sin() * r.cos() - y.cos() * r.sin();
+        let a21: f64 = y_sin * p_cos;
+        let a22: f64 = y_sin * p_sin * r_sin + y_cos * r_cos;
+        let a23: f64 = y_sin * p_sin * r_cos - y_cos * r_sin;
 
         // Third row
-        let a31: f64 = -p.sin();
-        let a32: f64 = p.cos() * r.sin();
-        let a33: f64 = p.cos() * r.cos();
+        let a31: f64 = -p_sin;
+        let a32: f64 = p_cos * r_sin;
+        let a33: f64 = p_cos * r_cos;
 
         // Following matrix multiplication
         Self {
