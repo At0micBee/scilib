@@ -8,10 +8,7 @@
 
 use std::f64::consts::FRAC_2_SQRT_PI;   // 2 / sqrt(Pi)
 
-use super::{                            // Using parts from the crate
-    super::constant,                    // Calling scilib constants
-    polynomial::Poly                    // Bernoulli polynomials
-};
+use super::super::constant;             // Calling scilib constants
 
 use num_complex::Complex64;             // Using complex numbers from the num crate
 
